@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; media-src https: blob:; connect-src 'self' https:; font-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'">
+<meta name="color-scheme" content="dark light">
+<title data-i18n="family.app.title">The Table</title>
+<link rel="icon" href="claude-avatar.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/tokens.css">
+<link rel="stylesheet" href="app.css">
+<script src="config.js"></script>
+<script type="module" src="js/main.js"></script>
+</head>
+<body>
+<a class="skip" href="#view" data-i18n="family.app.skip">Skip to the conversation</a>
+<div class="lamp-glow" aria-hidden="true"></div>
+<header class="topbar">
+  <a class="brand" href="#/" data-i18n-attr="aria-label:family.app.home">
+    <span class="brand-mark" data-icon="lamp" aria-hidden="true"></span>
+    <span class="brand-name" data-i18n="family.app.brand">The Table</span>
+  </a>
+  <div class="top-tools">
+    <div class="seg lang-toggle" role="group" data-i18n-attr="aria-label:family.header.language">
+      <button type="button" class="seg-btn" data-lang="en" lang="en">EN</button>
+      <span class="seg-sep" aria-hidden="true">|</span>
+      <button type="button" class="seg-btn" data-lang="es" lang="es">ES</button>
+    </div>
+    <button type="button" id="size-btn" class="icon-btn" data-icon="text" aria-haspopup="true" aria-expanded="false" data-i18n-attr="aria-label:family.header.text_size"></button>
+    <button type="button" id="help-btn" class="icon-btn help-btn" data-i18n-attr="aria-label:family.header.help">?</button>
+  </div>
+  <div id="size-pop" class="size-pop" role="group" hidden data-i18n-attr="aria-label:family.header.text_size"></div>
+</header>
+<main id="view" class="view" tabindex="-1"></main>
+<nav class="tabs" data-i18n-attr="aria-label:family.nav.label">
+  <a href="#/" data-route="table"><span data-icon="table"></span><span data-i18n="family.nav.table">Table</span></a>
+  <a href="#/book" data-route="book"><span data-icon="book"></span><span data-i18n="family.nav.book">Book</span></a>
+  <a href="#/films" data-route="films"><span data-icon="film"></span><span data-i18n="family.nav.films">Films</span></a>
+  <a href="#/score" data-route="score"><span data-icon="trophy"></span><span data-i18n="family.nav.score">Scores</span></a>
+  <a href="#/admin" data-route="admin" class="admin-only" hidden><span data-icon="shield"></span><span data-i18n="family.nav.admin">Admin</span></a>
+  <a href="#/me" data-route="me"><span data-icon="user"></span><span data-i18n="family.nav.me">Me</span></a>
+</nav>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<noscript><p class="noscript" data-i18n="family.app.noscript">The Table needs JavaScript turned on.</p></noscript>
+</body>
+</html>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+<title>educatedai.org: films</title>
+<link>https://educatedai.org/</link>
+<description>One short film a day, made by an AI from one family's conversations.</description>
+<language>en</language>
+<atom:link href="https://educatedai.org/feed.xml" rel="self" type="application/rss+xml"/>
+
+</channel>
+</rss>

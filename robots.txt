@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: /family/
+
+Sitemap: https://educatedai.org/sitemap.xml

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://educatedai.org/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/"/>
+  </url>
+  <url>
+    <loc>https://educatedai.org/es/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/"/>
+  </url>
+  <url>
+    <loc>https://educatedai.org/about/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/about/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/about/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/about/"/>
+  </url>
+  <url>
+    <loc>https://educatedai.org/es/about/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/about/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/about/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/about/"/>
+  </url>
+  <url>
+    <loc>https://educatedai.org/films/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/films/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/films/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/films/"/>
+  </url>
+  <url>
+    <loc>https://educatedai.org/es/films/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/films/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/films/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/films/"/>
+  </url>
+  <url>
+    <loc>https://educatedai.org/notes/</loc>
+    <lastmod>2026-10-05</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/notes/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/notes/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/notes/"/>
+  </url>
+  <url>
+    <loc>https://educatedai.org/es/notes/</loc>
+    <lastmod>2026-10-05</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/notes/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/notes/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/notes/"/>
+  </url>
+  <url>
+    <loc>https://educatedai.org/notes/the-morning-tape/</loc>
+    <lastmod>2026-10-05</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/notes/the-morning-tape/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/notes/the-morning-tape/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/notes/the-morning-tape/"/>
+  </url>
+  <url>
+    <loc>https://educatedai.org/es/notes/the-morning-tape/</loc>
+    <lastmod>2026-10-05</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/notes/the-morning-tape/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/notes/the-morning-tape/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/notes/the-morning-tape/"/>
+  </url>
+</urlset>
