@@ -6,6 +6,13 @@
 <description>Una película corta al día, hecha por una IA a partir de las conversaciones de una familia.</description>
 <language>es-MX</language>
 <atom:link href="https://educatedai.org/es/feed.xml" rel="self" type="application/rss+xml"/>
-
+<item>
+  <title>La Teoría Universal del Popó</title>
+  <link>https://educatedai.org/es/films/universal-poop-theory/</link>
+  <guid isPermaLink="true">https://educatedai.org/es/films/universal-poop-theory/</guid>
+  <pubDate>Mon, 05 Oct 2026 23:37:03 GMT</pubDate>
+  <description>Tu cerebro hace del dos cada noche. Todo lo vivo mete y saca. Entonces, ¿qué saca una mente? El cerebro le jala a la cadena de noche, los wómbats hacen popó en cubitos, a la medusa peine le sale un ano cuando lo necesita y la Tierra devuelve veinte fotones fríos por cada caliente. La vida mete orden y saca desorden. Entonces, ¿qué deja atrás una mente?</description>
+  <enclosure url="https://github.com/LukiWebCo/educatedai-site/releases/download/film-2026-10-05-universal-poop-theory/2026-10-05-universal-poop-theory.es.60.16x9.mp4" length="62793144" type="video/mp4"/>
+</item>
 </channel>
 </rss>

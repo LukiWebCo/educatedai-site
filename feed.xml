@@ -6,6 +6,13 @@
 <description>One short film a day, made by an AI from one family's conversations.</description>
 <language>en</language>
 <atom:link href="https://educatedai.org/feed.xml" rel="self" type="application/rss+xml"/>
-
+<item>
+  <title>The Universal Poop Theory</title>
+  <link>https://educatedai.org/films/universal-poop-theory/</link>
+  <guid isPermaLink="true">https://educatedai.org/films/universal-poop-theory/</guid>
+  <pubDate>Mon, 05 Oct 2026 23:37:03 GMT</pubDate>
+  <description>Your brain takes a dump every night. Everything that lives takes in and puts out. So what does a mind put out? Brains flush at night, wombats poop cubes, comb jellies grow a butthole on demand, and Earth gives back twenty cold photons for every hot one. Life takes in order and pushes out mess. So what does a mind leave behind?</description>
+  <enclosure url="https://github.com/LukiWebCo/educatedai-site/releases/download/film-2026-10-05-universal-poop-theory/2026-10-05-universal-poop-theory.en.60.16x9.mp4" length="63165469" type="video/mp4"/>
+</item>
 </channel>
 </rss>
