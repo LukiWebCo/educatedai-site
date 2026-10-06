@@ -10,7 +10,7 @@ import { bookView, chapterView } from './views/book.js';
 import { filmsView } from './views/films.js';
 import { meView } from './views/me.js';
 import { scoreView } from './views/score.js';
-import { newThreadView, shelfView, tableView, threadView } from './views/table.js';
+import { allView, newThreadView, shelfView, tableView, threadView } from './views/table.js';
 
 const SCALES = { 1: 1, 2: 1.15, 3: 1.32, 4: 1.55 };
 const view = document.getElementById('view');
@@ -139,7 +139,7 @@ async function route() {
   if (a === 'login' && state.me) { go('#/'); return; }
   document.body.classList.remove('games-tv'); // the TV screen re-adds it; leaving it must restore the chrome
   document.body.classList.remove('games-play');
-  markNav(isPublic ? '' : (a || 'table') === 't' || a === 'shelf' || a === 'new' ? 'table' : (a || 'table'));
+  markNav(isPublic ? '' : (a || 'table') === 't' || a === 'shelf' || a === 'new' || a === 'all' ? 'table' : (a || 'table'));
   view.replaceChildren(loading());
   let node;
   try {
@@ -149,6 +149,7 @@ async function route() {
       case 'login': node = await loginView(signedIn); break;
       case 't': node = await threadView(b); break;
       case 'shelf': node = await shelfView(b); break;
+      case 'all': node = await allView(); break;
       case 'new': node = await newThreadView(b); break;
       case 'book': node = b ? await chapterView(b) : await bookView(); break;
       case 'films': node = await filmsView(); break;

@@ -97,25 +97,42 @@ function mentionPicker(ta, grow) {
   return { box, open: () => { update(); } };
 }
 
+const MARKS = {
+  mentioned: ['at', () => t('family.table.mark_mentioned')],
+  replied: ['sms', () => t('family.table.mark_replied')],
+  new_today: ['lamp', () => t('family.table.mark_new')],
+};
+
 function threadCard(th, queued) {
   const last = th.last_post;
-  return h('a', { class: 'card thread-card', href: '#/t/' + th.id },
+  const mark = MARKS[th.mark];
+  const lang = currentLang();
+  const excerpt = last ? (last.alt && last.alt.lang === lang && last.lang !== lang ? last.alt.excerpt : last.excerpt) : '';
+  return h('a', { class: 'card thread-card' + (mark ? ' thread-marked mark-' + th.mark : ''), href: '#/t/' + th.id, 'data-thread': th.id, 'data-mark': th.mark || null },
+    mark ? h('span', { class: 'pill pill-mark', 'data-test': 'mark-' + th.mark }, icon(mark[0], 'icon icon-inline'), h('span', null, mark[1]())) : null,
     h('div', { class: 'thread-card-top' },
       h('h3', { class: 'thread-title', text: titleOf(th) }),
       h('span', { class: 'pill', text: (th.post_count === 1 ? t('family.table.posts_count.one', { n: th.post_count }) : t('family.table.posts_count.other', { n: th.post_count })) })),
     last ? h('p', { class: 'thread-last' },
       h('strong', { text: (last.claude ? 'Claude' : last.author) + ': ' }),
-      h('span', { text: last.claude ? last.excerpt.replace(/\[([^\]]+)\]\([^)]*\)/g, '$1') : last.excerpt })) : null,
+      h('span', { lang: last.alt && excerpt === last.alt.excerpt ? last.alt.lang : last.lang, text: last.claude ? excerpt.replace(/\[([^\]]+)\]\([^)]*\)/g, '$1') : excerpt })) : null,
     h('div', { class: 'thread-meta' },
-      h('span', { text: ago(th.last_post_at || th.created_at, currentLang()) }),
+      h('span', { text: ago(th.active_at || th.last_post_at || th.created_at, lang) }),
       queued ? h('span', { class: 'pill pill-thinking', text: t('family.table.claude_thinking_short') }) : null));
 }
 
+const threadsCount = (n) => (n === 1 ? t('family.table.threads_count.one', { n }) : t('family.table.threads_count.other', { n }));
+const topicsCount = (n) => (n === 1 ? t('family.all.topics_count.one', { n }) : t('family.all.topics_count.other', { n }));
+
+// The calm home (owner, 2026-10-06: "so many topics at once"): at most three blocks. Claude's question of the day,
+// today's film (only on a film day), and "What's going on": at most three conversations, the ones that mention or
+// answer me first. A quiet week gets one gentle line and the day's new starter topic. Everything else is one quiet
+// link away, on All conversations.
 export async function tableView() {
   const root = h('section', { class: 'page table-page' });
   let feed;
   try {
-    [feed] = await Promise.all([get('/api/feed'), loadShelves()]);
+    feed = await get('/api/feed');
   } catch (e) {
     return errorBox(e, () => go('#/'));
   }
@@ -150,49 +167,56 @@ export async function tableView() {
           icon('sms'), h('span', null, t('family.table.film_thread'))) : null)));
   }
 
-  if (feed.mentioned && feed.mentioned.length) {
-    root.append(h('section', { class: 'card mentioned-card', 'data-test': 'mentioned' },
-      h('p', { class: 'eyebrow' }, icon('at', 'icon icon-inline'), h('span', null, t('family.mention.you_were'))),
-      feed.mentioned.map((m) => h('a', { class: 'mention-link', href: '#/t/' + m.thread_id },
-        h('span', { class: 'grow', text: t('family.mention.in_thread', { who: m.by, title: (lang === 'es' && m.title_es) || m.title }) }),
-        h('span', { class: 'muted small', text: ago(m.at, lang) })))));
-  }
-
-  if (feed.claude_thinking.length) {
-    root.append(h('a', { class: 'thinking-banner', href: '#/t/' + feed.claude_thinking[0] }, thinking()));
-  }
-
   const queued = new Set(feed.claude_thinking);
-  root.append(h('h2', { class: 'section-title', text: t('family.table.active') }));
+  const convs = feed.conversations || [];
+  const going = h('section', { class: 'going-on', 'aria-labelledby': 'going-on-h', 'data-test': 'going-on' },
+    h('h2', { id: 'going-on-h', class: 'section-title', text: t('family.table.active') }));
   const list = h('div', { class: 'stack' });
-  const active = feed.active_threads.filter((x) => x.id !== q.thread_id && !(film && x.id === film.thread_id));
-  if (!active.length) list.append(h('p', { class: 'muted', text: t('family.table.empty') }));
-  for (const th of active.slice(0, 8)) list.append(threadCard(th, queued.has(th.id)));
-  root.append(list);
-
-  root.append(h('div', { class: 'row space' },
-    h('h2', { class: 'section-title', text: t('family.table.shelves') }),
-    h('a', { class: 'btn btn-quiet btn-small', href: '#/new' }, icon('plus'), h('span', null, t('family.table.new_thread')))));
-  const shelves = h('div', { class: 'shelves' });
-  for (const s of state.shelves) {
-    shelves.append(h('a', { class: 'shelf shelf-' + s.source, href: '#/shelf/' + s.id },
-      h('span', { class: 'shelf-title', text: shelfTitle(s) }),
-      h('span', { class: 'shelf-count', text: (s.thread_count === 1 ? t('family.table.threads_count.one', { n: s.thread_count }) : t('family.table.threads_count.other', { n: s.thread_count })) })));
-  }
-  root.append(shelves);
-
-  if (feed.scoreboard_top.length) {
-    root.append(h('div', { class: 'row space' },
-      h('h2', { class: 'section-title', text: t('family.table.score_title') }),
-      h('a', { class: 'link', href: '#/score' }, t('family.table.score_all'))));
-    const ol = h('ol', { class: 'card podium' });
-    feed.scoreboard_top.forEach((r, i) => ol.append(h('li', null,
-      h('span', { class: 'medal medal-' + (i + 1), text: String(i + 1) }), avatar(r.member, 's'),
-      h('span', { class: 'grow', text: r.member.display_name }),
-      h('span', { class: 'score', text: (r.score > 0 ? '+' : '') + r.score }))));
-    root.append(ol);
-  }
+  if (!convs.length) list.append(h('p', { class: 'quiet-line', 'data-test': 'quiet', text: feed.new_today ? t('family.table.quiet') : t('family.table.quiet_none') }));
+  for (const th of convs) list.append(threadCard(th, queued.has(th.id)));
+  if (feed.new_today) list.append(threadCard(feed.new_today, queued.has(feed.new_today.id)));
+  going.append(list);
+  root.append(going,
+    h('a', { class: 'all-link', href: '#/all', 'data-test': 'all-link' }, h('span', null, t('family.table.all_link')), icon('next', 'icon icon-inline')));
   root.append(h('a', { class: 'fab', href: '#/new', 'data-i18n-attr': 'aria-label:family.table.new_thread', 'aria-label': t('family.table.new_thread') }, icon('plus')));
+  return root;
+}
+
+// A collapsed group: a big summary row (title, count, "talked about this week"), the thread cards inside.
+function group(title, threads, { count, active, test, lede, cls = '' } = {}) {
+  return h('details', { class: 'card group ' + cls, 'data-test': test },
+    h('summary', { class: 'group-sum' },
+      h('span', { class: 'group-title', text: title }),
+      h('span', { class: 'group-meta' },
+        h('span', { class: 'group-count', text: count }),
+        active ? h('span', { class: 'pill pill-active', text: t('family.all.active_week') }) : null),
+      icon('next', 'icon group-chev')),
+    h('div', { class: 'stack group-body' }, lede ? h('p', { class: 'muted', text: lede }) : null,
+      threads.map((th) => threadCard(th, th.claude_state === 'queued'))));
+}
+
+// All conversations: every shelf collapsed with its count, the ones with talk this week first. Topics Claude hasn't
+// opened yet wait under one "Coming up" group, so nothing is hidden for good.
+export async function allView() {
+  let data;
+  try {
+    [data] = await Promise.all([get('/api/conversations'), loadShelves()]);
+  } catch (e) { return errorBox(e, () => go('#/all')); }
+  const root = h('section', { class: 'page all-page' },
+    backLink('#/', t('family.nav.table')),
+    h('h1', { text: t('family.all.heading') }),
+    h('p', { class: 'lede', text: t('family.all.lede') }));
+  const list = h('div', { class: 'stack groups' });
+  if (!data.groups.length) list.append(h('p', { class: 'muted', text: t('family.table.empty') }));
+  for (const g of data.groups) {
+    list.append(group(g.shelf ? shelfTitle(g.shelf) : t('family.all.other'), g.threads,
+      { count: threadsCount(g.count), active: g.active > 0, test: 'group', cls: g.shelf ? 'group-' + g.shelf.source : 'group-other' }));
+  }
+  if (data.coming_up.length) {
+    list.append(group(t('family.all.coming_up'), data.coming_up,
+      { count: topicsCount(data.coming_up.length), test: 'coming-up', lede: t('family.all.coming_up_lede'), cls: 'group-coming' }));
+  }
+  root.append(list, h('a', { class: 'btn btn-primary btn-big', href: '#/new' }, icon('plus'), h('span', null, t('family.table.new_thread'))));
   return root;
 }
 
@@ -203,11 +227,17 @@ export async function shelfView(id) {
   } catch (e) { return errorBox(e, () => go('#/shelf/' + id)); }
   const shelf = shelves.find((s) => String(s.id) === String(id));
   const root = h('section', { class: 'page' },
-    backLink('#/', t('family.nav.table')),
+    backLink('#/all', t('family.all.heading')),
     h('h1', { text: shelf ? shelfTitle(shelf) : t('family.table.shelves') }));
   const list = h('div', { class: 'stack' });
-  if (!threads.length) list.append(h('p', { class: 'muted', text: t('family.table.shelf_empty') }));
-  for (const th of threads) list.append(threadCard(th, th.claude_state === 'queued'));
+  const open = threads.filter((th) => !th.dormant);
+  const later = threads.filter((th) => th.dormant);
+  if (!open.length) list.append(h('p', { class: 'muted', text: t('family.table.shelf_empty') }));
+  for (const th of open) list.append(threadCard(th, th.claude_state === 'queued'));
+  if (later.length) {
+    list.append(group(t('family.all.coming_up'), later,
+      { count: topicsCount(later.length), test: 'coming-up', lede: t('family.all.coming_up_lede'), cls: 'group-coming' }));
+  }
   root.append(list, h('a', { class: 'btn btn-primary btn-big', href: '#/new/' + id }, icon('plus'), h('span', null, t('family.table.new_thread'))));
   return root;
 }

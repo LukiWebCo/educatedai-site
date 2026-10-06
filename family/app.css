@@ -207,6 +207,34 @@ select.input { appearance: none; background-image: linear-gradient(45deg, transp
 .thread-last { margin: 0 0 8px; color: var(--eai-color-ink-muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .thread-last strong { color: var(--eai-color-ink); font-weight: 700; }
 .thread-meta { display: flex; gap: var(--eai-space-3); align-items: center; font-size: var(--eai-step--1); color: var(--eai-color-ink-muted); }
+/* the calm home (2026-10-06): marked conversations, the quiet line, one quiet link to everything else */
+.thread-marked { border-color: color-mix(in oklab, var(--eai-color-accent) 55%, transparent); }
+.mark-new_today { border-color: color-mix(in oklab, var(--eai-color-hit) 55%, transparent); }
+.pill-mark { gap: 6px; margin-bottom: var(--eai-space-2); background: var(--eai-color-accent); color: var(--eai-color-bg); font-weight: 700; }
+.mark-new_today .pill-mark { background: var(--eai-color-hit); }
+.pill-active { background: color-mix(in oklab, var(--eai-color-hit) 22%, transparent); color: var(--eai-color-ink); white-space: normal; }
+.quiet-line { margin: 0; font-size: var(--eai-step-1); line-height: 1.4; color: color-mix(in oklab, var(--eai-color-ink) 85%, var(--eai-color-ink-muted)); }
+.all-link { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 56px; margin-top: var(--eai-space-5);
+  color: var(--eai-color-accent); font-weight: 700; font-size: var(--eai-step-0); text-underline-offset: 3px; }
+/* All conversations: one collapsed group per shelf */
+.group { padding: 0; overflow: hidden; }
+.group-sum { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: var(--eai-space-3); row-gap: 6px;
+  min-height: 64px; padding: var(--eai-space-3) var(--eai-space-4) var(--eai-space-3) var(--eai-space-5); cursor: pointer; list-style: none; }
+.group-sum::-webkit-details-marker { display: none; }
+.group-sum:focus-visible { outline: 3px solid var(--eai-color-accent); outline-offset: -3px; border-radius: var(--eai-radius-l); }
+.group-title { grid-column: 1; grid-row: 1; min-width: 0; font-weight: 700; font-size: var(--eai-step-1); line-height: 1.25; overflow-wrap: anywhere; }
+.group-meta { grid-column: 1; grid-row: 2; display: flex; flex-wrap: wrap; align-items: center; gap: 6px var(--eai-space-3); font-size: var(--eai-step--1); color: var(--eai-color-ink-muted); }
+.group-chev { grid-column: 2; grid-row: 1 / span 2; width: 26px; height: 26px; transition: transform var(--eai-motion-fast) var(--eai-ease); }
+.group[open] .group-chev { transform: rotate(90deg); }
+.group-body { padding: 0 var(--eai-space-3) var(--eai-space-4); }
+.group-body > .muted { margin: 0 var(--eai-space-2); }
+.group-body .thread-card { box-shadow: none; }
+.group-coming { border-style: dashed; }
+@media (prefers-reduced-motion: reduce) { .group-chev, a.card { transition: none; } a.card:hover { transform: none; } }
+.thread-meta { flex-wrap: wrap; }
+.thread-card-top { flex-wrap: wrap; }
+.thread-card-top .thread-title { flex: 1 1 10em; min-width: 0; overflow-wrap: anywhere; }
+.thread-meta .pill { white-space: normal; }
 .shelves { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--eai-space-3); }
 .shelf { display: flex; flex-direction: column; justify-content: space-between; gap: 6px; min-height: 96px; padding: 14px 14px 12px 18px;
   border-radius: var(--eai-radius-m); text-decoration: none; color: var(--eai-color-ink);
