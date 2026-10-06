@@ -3,8 +3,9 @@
 import { h, icon } from './dom.js';
 import { currentLang, t } from './i18n.js';
 
-export function howtoSource(lang) {
-  const ht = window.EAI && window.EAI.howto;
+// key: 'howto' (the sign-up tour) or 'gameHowto' (Dots & Lines, from the rules card); same shape in config.js.
+export function howtoSource(lang, key = 'howto') {
+  const ht = window.EAI && window.EAI[key];
   const set = ht && (ht[lang] || ht.en);
   if (!set) return null;
   const portrait = window.matchMedia('(orientation: portrait)').matches;
@@ -12,8 +13,8 @@ export function howtoSource(lang) {
   return typeof url === 'string' && /^https:\/\//.test(url) ? url : null;
 }
 
-function howtoPoster() {
-  const p = window.EAI && window.EAI.howtoPoster;
+function howtoPoster(key = 'howtoPoster') {
+  const p = window.EAI && window.EAI[key];
   if (!p) return null;
   const portrait = window.matchMedia('(orientation: portrait)').matches;
   const url = p[portrait ? '9x16' : '16x9'] || p['9x16'] || p['16x9'];
@@ -23,9 +24,9 @@ function howtoPoster() {
 // The phone-friendly player: plays inline (playsinline), starts muted with a big "tap for sound", uses
 // <source type="video/mp4"> (GitHub serves the file as application/octet-stream from an address with no .mp4 in
 // it; the type is how Safari knows it's a video), and if it can't play, offers the same file in the phone's own player.
-function howtoPlayer(src, autoplay) {
+export function howtoPlayer(src, autoplay, posterKey = 'howtoPoster') {
   const video = h('video', { class: 'howto-video', playsinline: true, 'webkit-playsinline': true, preload: 'metadata',
-    poster: howtoPoster() }, h('source', { src, type: 'video/mp4' }));
+    poster: howtoPoster(posterKey) }, h('source', { src, type: 'video/mp4' }));
   const sound = h('button', { class: 'btn btn-primary howto-sound', type: 'button', hidden: true },
     icon('play'), h('span', null, t('family.howto.tap_for_sound')));
   const open = h('a', { class: 'btn btn-quiet btn-big howto-open', href: src, target: '_blank', rel: 'noopener noreferrer' },
