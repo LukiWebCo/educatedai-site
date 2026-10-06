@@ -361,7 +361,7 @@ dialog.sheet h2 { margin: 0; }
 .confirm-text { font-size: var(--eai-step-1); line-height: 1.35; margin-bottom: var(--eai-space-5); }
 .confirm .row { justify-content: flex-end; flex-wrap: wrap; }
 .howto .row { margin-bottom: var(--eai-space-4); }
-.howto-video { display: block; width: 100%; max-height: 70dvh; border-radius: var(--eai-radius-m); background: #000; }
+.howto-video { display: block; width: 100%; max-height: 52dvh; object-fit: contain; border-radius: var(--eai-radius-m); background: #000; }
 .howto-frame { position: relative; }
 .howto-sound { position: absolute; top: var(--eai-space-3); right: var(--eai-space-3); min-height: 56px; font-size: var(--eai-step-1);
   box-shadow: 0 10px 30px -8px rgba(0,0,0,.7); }
@@ -372,7 +372,7 @@ dialog.sheet h2 { margin: 0; }
 .howto-soon { text-align: center; padding: var(--eai-space-2) 0 var(--eai-space-4); }
 .howto-soon .avatar { margin: 0 auto var(--eai-space-3); width: 72px; height: 72px; }
 .howto-soon-title { font-family: var(--eai-font-display); font-size: var(--eai-step-2); font-weight: 800; line-height: 1.15; }
-.howto > .btn-big { position: sticky; bottom: 0; margin-top: var(--eai-space-4); }
+.howto > .btn-big { position: sticky; bottom: 0; z-index: 2; margin-top: var(--eai-space-4); }
 .howto-tips { text-align: left; margin: var(--eai-space-4) 0 0; padding-left: 1.2em; display: grid; gap: 6px; }
 .toast { position: fixed; left: 50%; bottom: calc(100px + env(safe-area-inset-bottom)); z-index: 60; transform: translate(-50%, 20px);
   max-width: min(92vw, 520px); padding: 14px 22px; border-radius: 999px; background: var(--eai-color-ink); color: var(--eai-color-bg);
