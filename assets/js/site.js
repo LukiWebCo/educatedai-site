@@ -42,14 +42,32 @@
     var state = { voice: fig.getAttribute("data-voice"), cut: fig.getAttribute("data-cut"), aspect: null, sound: false };
     var tall = window.matchMedia("(max-width: 720px) and (orientation: portrait), (max-aspect-ratio: 4/5)");
 
+    var openLink = fig.querySelector("[data-open]");
+    var watchdog = null;
+    // the film's cuts: one "full" cut (from 2026-10-06) or the first films' 30 + 60
+    if (!(((data.mp4 || {})[state.voice] || (data.mp4 || {}).en || {})[state.cut])) {
+      state.cut = Object.keys((data.mp4 || {})[state.voice] || (data.mp4 || {}).en || {}).sort()[0] || state.cut;
+    }
+
     function url(v, c, a) {
       var m = data.mp4 || {};
-      var langs = [v, "en", "es"], cuts = [c, "60", "30"], aspects = [a, "16x9", "9x16"];
-      for (var i = 0; i < 3; i++) for (var j = 0; j < 3; j++) for (var k = 0; k < 3; k++) {
+      var langs = [v, "en", "es"], cuts = [c, "full", "60", "30"], aspects = [a, "16x9", "9x16"];
+      for (var i = 0; i < langs.length; i++) for (var j = 0; j < cuts.length; j++) for (var k = 0; k < aspects.length; k++) {
         var u = ((m[langs[i]] || {})[cuts[j]] || {})[aspects[k]];
         if (u) return u;
       }
       return "";
+    }
+
+    // Can't play here (an error, or nothing loaded after a while: iPhones can stall silently on files served as
+    // downloads): offer the same file in the phone's own player. The video keeps trying underneath.
+    function showFallback() {
+      errorBox.hidden = false;
+      soundBtn.hidden = true;
+    }
+    function armWatchdog() {
+      clearTimeout(watchdog);
+      watchdog = setTimeout(function () { if (video.readyState < 2) showFallback(); }, 12000);
     }
 
     function setTracks() {
@@ -80,8 +98,15 @@
       fig.setAttribute("data-cut", state.cut);
       video.poster = (data.poster || {})[state.aspect] || video.poster;
       errorBox.hidden = true;
+      if (openLink) openLink.href = src;
+      // Always a <source type="video/mp4">, never video.src: GitHub serves the files as application/octet-stream
+      // from an address with no .mp4 in it, and the type attribute is how Safari learns it's an MP4.
       video.querySelectorAll("source").forEach(function (s) { s.remove(); });
-      video.src = src;
+      video.removeAttribute("src");
+      var source = document.createElement("source");
+      source.src = src;
+      source.type = "video/mp4";
+      video.insertBefore(source, video.firstChild);
       setTracks();
       video.load();
       if (t) video.addEventListener("loadedmetadata", function once() { video.removeEventListener("loadedmetadata", once); try { video.currentTime = Math.min(t, video.duration || t); } catch (e) {} });
@@ -90,8 +115,15 @@
     }
 
     function play() {
+      armWatchdog();   // asked to play: if nothing has loaded in 12 s, offer the phone's own player
       var p = video.play();
-      if (p && p.catch) p.catch(function () { /* autoplay refused: the controls are there */ video.controls = true; soundBtn.hidden = true; });
+      if (p && p.catch) p.catch(function (e) {
+        if (e && e.name === "NotSupportedError") { showFallback(); return; }   // this browser can't play the file
+        if (e && e.name === "AbortError") return;                             // a newer load() replaced this play
+        /* autoplay refused (e.g. Low Power Mode): the controls are there; nothing loads until a tap */
+        clearTimeout(watchdog);
+        video.controls = true; soundBtn.hidden = true;
+      });
     }
 
     function sync() {
@@ -131,7 +163,9 @@
     };
     if (tall.addEventListener) tall.addEventListener("change", onShape);
 
-    video.addEventListener("error", function () { errorBox.hidden = false; soundBtn.hidden = true; }, true);
-    video.addEventListener("playing", function () { errorBox.hidden = true; });
+    // capture: a failed <source> fires its error on the source element, not the video
+    video.addEventListener("error", showFallback, true);
+    video.addEventListener("loadeddata", function () { clearTimeout(watchdog); });
+    video.addEventListener("playing", function () { clearTimeout(watchdog); errorBox.hidden = true; });
   });
 })();

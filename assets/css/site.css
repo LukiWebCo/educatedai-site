@@ -2,6 +2,7 @@
    Phone first. Chalk on a night-green board, one tangerine ball, lines that draw themselves. */
 
 *,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none !important}  /* components set display; the hidden attribute must still win */
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{
   margin:0;min-height:100vh;color:var(--eai-color-ink);background-color:var(--eai-color-bg);
@@ -116,8 +117,10 @@ main{width:min(1200px,100%);margin:0 auto;padding:0 var(--eai-space-4) var(--eai
   background:var(--eai-color-accent);color:var(--eai-color-bg);font:800 var(--eai-step-1)/1 var(--eai-font-display);font-stretch:85%;
   box-shadow:0 10px 30px -8px rgba(0,0,0,.7);white-space:nowrap}
 .player__sound-dot{width:14px;height:14px;border-radius:50%;background:var(--eai-color-bg);box-shadow:0 0 0 0 rgba(15,26,22,.6)}
-.player__error{position:absolute;left:var(--eai-space-4);right:var(--eai-space-4);bottom:var(--eai-space-4);margin:0;padding:var(--eai-space-3) var(--eai-space-4);
+.player__error{position:absolute;left:var(--eai-space-4);right:var(--eai-space-4);top:var(--eai-space-4);margin:0;padding:var(--eai-space-3) var(--eai-space-4);
   border-radius:var(--eai-radius-s);background:rgba(15,26,22,.92);border:1px solid rgba(244,239,227,.25);font-size:var(--eai-step--1)}
+.player__error p{margin:0 0 var(--eai-space-3)}
+.player__open{min-height:52px;text-decoration:none}
 .player__bar{display:flex;flex-wrap:wrap;justify-content:center;gap:var(--eai-space-3) var(--eai-space-5);margin-top:var(--eai-space-5)}
 .seg{display:inline-flex;align-items:center;gap:var(--eai-space-2)}
 .seg__lbl{font-family:var(--eai-font-mono);font-size:var(--eai-step--1);letter-spacing:.08em;text-transform:uppercase;color:var(--eai-color-ink-muted);margin-right:var(--eai-space-1)}
@@ -213,13 +216,14 @@ main{width:min(1200px,100%);margin:0 auto;padding:0 var(--eai-space-4) var(--eai
   font-size:clamp(2.75rem,12.5vw,4.6rem);line-height:.9;letter-spacing:-.02em;text-wrap:balance;max-width:20ch}
 .film__hook{font-size:var(--eai-step-2);line-height:1.25;max-width:32ch}
 .film__media{max-width:1000px}
-.film__direct{margin-top:var(--eai-space-5)}
-.film__direct summary{display:inline-flex;align-items:center;min-height:44px;cursor:pointer;font:var(--eai-step--1) var(--eai-font-mono);
-  letter-spacing:.06em;text-transform:uppercase;color:var(--eai-color-ink-muted)}
-.chips{list-style:none;padding:0;margin:var(--eai-space-3) 0 0;display:flex;flex-wrap:wrap;gap:var(--eai-space-2)}
-.chip{display:inline-flex;align-items:center;min-height:44px;padding:0 var(--eai-space-4);border-radius:999px;border:2px solid rgba(244,239,227,.22);
-  font:var(--eai-step--1) var(--eai-font-mono);text-decoration:none}
-.chip:hover{border-color:var(--eai-color-accent)}
+.direct{margin-top:var(--eai-space-6);padding:var(--eai-space-5);border-radius:var(--eai-radius-m);background:var(--eai-color-surface);
+  border:1px solid rgba(244,239,227,.14)}
+.direct__title{margin:0 0 var(--eai-space-2);font:800 var(--eai-step-1)/1.2 var(--eai-font-display);font-stretch:85%}
+.direct__hint{margin:0 0 var(--eai-space-4);color:var(--eai-color-ink-muted);max-width:60ch}
+.direct__list{list-style:none;padding:0;margin:0;display:grid;gap:var(--eai-space-3)}
+.direct__item{display:flex;flex-wrap:wrap;align-items:center;gap:var(--eai-space-2) var(--eai-space-4)}
+.direct__btn{min-height:56px;font-size:var(--eai-step-1);text-decoration:none}
+.direct__wide{display:inline-flex;align-items:center;min-height:44px;color:var(--eai-color-ink-muted)}
 .film__grid{display:grid;gap:var(--eai-space-7);margin-top:var(--eai-space-8)}
 @media (min-width:960px){.film__grid{grid-template-columns:minmax(0,2fr) minmax(0,1fr)}}
 .film__summary{font-size:var(--eai-step-1);line-height:1.45}

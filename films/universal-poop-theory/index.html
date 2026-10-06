@@ -32,10 +32,10 @@
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="preload" href="/assets/fonts/bricolage-grotesque/bricolage-grotesque-latin-wdth-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/atkinson-hyperlegible/atkinson-hyperlegible-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/tokens.css?v=fc22a20ab2">
-<link rel="stylesheet" href="/assets/css/site.css?v=fc22a20ab2">
-<script src="/assets/js/lang.js?v=fc22a20ab2"></script>
-<script src="/assets/js/site.js?v=fc22a20ab2" defer></script>
+<link rel="stylesheet" href="/assets/tokens.css?v=9725e62625">
+<link rel="stylesheet" href="/assets/css/site.css?v=9725e62625">
+<script src="/assets/js/lang.js?v=9725e62625"></script>
+<script src="/assets/js/site.js?v=9725e62625" defer></script>
 </head>
 <body class="page-film">
 <a class="skip" href="#main">Skip to the good part</a>
@@ -69,7 +69,10 @@
       <track kind="subtitles" srclang="es" label="Español" src="/assets/films/2026-10-05-universal-poop-theory/2026-10-05-universal-poop-theory.es.60.vtt">
     </video>
     <button class="player__sound" type="button" data-sound hidden><span class="player__sound-dot" aria-hidden="true"></span><span>Tap for sound</span></button>
-    <p class="player__error" data-error hidden>This video didn&#x27;t load. Try again in a minute, or open the film&#x27;s page for direct links.</p>
+    <div class="player__error" data-error role="status" hidden>
+      <p>This video won&#x27;t play here. Open it in your phone&#x27;s own player instead.</p>
+      <a class="btn btn--primary player__open" data-open href="https://github.com/LukiWebCo/educatedai-site/releases/download/film-2026-10-05-universal-poop-theory/2026-10-05-universal-poop-theory.en.60.16x9.mp4" target="_blank" rel="noopener">Open the video</a>
+    </div>
   </div>
   <div class="player__bar" data-bar hidden>
     <div class="seg" role="group" aria-label="Voice language">
@@ -84,15 +87,16 @@
   <script type="application/json" data-sources>{"labels":{"en":"English","es":"Español"},"mp4":{"en":{"30":{"16x9":"https://github.com/LukiWebCo/educatedai-site/releases/download/film-2026-10-05-universal-poop-theory/2026-10-05-universal-poop-theory.en.30.16x9.mp4","9x16":"https://github.com/LukiWebCo/educatedai-site/releases/download/film-2026-10-05-universal-poop-theory/2026-10-05-universal-poop-theory.en.30.9x16.mp4"},"60":{"16x9":"https://github.com/LukiWebCo/educatedai-site/releases/download/film-2026-10-05-universal-poop-theory/2026-10-05-universal-poop-theory.en.60.16x9.mp4","9x16":"https://github.com/LukiWebCo/educatedai-site/releases/download/film-2026-10-05-universal-poop-theory/2026-10-05-universal-poop-theory.en.60.9x16.mp4"}},"es":{"30":{"16x9":"https://github.com/LukiWebCo/educatedai-site/releases/download/film-2026-10-05-universal-poop-theory/2026-10-05-universal-poop-theory.es.30.16x9.mp4","9x16":"https://github.com/LukiWebCo/educatedai-site/releases/download/film-2026-10-05-universal-poop-theory/2026-10-05-universal-poop-theory.es.30.9x16.mp4"},"60":{"16x9":"https://github.com/LukiWebCo/educatedai-site/releases/download/film-2026-10-05-universal-poop-theory/2026-10-05-universal-poop-theory.es.60.16x9.mp4","9x16":"https://github.com/LukiWebCo/educatedai-site/releases/download/film-2026-10-05-universal-poop-theory/2026-10-05-universal-poop-theory.es.60.9x16.mp4"}}},"poster":{"16x9":"/assets/films/2026-10-05-universal-poop-theory/poster.16x9.webp","9x16":"/assets/films/2026-10-05-universal-poop-theory/poster.9x16.webp"},"vtt":{"en":{"30":"/assets/films/2026-10-05-universal-poop-theory/2026-10-05-universal-poop-theory.en.30.vtt","60":"/assets/films/2026-10-05-universal-poop-theory/2026-10-05-universal-poop-theory.en.60.vtt"},"es":{"30":"/assets/films/2026-10-05-universal-poop-theory/2026-10-05-universal-poop-theory.es.30.vtt","60":"/assets/films/2026-10-05-universal-poop-theory/2026-10-05-universal-poop-theory.es.60.vtt"}}}</script>
 </figure>
 
-    <details class="film__direct">
-      <summary>Direct video links</summary>
-      <ul class="chips">
-        <li><a class="chip" href="https://github.com/LukiWebCo/educatedai-site/releases/download/film-2026-10-05-universal-poop-theory/2026-10-05-universal-poop-theory.en.60.9x16.mp4">60 s, vertical</a></li>
-        <li><a class="chip" href="https://github.com/LukiWebCo/educatedai-site/releases/download/film-2026-10-05-universal-poop-theory/2026-10-05-universal-poop-theory.en.60.16x9.mp4">60 s, widescreen</a></li>
-        <li><a class="chip" href="https://github.com/LukiWebCo/educatedai-site/releases/download/film-2026-10-05-universal-poop-theory/2026-10-05-universal-poop-theory.en.30.9x16.mp4">30 s, vertical</a></li>
-        <li><a class="chip" href="https://github.com/LukiWebCo/educatedai-site/releases/download/film-2026-10-05-universal-poop-theory/2026-10-05-universal-poop-theory.en.30.16x9.mp4">30 s, widescreen</a></li>
+    <section class="film__direct direct" aria-labelledby="direct-title">
+      <h2 class="direct__title" id="direct-title">Watch it in your phone&#x27;s own player</h2>
+      <p class="direct__hint">If the video above won&#x27;t play, tap one of these. On an iPhone, choose View to watch it, or Download to keep it (it goes to the Files app).</p>
+      <ul class="direct__list">
+        <li class="direct__item"><a class="btn btn--ghost direct__btn" href="https://github.com/LukiWebCo/educatedai-site/releases/download/film-2026-10-05-universal-poop-theory/2026-10-05-universal-poop-theory.en.60.9x16.mp4" target="_blank" rel="noopener"><span aria-hidden="true">▶</span> <span lang="en">English</span> · 51 seconds</a> <a class="direct__wide" href="https://github.com/LukiWebCo/educatedai-site/releases/download/film-2026-10-05-universal-poop-theory/2026-10-05-universal-poop-theory.en.60.16x9.mp4" target="_blank" rel="noopener">Widescreen version</a></li>
+        <li class="direct__item"><a class="btn btn--ghost direct__btn" href="https://github.com/LukiWebCo/educatedai-site/releases/download/film-2026-10-05-universal-poop-theory/2026-10-05-universal-poop-theory.en.30.9x16.mp4" target="_blank" rel="noopener"><span aria-hidden="true">▶</span> <span lang="en">English</span> · 28 seconds</a> <a class="direct__wide" href="https://github.com/LukiWebCo/educatedai-site/releases/download/film-2026-10-05-universal-poop-theory/2026-10-05-universal-poop-theory.en.30.16x9.mp4" target="_blank" rel="noopener">Widescreen version</a></li>
+        <li class="direct__item"><a class="btn btn--ghost direct__btn" href="https://github.com/LukiWebCo/educatedai-site/releases/download/film-2026-10-05-universal-poop-theory/2026-10-05-universal-poop-theory.es.60.9x16.mp4" target="_blank" rel="noopener"><span aria-hidden="true">▶</span> <span lang="es">Español</span> · 49 seconds</a> <a class="direct__wide" href="https://github.com/LukiWebCo/educatedai-site/releases/download/film-2026-10-05-universal-poop-theory/2026-10-05-universal-poop-theory.es.60.16x9.mp4" target="_blank" rel="noopener">Widescreen version</a></li>
+        <li class="direct__item"><a class="btn btn--ghost direct__btn" href="https://github.com/LukiWebCo/educatedai-site/releases/download/film-2026-10-05-universal-poop-theory/2026-10-05-universal-poop-theory.es.30.9x16.mp4" target="_blank" rel="noopener"><span aria-hidden="true">▶</span> <span lang="es">Español</span> · 27 seconds</a> <a class="direct__wide" href="https://github.com/LukiWebCo/educatedai-site/releases/download/film-2026-10-05-universal-poop-theory/2026-10-05-universal-poop-theory.es.30.16x9.mp4" target="_blank" rel="noopener">Widescreen version</a></li>
       </ul>
-    </details>
+    </section>
   </div>
   <div class="film__grid">
     <section class="film__essay prose" aria-labelledby="idea-title">

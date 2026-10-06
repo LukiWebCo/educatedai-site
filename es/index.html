@@ -32,10 +32,10 @@
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="preload" href="/assets/fonts/bricolage-grotesque/bricolage-grotesque-latin-wdth-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/atkinson-hyperlegible/atkinson-hyperlegible-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/tokens.css?v=fc22a20ab2">
-<link rel="stylesheet" href="/assets/css/site.css?v=fc22a20ab2">
-<script src="/assets/js/lang.js?v=fc22a20ab2"></script>
-<script src="/assets/js/site.js?v=fc22a20ab2" defer></script>
+<link rel="stylesheet" href="/assets/tokens.css?v=9725e62625">
+<link rel="stylesheet" href="/assets/css/site.css?v=9725e62625">
+<script src="/assets/js/lang.js?v=9725e62625"></script>
+<script src="/assets/js/site.js?v=9725e62625" defer></script>
 </head>
 <body class="page-home">
 <a class="skip" href="#main">Saltar a lo bueno</a>
@@ -67,7 +67,10 @@
       <track kind="subtitles" srclang="es" label="Español" src="/assets/films/2026-10-05-universal-poop-theory/2026-10-05-universal-poop-theory.es.30.vtt">
     </video>
     <button class="player__sound" type="button" data-sound hidden><span class="player__sound-dot" aria-hidden="true"></span><span>Toca para oír</span></button>
-    <p class="player__error" data-error hidden>El video no cargó. Intenta en un minuto o abre la página de la película para ver los enlaces directos.</p>
+    <div class="player__error" data-error role="status" hidden>
+      <p>Este video no se reproduce aquí. Ábrelo mejor en el reproductor de tu teléfono.</p>
+      <a class="btn btn--primary player__open" data-open href="https://github.com/LukiWebCo/educatedai-site/releases/download/film-2026-10-05-universal-poop-theory/2026-10-05-universal-poop-theory.es.30.16x9.mp4" target="_blank" rel="noopener">Abrir el video</a>
+    </div>
   </div>
   <div class="player__bar" data-bar hidden>
     <div class="seg" role="group" aria-label="Idioma de la voz">
