@@ -1,0 +1,200 @@
+{
+ "author": "Claude, for educatedai.org",
+ "contrast": {
+  "min_delta_e": {
+   "deutan": {
+    "delta_e76": 15.0,
+    "pair": "rg"
+   },
+   "normal": {
+    "delta_e76": 41.5,
+    "pair": "bs"
+   },
+   "protan": {
+    "delta_e76": 29.0,
+    "pair": "bp"
+   },
+   "tritan": {
+    "delta_e76": 20.7,
+    "pair": "bg"
+   }
+  },
+  "number_on_token": {
+   "b": 9.95,
+   "g": 10.1,
+   "p": 6.54,
+   "r": 7.85,
+   "s": 14.72
+  },
+  "star_fill_on_spark": 2.26,
+  "star_outline_on_spark": 14.72,
+  "token_on_felt": {
+   "b": 9.91,
+   "g": 10.06,
+   "p": 6.51,
+   "r": 7.82,
+   "s": 14.66
+  }
+ },
+ "ease": {
+  "out": "cubic-bezier(.2,.8,.2,1)",
+  "pop": "cubic-bezier(.34,1.56,.64,1)",
+  "snap": "cubic-bezier(.2,.8,.2,1)"
+ },
+ "felt": {
+  "chalk": "#f4efe3",
+  "felt": "#0d2119",
+  "felt2": "#12291f",
+  "plate": "#10201a",
+  "rail": "#0a1712"
+ },
+ "generator": "tools/games_assets.py",
+ "license": "CC0-1.0",
+ "motion_ms": {
+  "bell_ring": 900,
+  "burst": 1100,
+  "clear": 700,
+  "flash": 600,
+  "flip": 420,
+  "lift": 140,
+  "line_draw": 420,
+  "new_glow": 1800,
+  "pop": 260,
+  "shake": 360,
+  "snap": 180,
+  "tick_pulse": 1000
+ },
+ "name": {
+  "en": "Dots & Lines",
+  "es": "Puntos y Rayas"
+ },
+ "sounds": {
+  "bell": "sfx/bell.mp3",
+  "clear": "sfx/clear.mp3",
+  "flip": "sfx/flip.mp3",
+  "invalid": "sfx/invalid.mp3",
+  "join": "sfx/join.mp3",
+  "music": "music/loop.mp3",
+  "place": "sfx/place.mp3",
+  "snap": "sfx/snap.mp3",
+  "tick": "sfx/tick.mp3",
+  "trade": "sfx/trade.mp3",
+  "win": "sfx/win.mp3",
+  "your_turn": "sfx/your_turn.mp3"
+ },
+ "spark": {
+  "as_badge": "a small suit token (half size) at the lower right showing the number it stands for",
+  "color": "#f4efe3",
+  "css": "--gm-suit-s",
+  "en": "Spark",
+  "es": "Chispa",
+  "glyph": "✦",
+  "key": "s",
+  "path": "M50 3a43 43 0 1 1-0.01 0Z",
+  "star": "#ff7a3d",
+  "star_path": "M50 13C53.4 35 59 41 81 46C59 51 53.4 57 50 79C46.6 57 41 51 19 46C41 41 46.6 35 50 13Z",
+  "symbol": "gm-token-s"
+ },
+ "suits": [
+  {
+   "color": "#ff9478",
+   "css": "--gm-suit-r",
+   "en": "Coral",
+   "es": "Coral",
+   "gloss": "M20 30A36 36 0 0 1 40 12",
+   "glyph": "●",
+   "key": "r",
+   "number": {
+    "size": 50,
+    "size_two_digits": 44,
+    "x": 50,
+    "y": 62
+   },
+   "path": "M50 3a43 43 0 1 1-0.01 0Z",
+   "round_stroke": 0,
+   "shape": "circle",
+   "side": "#735141",
+   "symbol": "gm-token-r"
+  },
+  {
+   "color": "#7fd0ff",
+   "css": "--gm-suit-b",
+   "en": "Sky",
+   "es": "Cielo",
+   "gloss": "M17 32V27a10 10 0 0 1 10-10h12",
+   "glyph": "■",
+   "key": "b",
+   "number": {
+    "size": 52,
+    "size_two_digits": 46,
+    "x": 50,
+    "y": 63
+   },
+   "path": "M27 8h46a19 19 0 0 1 19 19v42a19 19 0 0 1-19 19h-46a19 19 0 0 1-19-19v-42a19 19 0 0 1 19-19Z",
+   "round_stroke": 0,
+   "shape": "square",
+   "side": "#3d6a7a",
+   "symbol": "gm-token-b"
+  },
+  {
+   "color": "#8fdc5c",
+   "css": "--gm-suit-g",
+   "en": "Leaf",
+   "es": "Hoja",
+   "gloss": "M37 36L45 22",
+   "glyph": "▲",
+   "key": "g",
+   "number": {
+    "size": 46,
+    "size_two_digits": 38,
+    "x": 50,
+    "y": 77
+   },
+   "path": "M50 12L89 82H11Z",
+   "round_stroke": 13,
+   "shape": "triangle",
+   "side": "#447035",
+   "symbol": "gm-token-g"
+  },
+  {
+   "color": "#b98cf5",
+   "css": "--gm-suit-p",
+   "en": "Plum",
+   "es": "Ciruela",
+   "gloss": "M22 41L36 27",
+   "glyph": "◆",
+   "key": "p",
+   "number": {
+    "size": 48,
+    "size_two_digits": 40,
+    "x": 50,
+    "y": 63
+   },
+   "path": "M50 9L89 47L50 85L11 47Z",
+   "round_stroke": 12,
+   "shape": "diamond",
+   "side": "#554e75",
+   "symbol": "gm-token-p"
+  }
+ ],
+ "token": {
+  "number_fill": "#10201a",
+  "rim": "same outline, white 42%, 2.2 units, scaled .86 about (50,47)",
+  "shadow_dy": 8,
+  "side_dy": 5,
+  "side_mix_toward_felt": 0.58
+ },
+ "tokens": {
+  "accent": "#ff7a3d",
+  "accent2": "#8fd3ff",
+  "bg": "#0f1a16",
+  "danger": "#ff6b5e",
+  "focus": "#ffd84a",
+  "hit": "#b8f15a",
+  "ink": "#f4efe3",
+  "muted": "#a9b8ae",
+  "surface": "#15241e",
+  "surface2": "#1d2f28"
+ },
+ "viewBox": "0 0 100 100"
+}

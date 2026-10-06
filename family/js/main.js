@@ -137,6 +137,8 @@ async function route() {
   }
   if (!isPublic && !state.me) { go('#/login'); return; }
   if (a === 'login' && state.me) { go('#/'); return; }
+  document.body.classList.remove('games-tv'); // the TV screen re-adds it; leaving it must restore the chrome
+  document.body.classList.remove('games-play');
   markNav(isPublic ? '' : (a || 'table') === 't' || a === 'shelf' || a === 'new' ? 'table' : (a || 'table'));
   view.replaceChildren(loading());
   let node;
@@ -150,6 +152,7 @@ async function route() {
       case 'new': node = await newThreadView(b); break;
       case 'book': node = b ? await chapterView(b) : await bookView(); break;
       case 'films': node = await filmsView(); break;
+      case 'games': node = await (await import('./games/index.js')).gamesView(parts.slice(1)); break;
       case 'score': node = await scoreView(b); break;
       case 'admin': node = state.me.role === 'admin' ? await adminView() : errorBox({ key: 'family.errors.forbidden' }); break;
       case 'me': node = await meView(actions); break;

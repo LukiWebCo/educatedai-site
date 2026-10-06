@@ -1,0 +1,276 @@
+/* Dots & Lines / Puntos y Rayas: the game's look. Owned by W5 (contracts/games-art.md has the rules).
+   Game night on the family's board: deep green felt, chalk lines, enamel dots, one tangerine ball (the Spark).
+   Uses the frozen design tokens (/assets/tokens.css). Everything that moves lives inside the
+   `prefers-reduced-motion: no-preference` block at the bottom, so reduced motion gets a still (but complete) game.
+   Images are same-origin files in games-assets/ (CSP img-src 'self'). */
+
+:root {
+  /* surfaces */
+  --gm-felt: #0d2119; --gm-felt-2: #12291f; --gm-rail: #0a1712; --gm-plate: #10201a;
+  --gm-chalk: var(--eai-color-ink, #f4efe3);
+  --gm-chalk-soft: color-mix(in srgb, var(--gm-chalk) 22%, transparent);
+  /* suits: colour + shape (Coral ● r, Sky ■ b, Leaf ▲ g, Plum ◆ p) and the Spark ✦ s */
+  --gm-suit-r: #ff9478; --gm-suit-b: #7fd0ff; --gm-suit-g: #8fdc5c; --gm-suit-p: #b98cf5; --gm-suit-s: #f4efe3;
+  --gm-spark-star: var(--eai-color-accent, #ff7a3d);
+  /* signals */
+  --gm-pick: var(--gm-chalk); --gm-bad: var(--eai-color-danger, #ff6b5e); --gm-new: var(--eai-color-hit, #b8f15a);
+  --gm-hint: var(--eai-color-accent-2, #8fd3ff); --gm-ball: var(--eai-color-accent, #ff7a3d);
+  /* sizes: 52 px at text size 1, scaled by the family text-size control, capped at a sixth of the viewport */
+  --gm-dot: min(calc(52px * var(--eai-text-scale, 1)), calc((100vw - 40px) / 6));
+  --gm-gap: calc(var(--gm-dot) * .08);
+  /* motion (ms; dots.json motion_ms has the same numbers) */
+  --gm-t-pop: 260ms; --gm-t-snap: 180ms; --gm-t-lift: 140ms; --gm-t-flip: 420ms; --gm-t-shake: 360ms;
+  --gm-t-draw: 420ms; --gm-t-clear: 700ms; --gm-t-bell: 900ms; --gm-t-flash: 600ms; --gm-t-burst: 1100ms;
+  --gm-t-new: 1800ms; --gm-t-tick: 1000ms;
+  --gm-ease-pop: cubic-bezier(.34, 1.56, .64, 1); --gm-ease: cubic-bezier(.2, .8, .2, 1);
+}
+
+/* ---- surfaces ------------------------------------------------------------------------------------------ */
+.gm-felt {
+  background-color: var(--gm-felt);
+  background-image:
+    radial-gradient(120% 80% at 50% 0%, color-mix(in srgb, var(--gm-ball) 7%, transparent), transparent 60%),
+    radial-gradient(140% 100% at 50% 50%, transparent 55%, rgba(0, 0, 0, .38)),
+    url(games-assets/felt.svg);
+  background-size: auto, auto, 96px 96px;
+  background-attachment: fixed, fixed, scroll;
+  color: var(--gm-chalk);
+}
+.gm-card {
+  background: color-mix(in srgb, var(--gm-felt-2) 88%, transparent);
+  border-radius: var(--eai-radius-l, 20px);
+  box-shadow: inset 0 0 0 1px rgba(244, 239, 227, .09), 0 14px 30px -18px rgba(0, 0, 0, .8);
+}
+.gm-tray { /* the sticky bottom tray: a darker rail with a chalk edge */
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--gm-rail) 92%, transparent), var(--gm-rail));
+  border-top: 2px solid var(--gm-chalk-soft);
+  box-shadow: 0 -18px 30px -20px rgba(0, 0, 0, .9);
+}
+
+/* ---- the wordmark: real text, so it scales and translates ------------------------------------------------
+   <span class="gm-wordmark"><span class="gm-wm-word">Dots</span> <span class="gm-wm-amp">&amp;</span>
+   <span class="gm-wm-word">Lines</span></span>   (ES: Puntos <span class="gm-wm-amp">y</span> Rayas) */
+.gm-wordmark {
+  display: inline-block; position: relative; padding-bottom: .42em;
+  font-family: var(--eai-font-display); font-weight: 800; font-stretch: 75%;
+  font-size: clamp(2.4rem, 11vw, 4.8rem); line-height: .9; letter-spacing: -.02em; color: var(--gm-chalk);
+}
+.gm-wm-amp { color: var(--gm-ball); font-stretch: 100%; }
+.gm-wordmark::after { /* a full group of four suit dots on a chalk line: the line that clears */
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: .4em;
+  background: url(games-assets/wordmark-line.svg) left center / 100% 100% no-repeat;
+}
+
+/* ---- dots ------------------------------------------------------------------------------------------------
+   <span class="gm-dot gm-dot--r [is-…]"><svg viewBox="0 0 100 100">…token…</svg></span>
+   Tokens come from dots.js using games-assets/dots.json (or <use href="games-assets/dots.svg#gm-token-r">). */
+.gm-dot {
+  position: relative; display: inline-grid; place-items: center; flex: none;
+  width: var(--gm-dot); height: var(--gm-dot);
+  border-radius: 50%; -webkit-tap-highlight-color: transparent;
+}
+.gm-dot > svg { width: 100%; height: 100%; display: block; overflow: visible; }
+.gm-dot > svg text { font-family: var(--eai-font-display); }
+button.gm-dot { padding: 0; border: 0; background: none; color: inherit; cursor: pointer; }
+.gm-dot::after { /* state ring, drawn around the token face */
+  content: ""; position: absolute; inset: -4%; bottom: 4%; border-radius: 50%; pointer-events: none;
+  border: 3px solid transparent;
+}
+.gm-dot.is-picked { transform: translateY(-16%) scale(1.06); z-index: 2; }
+.gm-dot.is-picked::after { border-color: var(--gm-pick); box-shadow: 0 0 0 3px rgba(0, 0, 0, .45), 0 12px 18px -6px rgba(0, 0, 0, .7); }
+.gm-dot.is-invalid::after { border: 3px dashed var(--gm-bad); }
+.gm-dot.is-new::after { border-color: var(--gm-new); box-shadow: 0 0 16px 2px color-mix(in srgb, var(--gm-new) 55%, transparent); }
+.gm-dot.is-hint::after { border: 3px dashed var(--gm-hint); }
+.gm-dot.is-stack::after { border-color: var(--gm-ball); }
+.gm-dot.is-locked { filter: grayscale(.9) brightness(.65); opacity: .6; }
+.gm-dot.is-locked::after {
+  border-color: rgba(244, 239, 227, .25); inset: 2% 6% 10%;
+  background: repeating-linear-gradient(-45deg, rgba(15, 26, 22, .55) 0 4px, transparent 4px 9px);
+}
+.gm-new { /* the "New!" chip a Market trade puts on a dot (text from W3a's i18n) */
+  position: absolute; top: -22%; left: 50%; transform: translateX(-50%) rotate(-6deg); z-index: 3;
+  padding: 1px 7px; border-radius: 999px; white-space: nowrap;
+  background: var(--gm-new); color: var(--gm-plate);
+  font: 700 calc(var(--gm-dot) * .2)/1.3 var(--eai-font-mono); text-transform: uppercase; letter-spacing: .04em;
+}
+/* a Spark that stands for a dot: a small token of that suit and number tucked at its lower right */
+.gm-as { position: absolute; right: -10%; bottom: -4%; width: 50%; height: 50%; z-index: 1;
+  filter: drop-shadow(0 0 0 var(--gm-felt)) drop-shadow(2px 2px 0 var(--gm-felt)); }
+.gm-as > svg { width: 100%; height: 100%; display: block; }
+
+/* the Stack: the top dot on a pile, with its count */
+.gm-stack { position: relative; display: inline-grid; padding: 0 6px 6px 0; }
+.gm-stack::before, .gm-stack::after {
+  content: ""; position: absolute; width: var(--gm-dot); height: var(--gm-dot); border-radius: 50%;
+  background: var(--gm-felt-2); box-shadow: inset 0 0 0 2px var(--gm-chalk-soft);
+}
+.gm-stack::before { left: 6px; top: 6px; }
+.gm-stack::after { left: 3px; top: 3px; }
+.gm-stack > .gm-dot { z-index: 1; }
+.gm-stack-count {
+  position: absolute; right: -4px; top: -6px; z-index: 2; min-width: 1.7em; padding: 0 .35em; text-align: center;
+  border-radius: 999px; background: var(--gm-ball); color: var(--gm-plate);
+  font: 700 var(--eai-step--1)/1.6 var(--eai-font-mono);
+}
+
+/* ---- lines (Rayas): dots strung on a chalk line. Runs: a solid line. Groups: a dotted line. --------------- */
+.gm-line {
+  position: relative; display: flex; align-items: center; min-height: calc(var(--gm-dot) + 12px);
+  padding: 6px 10px; border-radius: calc(var(--gm-dot) / 2 + 10px); border: 2px solid transparent;
+}
+.gm-line-dots { position: relative; display: flex; gap: var(--gm-gap); }
+.gm-line-dots::before { /* the chalk line, from the first dot's centre to the last */
+  content: ""; position: absolute; left: calc(var(--gm-dot) / 2); right: calc(var(--gm-dot) / 2);
+  top: calc(var(--gm-dot) * .46 - 2px); height: 4px; border-radius: 2px; transform-origin: left center;
+  background: linear-gradient(90deg, var(--gm-chalk) 0 70%, color-mix(in srgb, var(--gm-chalk) 70%, transparent) 70% 74%,
+    var(--gm-chalk) 74%) 0 0 / 23px 100%;
+  opacity: .85;
+}
+.gm-line--group .gm-line-dots::before {
+  background: radial-gradient(circle, var(--gm-chalk) 0 2px, transparent 2.5px) 0 50% / 11px 4px repeat-x;
+}
+.gm-line-dots > .gm-dot { z-index: 1; }
+.gm-line.is-full { border-color: color-mix(in srgb, var(--gm-ball) 70%, transparent);
+  box-shadow: 0 0 22px -4px color-mix(in srgb, var(--gm-ball) 55%, transparent), inset 0 0 18px -8px var(--gm-ball); }
+.gm-line.is-bad { border: 2px dashed var(--gm-bad); background: color-mix(in srgb, var(--gm-bad) 8%, transparent); }
+.gm-line.is-bad .gm-line-dots::before { background: var(--gm-bad); opacity: .5; }
+.gm-line-why {
+  margin-left: auto; padding: 2px 10px; border-radius: 999px; white-space: nowrap;
+  background: var(--gm-bad); color: var(--gm-plate); font: 700 var(--eai-step--1)/1.5 var(--eai-font-body);
+}
+.gm-line.is-hint { border: 2px dashed var(--gm-hint); }
+.gm-target { /* "Put here" / "+ New line" drop targets */
+  display: grid; place-items: center; min-height: calc(var(--gm-dot) + 12px); padding: 6px 14px;
+  border: 2px dashed color-mix(in srgb, var(--gm-chalk) 55%, transparent); border-radius: calc(var(--gm-dot) / 2 + 10px);
+  color: var(--gm-chalk); font: 700 var(--eai-step-0)/1.2 var(--eai-font-mono); text-transform: uppercase; letter-spacing: .08em;
+  background: color-mix(in srgb, var(--gm-chalk) 4%, transparent);
+}
+.gm-target:hover, .gm-target:focus-visible { border-color: var(--gm-chalk); background: color-mix(in srgb, var(--gm-chalk) 9%, transparent); }
+
+/* ---- buttons -------------------------------------------------------------------------------------------- */
+.gm-btn {
+  min-height: 56px; padding: 10px 26px; border: 0; border-radius: var(--eai-radius-m, 10px); cursor: pointer;
+  background: var(--gm-chalk); color: var(--gm-plate);
+  font: 800 var(--eai-step-1)/1 var(--eai-font-display); font-stretch: 85%; letter-spacing: .01em;
+  box-shadow: 4px 4px 0 0 rgba(0, 0, 0, .55);
+}
+.gm-btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 0 rgba(0, 0, 0, .55); }
+.gm-btn--trade, .gm-btn--go { background: var(--gm-ball); color: var(--gm-plate); box-shadow: 4px 4px 0 0 var(--gm-chalk); }
+.gm-btn[disabled] { opacity: .45; cursor: not-allowed; transform: none; }
+
+/* ---- the Market ------------------------------------------------------------------------------------------ */
+.gm-market { position: relative; display: grid; gap: 14px; justify-items: center; text-align: center; padding: 22px 16px; }
+.gm-market-banner {
+  display: flex; align-items: center; gap: 14px; padding: 10px 18px 10px 12px;
+  background: var(--gm-ball); color: var(--gm-plate); border-radius: var(--eai-radius-m, 10px);
+  box-shadow: 6px 6px 0 0 var(--gm-chalk); transform: rotate(-2deg);
+}
+.gm-market-title { font: 800 clamp(2.2rem, 10vw, 4.4rem)/.9 var(--eai-font-display); font-stretch: 75%; text-transform: uppercase; letter-spacing: -.01em; }
+.gm-bell { width: clamp(48px, 12vw, 84px); height: auto; flex: none; transform-origin: 50% 30%; }
+.gm-market-banner .gm-bell path, .gm-market-banner .gm-bell g { stroke: var(--gm-plate); }
+.gm-market-banner .gm-bell rect { fill: var(--gm-chalk); }
+.gm-market-sub { margin: 0; font-size: var(--eai-step-1); color: var(--gm-chalk); }
+.gm-ring { /* countdown: set --gm-p (0..1 of time left) from JS with el.style.setProperty */
+  --gm-p: 1; --gm-ring-c: var(--gm-plate);
+  position: relative; display: grid; place-items: center; flex: none;
+  width: clamp(54px, 13vw, 96px); aspect-ratio: 1; border-radius: 50%;
+  background: conic-gradient(var(--gm-ring-c) calc(var(--gm-p) * 360deg), color-mix(in srgb, var(--gm-ring-c) 18%, transparent) 0);
+}
+.gm-ring::before { content: ""; position: absolute; inset: 14%; border-radius: 50%; background: var(--gm-ball); }
+.gm-ring-num { position: relative; font: 800 clamp(1.4rem, 6vw, 2.6rem)/1 var(--eai-font-display); font-variant-numeric: tabular-nums; }
+.gm-ring--big { width: min(56vw, 360px); --gm-ring-c: var(--gm-ball); }
+.gm-ring--big::before { background: var(--gm-felt); }
+.gm-ring--big .gm-ring-num { font-size: min(22vw, 150px); color: var(--gm-chalk); }
+.gm-ring.is-urgent { --gm-ring-c: var(--gm-plate); }
+.gm-ring--big.is-urgent { --gm-ring-c: var(--gm-bad); }
+.gm-offers { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.gm-offer {
+  padding: 6px 14px; border-radius: 999px; border: 2px solid var(--gm-chalk-soft);
+  font: 700 var(--eai-step-0)/1.3 var(--eai-font-mono); color: var(--gm-chalk);
+}
+.gm-offer.is-mine { border-color: var(--gm-chalk); }
+.gm-offer.is-match { border-color: var(--gm-new); color: var(--gm-new); }
+.gm-flash { /* full-screen flash when the bell rings; add the element, it removes itself visually */
+  position: fixed; inset: 0; z-index: 60; pointer-events: none; opacity: 0;
+  background: radial-gradient(70% 60% at 50% 40%, color-mix(in srgb, var(--gm-ball) 55%, transparent), transparent 75%);
+}
+
+/* ---- round end -------------------------------------------------------------------------------------------- */
+.gm-win {
+  position: relative; display: grid; gap: 10px; justify-items: center; text-align: center; padding: 30px 18px 26px;
+  background: var(--gm-felt-2); border-radius: var(--eai-radius-l, 20px); box-shadow: var(--eai-shadow-2, 6px 6px 0 0 #ff7a3d);
+  overflow: hidden; isolation: isolate;
+}
+.gm-win-kicker { font: 400 var(--eai-step--1)/1 var(--eai-font-mono); letter-spacing: .16em; text-transform: uppercase; color: var(--eai-color-ink-muted, #a9b8ae); }
+.gm-win-title { font: 800 clamp(2.4rem, 11vw, 4.6rem)/.92 var(--eai-font-display); font-stretch: 75%; color: var(--gm-chalk);
+  text-shadow: 0 0 14px var(--gm-felt-2), 0 0 4px var(--gm-felt-2); } /* the chalk burst passes behind the words */
+.gm-win-dots { display: flex; gap: var(--gm-gap); padding: 6px 0; }
+.gm-win-points { font-size: var(--eai-step-1); }
+.gm-win-points b { color: var(--gm-ball); font: 800 var(--eai-step-3)/1 var(--eai-font-display); }
+.gm-burst { /* chalk burst behind a win card or a clearing line */
+  position: absolute; left: 50%; top: 46%; z-index: -1; width: min(150%, 640px); aspect-ratio: 1;
+  transform: translate(-50%, -50%); pointer-events: none;
+  background: url(games-assets/burst.svg) center / contain no-repeat; opacity: .5;
+}
+
+/* ---- the TV --------------------------------------------------------------------------------------------- */
+.gm-tv { --gm-dot: clamp(56px, 4.4vw, 96px); }
+.gm-tv .gm-wordmark { font-size: clamp(3rem, 5vw, 6rem); }
+
+/* ---- motion: only when the viewer hasn't asked for less -------------------------------------------------- */
+@media (prefers-reduced-motion: no-preference) {
+  .gm-dot { transition: transform var(--gm-t-lift) var(--gm-ease), filter var(--gm-t-lift) linear, opacity var(--gm-t-lift) linear; }
+  .gm-dot.is-enter { animation: gm-pop var(--gm-t-pop) var(--gm-ease-pop) both; }
+  .gm-dot.is-snap { animation: gm-snap var(--gm-t-snap) var(--gm-ease) both; }
+  .gm-dot.is-flip { animation: gm-flip var(--gm-t-flip) var(--gm-ease) both; }
+  .gm-dot.is-invalid { animation: gm-shake var(--gm-t-shake) var(--gm-ease) both; }
+  .gm-dot.is-new::after { animation: gm-glow var(--gm-t-new) ease-in-out 2; }
+  .gm-dot.is-hint::after { animation: gm-breathe 1.6s ease-in-out infinite; }
+  .gm-new { animation: gm-pop var(--gm-t-pop) var(--gm-ease-pop) both; }
+  .gm-line.is-drawn .gm-line-dots::before { animation: gm-draw var(--gm-t-draw) var(--gm-ease) both; }
+  .gm-line.is-bad { animation: gm-shake var(--gm-t-shake) var(--gm-ease) both; }
+  .gm-line.is-full { animation: gm-full 900ms ease-in-out 2; }
+  .gm-line.is-clearing .gm-dot { animation: gm-clear var(--gm-t-clear) var(--gm-ease) both; }
+  .gm-line.is-clearing .gm-dot:nth-child(2) { animation-delay: 40ms; }
+  .gm-line.is-clearing .gm-dot:nth-child(3) { animation-delay: 80ms; }
+  .gm-line.is-clearing .gm-dot:nth-child(4) { animation-delay: 120ms; }
+  .gm-line.is-clearing .gm-dot:nth-child(5) { animation-delay: 160ms; }
+  .gm-line.is-clearing .gm-dot:nth-child(6) { animation-delay: 200ms; }
+  .gm-line.is-clearing .gm-line-dots::before { animation: gm-undraw var(--gm-t-clear) var(--gm-ease) both; }
+  .gm-target { animation: gm-breathe 1.8s ease-in-out infinite; }
+  .gm-market.is-open .gm-market-banner { animation: gm-slam 520ms var(--gm-ease-pop) both; }
+  .gm-bell.is-ringing { animation: gm-ring var(--gm-t-bell) ease-in-out both; }
+  .gm-ring { transition: --gm-p 1s linear; }
+  .gm-ring.is-urgent { animation: gm-tick var(--gm-t-tick) ease-out infinite; }
+  .gm-flash.is-on { animation: gm-flash var(--gm-t-flash) ease-out both; }
+  .gm-shake { animation: gm-shake-screen 420ms var(--gm-ease) both; }
+  .gm-offer.is-new { animation: gm-pop var(--gm-t-pop) var(--gm-ease-pop) both; }
+  .gm-win { animation: gm-pop 420ms var(--gm-ease-pop) both; }
+  .gm-win .gm-burst { animation: gm-burst var(--gm-t-burst) var(--gm-ease) both; }
+  .gm-win-dots .gm-dot { animation: gm-pop var(--gm-t-pop) var(--gm-ease-pop) both; }
+  .gm-win-dots .gm-dot:nth-child(1) { animation-delay: 250ms; }
+  .gm-win-dots .gm-dot:nth-child(2) { animation-delay: 330ms; }
+  .gm-win-dots .gm-dot:nth-child(3) { animation-delay: 410ms; }
+  .gm-win-dots .gm-dot:nth-child(4) { animation-delay: 490ms; }
+  .gm-win-dots .gm-dot:nth-child(n+5) { animation-delay: 570ms; }
+  .gm-wordmark::after { animation: gm-wipe 700ms var(--gm-ease) 200ms both; }
+}
+@property --gm-p { syntax: "<number>"; inherits: true; initial-value: 1; }
+
+@keyframes gm-pop { 0% { transform: scale(.4); opacity: 0; } 70% { transform: scale(1.08); opacity: 1; } 100% { transform: scale(1); } }
+@keyframes gm-snap { 0% { transform: translateY(-14%) scale(1.06); } 60% { transform: translateY(3%) scale(.97); } 100% { transform: none; } }
+@keyframes gm-flip { 0% { transform: perspective(300px) rotateY(90deg) scale(.9); } 60% { transform: perspective(300px) rotateY(-12deg); } 100% { transform: none; } }
+@keyframes gm-shake { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-6px); } 40% { transform: translateX(5px); } 60% { transform: translateX(-3px); } 80% { transform: translateX(2px); } }
+@keyframes gm-shake-screen { 0%, 100% { transform: none; } 15% { transform: translate(-5px, 2px) rotate(-.4deg); } 35% { transform: translate(5px, -2px) rotate(.4deg); } 55% { transform: translate(-3px, 1px); } 75% { transform: translate(2px, -1px); } }
+@keyframes gm-glow { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .5; transform: scale(1.1); } }
+@keyframes gm-breathe { 0%, 100% { opacity: 1; } 50% { opacity: .55; } }
+@keyframes gm-draw { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes gm-undraw { from { transform: scaleX(1); opacity: .85; } to { transform: scaleX(0); opacity: 0; transform-origin: right center; } }
+@keyframes gm-full { 0%, 100% { box-shadow: 0 0 22px -4px color-mix(in srgb, var(--gm-ball) 55%, transparent); } 50% { box-shadow: 0 0 34px 2px color-mix(in srgb, var(--gm-ball) 70%, transparent); } }
+@keyframes gm-clear { 0% { transform: none; opacity: 1; } 30% { transform: translateY(-10%) scale(1.12); } 100% { transform: translateY(-120%) scale(.5) rotate(25deg); opacity: 0; } }
+@keyframes gm-slam { 0% { transform: rotate(-12deg) scale(2.2); opacity: 0; } 60% { transform: rotate(1deg) scale(.95); opacity: 1; } 100% { transform: rotate(-2deg) scale(1); } }
+@keyframes gm-ring { 0%, 100% { transform: rotate(0); } 10% { transform: rotate(16deg); } 25% { transform: rotate(-14deg); } 40% { transform: rotate(10deg); } 55% { transform: rotate(-7deg); } 70% { transform: rotate(4deg); } 85% { transform: rotate(-2deg); } }
+@keyframes gm-tick { 0% { transform: scale(1.12); } 40%, 100% { transform: scale(1); } }
+@keyframes gm-flash { 0% { opacity: 0; } 15% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes gm-burst { 0% { transform: translate(-50%, -50%) scale(.2) rotate(-20deg); opacity: 0; } 25% { opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1) rotate(0); opacity: .5; } }
+@keyframes gm-wipe { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }

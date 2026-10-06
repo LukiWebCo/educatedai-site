@@ -1,0 +1,94 @@
+{
+ "house_lkfs_100ms": -14.0,
+ "music": {
+  "bars": 8,
+  "bpm": 100,
+  "encoder_delay_samples": 1105,
+  "file": "music/loop.mp3",
+  "key": "F major",
+  "lkfs_integrated": -24.0,
+  "loop_samples": 846720,
+  "loop_seconds": 19.2,
+  "what": "a light game-night loop: marimba tune, felt-piano chords, soft bass, shaker"
+ },
+ "sample_rate": 44100,
+ "sfx": {
+  "bell": {
+   "file": "sfx/bell.mp3",
+   "lkfs_100ms": -14.0,
+   "seconds": 1.745,
+   "trim_db": 0,
+   "what": "the Market opens: a counter bell struck twice"
+  },
+  "clear": {
+   "file": "sfx/clear.mp3",
+   "lkfs_100ms": -14.0,
+   "seconds": 1.117,
+   "trim_db": 0,
+   "what": "a full line clears: a rising pentatonic run with a sparkle on top"
+  },
+  "flip": {
+   "file": "sfx/flip.mp3",
+   "lkfs_100ms": -17.0,
+   "seconds": 0.661,
+   "trim_db": -3,
+   "what": "the next Stack dot flips up: a short swish and one bright note"
+  },
+  "invalid": {
+   "file": "sfx/invalid.mp3",
+   "lkfs_100ms": -17.0,
+   "seconds": 0.676,
+   "trim_db": -3,
+   "what": "that doesn't fit: two low, muffled notes stepping down (a polite 'nope')"
+  },
+  "join": {
+   "file": "sfx/join.mp3",
+   "lkfs_100ms": -16.0,
+   "seconds": 0.724,
+   "trim_db": -2,
+   "what": "someone sits down: a little bloop and two plucked notes"
+  },
+  "place": {
+   "file": "sfx/place.mp3",
+   "lkfs_100ms": -16.0,
+   "seconds": 0.641,
+   "trim_db": -2,
+   "what": "a dot set down: one soft marimba knock on felt"
+  },
+  "snap": {
+   "file": "sfx/snap.mp3",
+   "lkfs_100ms": -17.0,
+   "seconds": 0.577,
+   "trim_db": -3,
+   "what": "a dot clicks into a line: two quick rising wooden notes and a latch tick"
+  },
+  "tick": {
+   "file": "sfx/tick.mp3",
+   "lkfs_100ms": -21.0,
+   "seconds": 0.323,
+   "trim_db": -7,
+   "what": "each of the Market's last 5 seconds: a small woodblock tick"
+  },
+  "trade": {
+   "file": "sfx/trade.mp3",
+   "lkfs_100ms": -15.0,
+   "seconds": 0.866,
+   "trim_db": -1,
+   "what": "a trade lands: two swishes crossing, then two notes"
+  },
+  "win": {
+   "file": "sfx/win.mp3",
+   "lkfs_100ms": -14.0,
+   "seconds": 2.543,
+   "trim_db": 0,
+   "what": "round won: a marimba fanfare over a warm F chord, with a sparkle"
+  },
+  "your_turn": {
+   "file": "sfx/your_turn.mp3",
+   "lkfs_100ms": -14.0,
+   "seconds": 1.591,
+   "trim_db": 0,
+   "what": "your turn: a two-note glass chime, rising a fourth"
+  }
+ }
+}
