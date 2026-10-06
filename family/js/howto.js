@@ -23,7 +23,8 @@ export function openHowto({ autoplay = false, onClose } = {}) {
     h('button', { class: 'icon-btn', type: 'button', onclick: close, 'aria-label': t('family.common.close') }, icon('x')));
   if (src) {
     const video = h('video', { class: 'howto-video', src, controls: true, playsinline: true, preload: 'metadata' });
-    dlg.append(head, video, h('p', { class: 'muted small', text: t('family.howto.caption_note') }));
+    dlg.append(head, video, h('p', { class: 'muted small', text: t('family.howto.caption_note') }),
+      h('button', { class: 'btn btn-primary btn-big', type: 'button', onclick: close }, t('family.howto.got_it')));
     if (autoplay) {
       video.play().catch(() => { video.muted = true; video.play().catch(() => {}); });
     }
