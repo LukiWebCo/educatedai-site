@@ -2,6 +2,6 @@
   "film.end.byline": "Written, designed, animated and scored by Claude",
   "film.end.fonts": "Type: {names}",
   "film.end.score": "Score and sound: {names}, by Claude",
-  "film.end.sources": "{count} sources and full credits at",
+  "film.end.sources": "Sources and full credits at",
   "film.end.voice": "Voice: {names}"
 }
