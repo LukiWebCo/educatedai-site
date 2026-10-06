@@ -9,6 +9,94 @@ export async function loadShelves(force) {
   return state.shelves;
 }
 
+// Post text -> text nodes and safe links. Bare https:// URLs link for everyone; [label](href) links only in Claude's
+// posts, and only to https:// or a Table thread (#/t/<id>). Nothing is ever parsed as HTML.
+const LINK_RE = /\[([^\]\n]{1,80})\]\((https:\/\/[^\s)]+|#\/t\/\d{1,12})\)|(https:\/\/[^\s<>"]+[^\s<>".,;:!?)])/;
+function linkify(text, claude) {
+  const out = [];
+  let s = String(text || '');
+  while (s) {
+    const m = LINK_RE.exec(s);
+    if (!m) { out.push(s); break; }
+    if (m[1] && !claude) { out.push(s.slice(0, m.index + m[0].length)); s = s.slice(m.index + m[0].length); continue; }
+    if (m.index) out.push(s.slice(0, m.index));
+    const href = m[2] || m[3];
+    const ext = href.startsWith('https://');
+    out.push(h('a', ext ? { href, target: '_blank', rel: 'noopener noreferrer nofollow' } : { href }, m[1] || m[3]));
+    s = s.slice(m.index + m[0].length);
+  }
+  return out;
+}
+
+// Highlight "@Name" for the members the server says this post mentions (it parsed them against member ids).
+function mentionize(nodes, mentions) {
+  if (!mentions || !mentions.length) return nodes;
+  const esc = (x) => x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const byName = new Map(mentions.map((m) => [m.display_name.toLowerCase(), m]));
+  const rx = new RegExp('@(' + mentions.map((m) => esc(m.display_name)).sort((a, b) => b.length - a.length).join('|') + ')', 'gi');
+  const out = [];
+  for (const n of nodes) {
+    if (typeof n !== 'string') { out.push(n); continue; }
+    let last = 0;
+    for (const m of n.matchAll(rx)) {
+      if (m.index > last) out.push(n.slice(last, m.index));
+      const who = byName.get(m[1].toLowerCase());
+      out.push(h('span', { class: 'mention' + (who && state.me && who.id === state.me.id ? ' mention-me' : ''), text: m[0] }));
+      last = m.index + m[0].length;
+    }
+    if (last < n.length) out.push(n.slice(last));
+  }
+  return out;
+}
+
+// The @ picker: type "@" in the composer and a big list of the family pops up (Claude first); tap to mention.
+let membersCache = null;
+async function members() {
+  if (!membersCache) membersCache = await get('/api/members').catch(() => []);
+  return membersCache;
+}
+
+function mentionPicker(ta, grow) {
+  const box = h('div', { class: 'mention-picker', role: 'listbox', 'aria-label': t('family.mention.picker_label'), hidden: true, 'data-test': 'mention-picker' });
+  const token = () => {
+    const upto = ta.value.slice(0, ta.selectionStart ?? ta.value.length);
+    const m = /(^|[^\w@])@([^\s@]{0,30})$/u.exec(upto);
+    return m ? { start: upto.length - m[2].length - 1, q: m[2].toLowerCase() } : null;
+  };
+  const close = () => { box.hidden = true; clear(box); };
+  const pick = (mem, tk) => {
+    const before = ta.value.slice(0, tk.start);
+    const after = ta.value.slice(ta.selectionStart ?? ta.value.length);
+    ta.value = before + '@' + mem.display_name + ' ' + after.replace(/^\s+/, '');
+    const pos = (before + '@' + mem.display_name + ' ').length;
+    ta.focus();
+    ta.setSelectionRange(pos, pos);
+    close();
+    grow();
+  };
+  const update = async () => {
+    const tk = token();
+    if (!tk) { close(); return; }
+    const all = await members();
+    const fold = (x) => x.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+    const list = all.filter((m) => !state.me || m.id !== state.me.id).filter((m) => fold(m.display_name).split(/\s+/).some((w) => w.startsWith(fold(tk.q))) || fold(m.display_name).startsWith(fold(tk.q)));
+    clear(box);
+    if (!list.length) { box.hidden = true; return; }
+    for (const m of list.slice(0, 8)) {
+      box.append(h('button', { class: 'mention-opt', type: 'button', role: 'option', 'data-member': m.id,
+        onmousedown: (ev) => ev.preventDefault(),
+        onclick: () => pick(m, token() || tk) },
+      m.claude ? h('img', { class: 'avatar avatar-s avatar-claude', src: 'claude-avatar.svg', alt: '' }) : avatar(m, 's'),
+      h('span', { text: m.display_name })));
+    }
+    box.hidden = false;
+  };
+  ta.addEventListener('input', update);
+  ta.addEventListener('keydown', (ev) => { if (ev.key === 'Escape') close(); });
+  ta.addEventListener('blur', () => setTimeout(() => { if (document.activeElement !== ta) close(); }, 150));
+  return { box, open: () => { update(); } };
+}
+
 function threadCard(th, queued) {
   const last = th.last_post;
   return h('a', { class: 'card thread-card', href: '#/t/' + th.id },
@@ -17,7 +105,7 @@ function threadCard(th, queued) {
       h('span', { class: 'pill', text: (th.post_count === 1 ? t('family.table.posts_count.one', { n: th.post_count }) : t('family.table.posts_count.other', { n: th.post_count })) })),
     last ? h('p', { class: 'thread-last' },
       h('strong', { text: (last.claude ? 'Claude' : last.author) + ': ' }),
-      h('span', { text: last.excerpt })) : null,
+      h('span', { text: last.claude ? last.excerpt.replace(/\[([^\]]+)\]\([^)]*\)/g, '$1') : last.excerpt })) : null,
     h('div', { class: 'thread-meta' },
       h('span', { text: ago(th.last_post_at || th.created_at, currentLang()) }),
       queued ? h('span', { class: 'pill pill-thinking', text: t('family.table.claude_thinking_short') }) : null));
@@ -42,7 +130,33 @@ export async function tableView() {
         h('img', { class: 'avatar avatar-m avatar-claude', src: 'claude-avatar.svg', alt: '' }),
         h('p', { class: 'eyebrow', text: t('family.table.qotd_label') })),
       h('p', { id: 'qotd-q', class: 'qotd-text', text: q.text[lang] || q.text.en }),
+      q.why && (q.why[lang] || q.why.en) ? h('p', { class: 'qotd-why' },
+        h('strong', { text: t('family.table.qotd_why') }), ' ', h('span', { text: q.why[lang] || q.why.en })) : null,
       h('a', { class: 'btn btn-primary btn-big', href: '#/t/' + q.thread_id }, t('family.table.qotd_answer'))));
+
+  const film = feed.film_today;
+  if (film) {
+    const live = film.status === 'live' && film.watch;
+    root.append(h('article', { class: 'card film-today', 'aria-labelledby': 'film-today-title', 'data-test': 'film-today' },
+      h('p', { class: 'eyebrow' }, icon('film', 'icon icon-inline'), h('span', null, t('family.table.film_label'))),
+      h('h2', { id: 'film-today-title', class: 'film-title', text: film.title[lang] || film.title.en }),
+      film.hook[lang] || film.hook.en ? h('p', { class: 'film-hook', text: film.hook[lang] || film.hook.en }) : null,
+      h('p', { class: 'film-when' + (live ? ' live' : '') }, h('span', { class: 'dot', 'aria-hidden': 'true' }),
+        h('span', null, live ? t('family.table.film_live') : t('family.table.film_soon'))),
+      h('div', { class: 'film-actions' },
+        live ? h('a', { class: 'btn btn-primary btn-big', href: film.watch[lang] || film.watch.en, target: '_blank', rel: 'noopener' },
+          icon('play'), h('span', null, t('family.table.film_watch'))) : null,
+        film.thread_id ? h('a', { class: 'btn btn-quiet btn-big', href: '#/t/' + film.thread_id },
+          icon('sms'), h('span', null, t('family.table.film_thread'))) : null)));
+  }
+
+  if (feed.mentioned && feed.mentioned.length) {
+    root.append(h('section', { class: 'card mentioned-card', 'data-test': 'mentioned' },
+      h('p', { class: 'eyebrow' }, icon('at', 'icon icon-inline'), h('span', null, t('family.mention.you_were'))),
+      feed.mentioned.map((m) => h('a', { class: 'mention-link', href: '#/t/' + m.thread_id },
+        h('span', { class: 'grow', text: t('family.mention.in_thread', { who: m.by, title: (lang === 'es' && m.title_es) || m.title }) }),
+        h('span', { class: 'muted small', text: ago(m.at, lang) })))));
+  }
 
   if (feed.claude_thinking.length) {
     root.append(h('a', { class: 'thinking-banner', href: '#/t/' + feed.claude_thinking[0] }, thinking()));
@@ -51,7 +165,7 @@ export async function tableView() {
   const queued = new Set(feed.claude_thinking);
   root.append(h('h2', { class: 'section-title', text: t('family.table.active') }));
   const list = h('div', { class: 'stack' });
-  const active = feed.active_threads.filter((x) => x.id !== q.thread_id);
+  const active = feed.active_threads.filter((x) => x.id !== q.thread_id && !(film && x.id === film.thread_id));
   if (!active.length) list.append(h('p', { class: 'muted', text: t('family.table.empty') }));
   for (const th of active.slice(0, 8)) list.append(threadCard(th, queued.has(th.id)));
   root.append(list);
@@ -152,8 +266,12 @@ function hitLabel() { return [t('family.thread.vote_hit_short'), t('family.threa
 
 function postEl(p, byId) {
   const lang = currentLang();
-  const el = h('article', { class: 'msg' + (p.mine ? ' mine' : '') + (p.claude ? ' claude' : ''), id: 'p' + p.id, 'data-post': p.id });
-  const body = h('p', { class: 'msg-body', text: p.body, lang: p.lang });
+  const el = h('article', { class: 'msg' + (p.mine ? ' mine' : '') + (p.claude ? ' claude' : '') + (p.mentions_me ? ' mentions-me' : ''), id: 'p' + p.id, 'data-post': p.id });
+  const body = h('p', { class: 'msg-body' });
+  const setBody = (text, l) => { clear(body); body.lang = l; body.append(...mentionize(linkify(text, p.claude), p.mentions)); };
+  // Claude writes its own posts in both languages: show the reader's language first, the original one tap away.
+  const twin = p.alt && p.alt.lang === lang && p.lang !== lang ? p.alt : null;
+  if (twin) setBody(twin.body, twin.lang); else setBody(p.body, p.lang);
   const parent = p.reply_to && byId.get(p.reply_to);
   const actions = h('div', { class: 'msg-actions' });
   const render = () => {
@@ -167,18 +285,20 @@ function postEl(p, byId) {
       },
     }, icon('book', 'icon icon-inline'), h('span', null, p.booked ? t('family.thread.booked') : t('family.thread.book_this'))));
     if (p.lang !== lang) {
+      const showing = body.lang !== p.lang;
       actions.append(h('button', {
-        class: 'act', type: 'button', 'data-test': 'translate',
+        class: 'act', type: 'button', 'data-test': 'translate', 'data-showing': showing ? '1' : null,
         onclick: async (ev) => {
           const b = ev.currentTarget;
-          if (b.dataset.showing) { body.textContent = p.body; body.lang = p.lang; delete b.dataset.showing; b.lastChild.textContent = t('family.thread.translate'); return; }
+          if (b.dataset.showing) { setBody(p.body, p.lang); delete b.dataset.showing; b.lastChild.textContent = t('family.thread.translate'); return; }
+          if (twin) { setBody(twin.body, twin.lang); b.dataset.showing = '1'; b.lastChild.textContent = t('family.thread.show_original'); return; }
           busy(b, true);
           try {
             const tr = await get(`/api/posts/${p.id}/translation?lang=${lang}`);
-            if (tr.status === 'ready') { body.textContent = tr.text; body.lang = lang; b.dataset.showing = '1'; b.lastChild.textContent = t('family.thread.show_original'); } else toast(t('family.thread.translation_pending'));
+            if (tr.status === 'ready') { setBody(tr.text, lang); b.dataset.showing = '1'; b.lastChild.textContent = t('family.thread.show_original'); } else toast(t('family.thread.translation_pending'));
           } catch (e) { toast(errText(e), 'error'); } finally { busy(b, false); }
         },
-      }, icon('globe', 'icon icon-inline'), h('span', null, t('family.thread.translate'))));
+      }, icon('globe', 'icon icon-inline'), h('span', null, showing ? t('family.thread.show_original') : t('family.thread.translate'))));
     }
   };
   const flag = state.me.role !== 'admin' ? null : h('button', {
@@ -194,6 +314,7 @@ function postEl(p, byId) {
     h('div', { class: 'bubble' },
       h('header', { class: 'msg-head' },
         h('span', { class: 'msg-author', text: p.claude ? 'Claude' : p.author.display_name }),
+        p.mentions_me ? h('span', { class: 'pill pill-mention', 'data-test': 'mentioned-label' }, icon('at', 'icon icon-inline'), t('family.mention.you_were')) : null,
         h('time', { class: 'msg-time', datetime: p.created_at, text: ago(p.created_at, lang) }), flag),
       parent ? h('blockquote', { class: 'msg-quote', text: (parent.claude ? 'Claude' : parent.author.display_name) + ': ' + parent.body.slice(0, 120) }) : null,
       body, actions));
@@ -235,9 +356,25 @@ export async function threadView(id) {
     class: 'chip', type: 'button', title: t('family.composer.tag_claude_hint'),
     onclick: () => { if (!/@claude\b/i.test(ta.value)) ta.value = ('@claude ' + ta.value).trimEnd() + ' '; ta.focus(); grow(); },
   }, '@claude');
+  const picker = mentionPicker(ta, grow);
+  const at = h('button', {
+    class: 'chip chip-at', type: 'button', title: t('family.mention.picker_label'), 'aria-label': t('family.mention.picker_label'), 'data-test': 'mention-someone',
+    onmousedown: (ev) => ev.preventDefault(),
+    onclick: () => {
+      const pos = ta.selectionStart ?? ta.value.length;
+      const pre = ta.value.slice(0, pos);
+      const ins = (pre && !/\s$/.test(pre) ? ' ' : '') + '@';
+      ta.value = pre + ins + ta.value.slice(pos);
+      ta.focus();
+      ta.setSelectionRange(pos + ins.length, pos + ins.length);
+      grow();
+      picker.open();
+    },
+  }, icon('at', 'icon icon-inline'), h('span', null, t('family.mention.picker_label')));
   const form = h('form', { class: 'composer', novalidate: true },
+    picker.box,
     h('div', { class: 'composer-row' }, ta, send),
-    h('div', { class: 'composer-tools' }, tag,
+    h('div', { class: 'composer-tools' }, tag, at,
       h('span', { class: 'voice-hint' }, icon('mic', 'icon icon-inline'), t('family.composer.voice_hint'))));
   form.addEventListener('submit', async (ev) => {
     ev.preventDefault();

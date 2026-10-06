@@ -1,0 +1,13 @@
+{
+  "name": "The Table · La Mesa",
+  "short_name": "La Mesa",
+  "start_url": "/family/",
+  "scope": "/family/",
+  "display": "standalone",
+  "background_color": "#0f1a16",
+  "theme_color": "#0f1a16",
+  "icons": [
+    {"src": "/assets/apple-touch-icon.png", "sizes": "180x180", "type": "image/png", "purpose": "any"},
+    {"src": "/family/claude-avatar.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any"}
+  ]
+}

@@ -5,6 +5,7 @@ import { t } from '../i18n.js';
 import { openHowto } from '../howto.js';
 import * as passkey from '../passkey.js';
 import { busy, errText, state, toast } from '../ui.js';
+import { notifyCard } from '../notify.js';
 
 export async function meView(actions) {
   const me = await get('/api/me').catch(() => state.me);
@@ -54,6 +55,7 @@ export async function meView(actions) {
   root.append(
     h('div', { class: 'card stack' }, h('h2', { text: t('family.header.language') }), langRow),
     h('div', { class: 'card stack' }, h('h2', { text: t('family.header.text_size') }), sizeRow, h('p', { class: 'sample', text: t('family.me.size_sample') })),
+    await notifyCard(),
     h('div', { class: 'card stack' }, h('h2', { text: t('family.me.help_title') }),
       h('button', { class: 'btn btn-quiet btn-big', type: 'button', onclick: () => openHowto({ autoplay: true }) }, icon('play'), h('span', null, t('family.me.watch_howto')))),
     h('div', { class: 'card stack' }, h('h2', { text: t('family.me.security_title') }),
