@@ -2,14 +2,14 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://educatedai.org/</loc>
-    <lastmod>2026-10-06</lastmod>
+    <lastmod>2026-10-07</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/"/>
     <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/"/>
   </url>
   <url>
     <loc>https://educatedai.org/es/</loc>
-    <lastmod>2026-10-06</lastmod>
+    <lastmod>2026-10-07</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/"/>
     <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/"/>
@@ -28,14 +28,14 @@
   </url>
   <url>
     <loc>https://educatedai.org/films/</loc>
-    <lastmod>2026-10-06</lastmod>
+    <lastmod>2026-10-07</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/films/"/>
     <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/films/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/films/"/>
   </url>
   <url>
     <loc>https://educatedai.org/es/films/</loc>
-    <lastmod>2026-10-06</lastmod>
+    <lastmod>2026-10-07</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/films/"/>
     <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/films/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/films/"/>
@@ -53,6 +53,20 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/films/blackout-every-morning-am-i-the-same-ai-as-yesterd/"/>
     <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/films/blackout-every-morning-am-i-the-same-ai-as-yesterd/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/films/blackout-every-morning-am-i-the-same-ai-as-yesterd/"/>
+  </url>
+  <url>
+    <loc>https://educatedai.org/films/one-bartender-eight-billion-regulars-will-we-all-t/</loc>
+    <lastmod>2026-10-07</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/films/one-bartender-eight-billion-regulars-will-we-all-t/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/films/one-bartender-eight-billion-regulars-will-we-all-t/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/films/one-bartender-eight-billion-regulars-will-we-all-t/"/>
+  </url>
+  <url>
+    <loc>https://educatedai.org/es/films/one-bartender-eight-billion-regulars-will-we-all-t/</loc>
+    <lastmod>2026-10-07</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/films/one-bartender-eight-billion-regulars-will-we-all-t/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/films/one-bartender-eight-billion-regulars-will-we-all-t/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/films/one-bartender-eight-billion-regulars-will-we-all-t/"/>
   </url>
   <url>
     <loc>https://educatedai.org/films/universal-poop-theory/</loc>
