@@ -5,6 +5,7 @@ import { h } from '../../dom.js';
 import { t } from '../../i18n.js';
 import { cardNode, probeArt } from './cards.js';
 import { cardSound } from './sound.js';
+import { setViewMode, viewMode } from './view.js';
 
 const SEEN = 'eai.games.rules_seen.conquian';
 const PAGAT = 'https://www.pagat.com/rummy/conquian.html';
@@ -68,6 +69,20 @@ export function rulesBody(opts = {}) {
       h('a', { href: PAGAT, target: '_blank', rel: 'noopener noreferrer', text: t('family.games.cq.rules.credit_link') })));
 }
 
+// "How the table looks: Simple | Full" (per device). In the "?" sheet and at the foot of the play screen.
+export function viewSwitch(cls = '') {
+  const mode = viewMode();
+  const btn = (m, label) => h('button', { class: 'cq-vs-btn' + (mode === m ? ' on' : ''), type: 'button', 'aria-pressed': String(mode === m), 'data-fk': 'view-' + m,
+    onclick: (ev) => {
+      setViewMode(m);
+      const box = ev.currentTarget.closest('.cq-vs');
+      if (box) box.querySelectorAll('.cq-vs-btn').forEach((b) => { const on = b.dataset.fk === 'view-' + m; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
+    } }, label);
+  return h('div', { class: 'cq-vs ' + cls, role: 'group', 'aria-label': t('family.games.cq.view.label') },
+    h('span', { class: 'cq-vs-l', text: t('family.games.cq.view.label') }),
+    h('span', { class: 'cq-vs-btns' }, btn('simple', t('family.games.cq.view.simple')), btn('full', t('family.games.cq.view.full'))));
+}
+
 export async function openCqRules(opts = {}) {
   await probeArt();
   return new Promise((resolve) => {
@@ -79,6 +94,7 @@ export async function openCqRules(opts = {}) {
           h('p', { class: 'eyebrow', text: t('family.games.cq.rules.eyebrow') }),
           h('h2', { id: 'cq-rules-title', class: 'grules-title', text: t('family.games.cq.name') })),
         h('button', { class: 'icon-btn grules-x', type: 'button', 'aria-label': t('family.games.common.close'), onclick: done }, '×')),
+      viewSwitch('cq-vs-sheet'),
       rulesBody(opts),
       h('button', { class: 'btn btn-primary btn-big grules-ok', type: 'button', onclick: done }, t('family.games.cq.rules.got_it')));
     dlg.addEventListener('cancel', (ev) => { ev.preventDefault(); done(); });

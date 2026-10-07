@@ -1,5 +1,5 @@
-// Conquián words that come from the server as codes: events (contracts/conquian.md §7), errors (§8), the Smart
-// Hint's `why` (§9) and the reasons a meld you're building isn't one yet. Every key is written out literally so
+// Conquián words that come from the server as codes: events (contracts/conquian.md §7), errors (§8), and the
+// reasons a meld you're building isn't one yet. Every key is written out literally so
 // tests/test_i18n.py can see it.
 import { t } from '../../i18n.js';
 import { faceName } from './cards.js';
@@ -92,29 +92,5 @@ export function takeWhy(w) {
     case 'holding': return t('family.games.cq.take.holding');
     case 'bad': return t('family.games.cq.take.bad');
     default: return '';
-  }
-}
-
-// The Smart Hint's one-line reason. W1's `why` codes we know get their own line; anything else falls back on
-// the hint's kind.
-export function hintWhy(hint) {
-  switch (hint && hint.why) {
-    case 'out': return t('family.games.cq.hint.why.out');
-    case 'fits': return t('family.games.cq.hint.why.fits');
-    case 'new_meld': return t('family.games.cq.hint.why.new_meld');
-    case 'rearrange': return t('family.games.cq.hint.why.rearrange');
-    case 'forced': return t('family.games.cq.hint.why.forced');
-    case 'no_fit': return t('family.games.cq.hint.why.no_fit');
-    case 'force': return hint.kind === 'discard' ? t('family.games.cq.hint.why.force_discard') : t('family.games.cq.hint.why.force');
-    case 'loose': return hint.kind === 'cambio' ? t('family.games.cq.hint.why.loose_cambio') : t('family.games.cq.hint.why.loose');
-    case 'between': return t('family.games.cq.hint.why.between');
-    default: break;
-  }
-  switch (hint && hint.kind) {
-    case 'take': return t('family.games.cq.hint.kind.take');
-    case 'pass': return t('family.games.cq.hint.kind.pass');
-    case 'discard': return t('family.games.cq.hint.kind.discard');
-    case 'cambio': return t('family.games.cq.hint.kind.cambio');
-    default: return t('family.games.cq.hint.kind.wait');
   }
 }

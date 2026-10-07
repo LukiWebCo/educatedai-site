@@ -1,12 +1,12 @@
-// Games lobby (#/games), the New game flow (#/games/new), Join with a code (#/games/join), and the
-// room's waiting room (a room in status "lobby", mounted by index.js inside #/games/r/:id).
-import { ago, avatar, h, icon } from '../dom.js';
-import { currentLang, t } from '../i18n.js';
+// The New game flow (#/games/new[?game=dots|conquian]), Join with a code (#/games/join), and the room's waiting
+// room (a room in status "lobby", mounted by index.js inside #/games/r/:id). The hub and each game's home: home.js.
+import { avatar, h, icon } from '../dom.js';
+import { t } from '../i18n.js';
 import { errText, go, state, toast } from '../ui.js';
 import { games } from './net.js';
 import { dotArt, seatAvatar } from './market.js';
-import { openRules, rulesButton, rulesSeen } from './rules_card.js';
-import { modeLabel, wordmark } from './tv.js';
+import { openRules, rulesButton } from './rules_card.js';
+import { modeLabel } from './tv.js';
 
 const CODE_CHARS = 'BCDFGHJKLMNPQRSTVWXZ23456789';
 
@@ -20,8 +20,17 @@ function head(title, lede, withRules = true) {
     lede ? h('p', { class: 'lede ghead-lede', text: lede }) : null);
 }
 
-function back(hash, label) {
-  return h('a', { class: 'back gback', href: hash }, icon('back'), h('span', null, label));
+function back(hash, label, cls = '') {
+  return h('a', { class: 'back gback ' + cls, href: hash }, icon('back'), h('span', null, label));
+}
+
+export const gameName = (g) => (g === 'conquian' ? t('family.games.cq.name') : t('family.games.common.game_name'));
+// The page a game's screens go back to: its own home (#/games/dots, #/games/conquian), or the hub.
+export const gameHome = (g) => (g === 'conquian' || g === 'dots' ? '#/games/' + g : '#/games');
+// ?game= on the hash (#/games/new?game=conquian, #/games/join?game=dots), or null.
+export function hashGame() {
+  const m = /[?&]game=(dots|conquian)\b/.exec(location.hash);
+  return m ? m[1] : null;
 }
 
 // ---- room options, said plainly (room cards, the waiting room) ----------------------------------------
@@ -46,113 +55,6 @@ export function optionTags(st, game = 'dots') {
     if (st.match_to) tags.push(t('family.games.lobby.tag_match', { n: st.match_to }));
   }
   return h('span', { class: 'gopt-tags' }, tags.map((x) => h('span', { class: 'gtag gtag-opt', text: x })));
-}
-
-async function startPractice(btn, game) {
-  btn.disabled = true;
-  try {
-    const r = await games.practice(game);
-    go('#/games/r/' + r.room_id);
-  } catch (e) { toast(errText(e), 'error'); btn.disabled = false; }
-}
-
-// ---- lobby ------------------------------------------------------------------------------------------
-function roomRow(card, kind) {
-  const names = card.seats.map((s) => s.name);
-  let status;
-  if (card.status === 'lobby') status = t('family.games.lobby.status_lobby', { code: card.code });
-  else if (card.status === 'finished') status = t('family.games.lobby.status_over');
-  else if (card.my_turn) status = t('family.games.common.your_turn');
-  else status = t('family.games.lobby.status_playing');
-  const go2 = kind === 'invite' || kind === 'open' ? null : '#/games/r/' + card.id;
-  const inner = [
-    h('span', { class: 'groom-faces' }, card.seats.slice(0, 4).map((s) => avatar({ display_name: s.name, claude: s.bot }, 's')),
-      card.seats.length > 4 ? h('span', { class: 'groom-more', text: '+' + (card.seats.length - 4) }) : null),
-    h('span', { class: 'groom-text' },
-      h('span', { class: 'groom-title', text: names.length ? names.join(', ') : card.host_name }),
-      h('span', { class: 'groom-sub' },
-        card.game === 'conquian' ? h('span', { class: 'gtag gtag-game', text: t('family.games.cq.name') }) : null,
-        h('span', { class: 'gtag gtag-mode gtag-' + card.mode, text: modeLabel(card.mode) }),
-        h('span', { class: 'groom-status' + (card.my_turn ? ' is-turn' : ''), text: status }),
-        card.updated_at ? h('span', { class: 'groom-ago', text: ago(card.updated_at, currentLang()) }) : null),
-      optionTags(card.settings, card.game)),
-  ];
-  if (go2) return h('a', { class: 'groom' + (card.my_turn ? ' is-turn' : ''), href: go2 }, inner, icon('next', 'icon groom-go'));
-  const joinBtn = h('button', { class: 'btn btn-primary groom-join', type: 'button' }, kind === 'invite' ? t('family.games.lobby.accept') : t('family.games.lobby.join_btn'));
-  joinBtn.addEventListener('click', async () => {
-    joinBtn.disabled = true;
-    try {
-      const r = await games.join(card.code, 'player');
-      go('#/games/r/' + r.room_id);
-    } catch (e) { toast(errText(e), 'error'); joinBtn.disabled = false; }
-  });
-  return h('div', { class: 'groom' }, inner, joinBtn);
-}
-
-function section(cls, title, count, rows, emptyText) {
-  return h('section', { class: 'gcard ' + cls },
-    h('h2', { class: 'gcard-title' }, h('span', { text: title }), count ? h('span', { class: 'gcount', text: String(count) }) : null),
-    rows.length ? h('div', { class: 'groom-list' }, rows) : h('p', { class: 'gcard-empty', text: emptyText }));
-}
-
-// Practice with Claude: up top and loud for someone who hasn't finished a game yet, a quiet row after that.
-function practiceCard(first) {
-  const btn = h('button', { class: 'btn btn-big ' + (first ? 'btn-primary' : 'btn-quiet') + ' gpractice-btn', type: 'button' },
-    h('span', { text: t('family.games.lobby.practice') }));
-  btn.addEventListener('click', () => startPractice(btn));
-  // Conquián's own lesson (a first classic hand), and its rules card one tap away.
-  const cq = h('button', { class: 'btn btn-big btn-quiet gpractice-btn gpractice-cq', type: 'button' },
-    h('span', { text: t('family.games.cq.lobby.practice') }));
-  cq.addEventListener('click', () => startPractice(cq, 'conquian'));
-  const cqRules = h('button', { class: 'btn btn-quiet gpractice-rules', type: 'button', onclick: () => openRules('conquian') }, t('family.games.cq.lobby.how'));
-  return h('section', { class: 'gpractice' + (first ? ' is-first' : '') },
-    first ? h('p', { class: 'gpractice-k', text: t('family.games.lobby.practice_new') }) : null,
-    btn,
-    h('p', { class: 'gpractice-sub', text: t('family.games.lobby.practice_sub') }),
-    h('div', { class: 'gpractice-row' }, cq, cqRules),
-    h('p', { class: 'gpractice-sub', text: t('family.games.cq.lobby.practice_sub') }));
-}
-
-export async function lobbyView() {
-  const data = await games.rooms();
-  const root = h('section', { class: 'page globby' });
-  function draw(d) {
-    const mine = d.mine || [];
-    const turn = mine.filter((c) => c.my_turn);
-    const rest = mine.filter((c) => !c.my_turn);
-    root.replaceChildren(...[   // (replaceChildren would print a null as the text "null")
-      h('header', { class: 'ghead globby-head' },
-        h('div', { class: 'ghead-row' },
-          h('p', { class: 'eyebrow grow', text: t('family.games.lobby.eyebrow') }),
-          rulesButton()),
-        h('h1', { class: 'sr-only', text: t('family.games.common.game_name') }),
-        wordmark('globby-wm'),
-        h('p', { class: 'lede ghead-lede', text: t('family.games.lobby.tagline') })),
-      d.me_new ? practiceCard(true) : null,
-      h('div', { class: 'ghero' },
-        h('a', { class: 'btn btn-primary btn-big ghero-new', href: '#/games/new' }, icon('plus'), h('span', { text: t('family.games.lobby.new_game') })),
-        h('a', { class: 'btn btn-quiet btn-big ghero-join', href: '#/games/join' }, h('span', { text: t('family.games.lobby.join_code') }))),
-      d.me_new ? null : practiceCard(false),
-      section('gcard-turn' + (turn.length ? ' is-hot' : ''), turn.length ? t('family.games.lobby.your_turn_n', { n: d.my_turn || turn.length }) : t('family.games.lobby.your_turn'), 0,
-        turn.map((c) => roomRow(c, 'mine')), t('family.games.lobby.your_turn_none')),
-      section('gcard-invites', t('family.games.lobby.invites'), (d.invites || []).length, (d.invites || []).map((c) => roomRow(c, 'invite')), t('family.games.lobby.invites_none')),
-      ...(rest.length ? [section('gcard-mine', t('family.games.lobby.your_games'), 0, rest.map((c) => roomRow(c, 'mine')), '')] : []),
-      section('gcard-open', t('family.games.lobby.open_rooms'), (d.open || []).length, (d.open || []).map((c) => roomRow(c, 'open')), t('family.games.lobby.open_none'))].filter(Boolean));
-  }
-  draw(data);
-  // Keep "Your turn" fresh while the lobby is on screen (leisure games move while you're away).
-  let seen = false;
-  const refresh = async () => {
-    if (root.isConnected) seen = true;
-    else if (seen) { clearInterval(iv); document.removeEventListener('visibilitychange', onVis); return; }
-    if (document.hidden) return;
-    try { draw(await games.rooms()); } catch { /* keep what we have */ }
-  };
-  const iv = setInterval(refresh, 20000);
-  const onVis = () => { if (!document.hidden && root.isConnected) refresh(); };
-  document.addEventListener('visibilitychange', onVis);
-  if (!rulesSeen()) setTimeout(() => { if (root.isConnected) openRules(); }, 400);
-  return root;
 }
 
 // ---- New game -----------------------------------------------------------------------------------
@@ -206,8 +108,10 @@ function gamePicker(game, onPick) {
 
 export async function newGameView() {
   const s = { step: 0, game: 'dots', mode: null, invite: new Set(), claude: null, simple_table: null, hints: true, turn_seconds: 0, leisure_hours: 24, stack_adj: 0, match_to: 0,
-    variant: null, cq_match: 0, forcing: true, cambio: true };
-  if (/[?&]game=conquian\b/.test(location.hash)) s.game = 'conquian';
+    variant: null, cq_match: 0, forcing: false, cambio: false };   // Conquián: no forcing, no Cambio unless chosen
+  // From a game's home the game is already chosen (?game=…): no picker. Without it, the picker (Dots by default).
+  const fixed = hashGame();
+  if (fixed) s.game = fixed;
   // Conquián: Classic is for two; with more people at the table, Familia (2–4).
   const seatCount = () => 1 + s.invite.size + (s.claude ? 1 : 0);
   const variant = () => s.variant || (seatCount() > 2 ? 'familia' : 'classic');
@@ -223,7 +127,7 @@ export async function newGameView() {
   const nav = (title) => [
     h('div', { class: 'gnew-top' },
       s.step ? h('button', { class: 'back gback', type: 'button', onclick: () => { s.step -= 1; draw(); } }, icon('back'), h('span', { text: t('family.games.common.back') }))
-        : back('#/games', t('family.games.common.games')),
+        : back(gameHome(fixed), fixed ? gameName(fixed) : t('family.games.common.games'), fixed ? 'gnew-game gnew-game-' + fixed : ''),
       stepper(s.step, N)),
     h('h1', { class: 'gnew-title', text: title }),
   ];
@@ -251,7 +155,7 @@ export async function newGameView() {
   function draw() {
     if (s.step === 0) {
       root.replaceChildren(...nav(t('family.games.lobby.new_mode')),
-        gamePicker(s.game, (g) => { s.game = g; draw(); }),
+        ...(fixed ? [] : [gamePicker(s.game, (g) => { s.game = g; draw(); })]),
         h('div', { class: 'gchoices' },
           ['together', 'live', 'leisure'].map((m) => bigChoice({
             cls: 'gchoice-' + m, art: modeArt(m),
@@ -392,7 +296,7 @@ export async function joinView(prefill) {
   watchBtn.addEventListener('click', () => join('spectator'));
   const boxRow = h('div', { class: 'gboxes' }, boxes);
   const root = h('section', { class: 'page gjoin' },
-    back('#/games', t('family.games.common.games')),
+    back(gameHome(hashGame()), hashGame() ? gameName(hashGame()) : t('family.games.common.games')),
     head(t('family.games.lobby.join_title'), t('family.games.lobby.join_lede'), false),
     boxRow, msg,
     h('div', { class: 'gjoin-actions' }, joinBtn, watchBtn));
@@ -413,6 +317,9 @@ export function roomLobbyView(ctx) {
   const el = h('section', { class: 'page gwait' });
   let busy = false;
   let picking = false;
+  let inviting = false;      // the host's "Invite family" list is open
+  let people = null;         // GET /games/people, once
+  const invited = new Set(); // invites sent from this screen
   let seatsSeen = (ctx.getView().seats || []).length;
   const popped = new Set();   // seats already drawn: only a newcomer pops in, not every row on every update
 
@@ -457,6 +364,31 @@ export function roomLobbyView(ctx) {
             h('button', { class: 'btn btn-quiet btn-big', type: 'button', disabled: busy, onclick: () => op(() => games.seats(room.id, { op: 'add_bot', level: 'sharp' }), () => { picking = false; }) }, t('family.games.common.claude_sharp'))))
         : h('button', { class: 'gwait-claude', type: 'button', disabled: busy, onclick: () => { picking = true; draw(); } },
           h('img', { class: 'avatar avatar-l avatar-claude', src: 'claude-avatar.svg', alt: '' }), h('span', { class: 'grow', text: t('family.games.lobby.add_claude') }), h('span', { class: 'gwait-plus', 'aria-hidden': 'true', text: '+' }));
+    }
+
+    // Invite family (host): tap a name and the invite goes out (it shows up in their Games).
+    let inviter = null;
+    if (isHost) {
+      if (!inviting) {
+        inviter = h('button', { class: 'gwait-invite', type: 'button', disabled: busy, onclick: () => {
+          inviting = true; draw();
+          if (!people) games.people().then((p) => { people = p || []; draw(); }).catch(() => { people = []; draw(); });
+        } }, h('span', { class: 'gwait-invite-ic', 'aria-hidden': 'true' }, icon('user')), h('span', { class: 'grow', text: t('family.games.lobby.invite_more') }), h('span', { class: 'gwait-plus', 'aria-hidden': 'true', text: '+' }));
+      } else {
+        const seated = new Set(seats.filter((x) => !x.bot).map((x) => x.name));
+        const folks = (people || []).filter((p) => p.id !== me.id && !/^claude$/i.test(p.display_name || '') && !seated.has(p.display_name));
+        inviter = h('section', { class: 'gwait-people' },
+          h('h2', { class: 'gwait-h2' }, h('span', { text: t('family.games.lobby.invite_more') })),
+          !people ? h('p', { class: 'gcard-empty', text: t('family.games.common.loading') })
+            : !folks.length ? h('p', { class: 'gcard-empty', text: t('family.games.lobby.people_none') })
+              : h('div', { class: 'gpeople' }, folks.map((p) => {
+                const on = invited.has(p.id);
+                return h('button', { type: 'button', class: 'gperson' + (on ? ' on' : ''), 'aria-pressed': String(on), disabled: on || busy,
+                  onclick: () => op(() => games.invite(room.id, [p.id]), () => { invited.add(p.id); toast(t('family.games.lobby.invite_sent')); }) },
+                avatar(p, 'm'), h('span', { class: 'grow gperson-name', text: p.display_name }),
+                h('span', { class: 'gcheck', 'aria-hidden': 'true' }, on ? '✓' : ''));
+              })));
+      }
     }
 
     // The room's options in plain words; the host can still flip Simple table and Hints here.
@@ -507,6 +439,7 @@ export function roomLobbyView(ctx) {
       h('h2', { class: 'gwait-h2' }, h('span', { text: t('family.games.lobby.players') }), h('span', { class: 'gcount', text: String(seats.length) })),
       h('ul', { class: 'gwait-seats' }, seatRows),
       adder,
+      inviter,
       options,
       humans < 2 && !seats.some((s) => s.bot) ? h('p', { class: 'gwait-hint gwait-alone', text: t('family.games.lobby.alone') }) : null,
       mine != null && !isHost ? h('button', { class: 'btn btn-quiet gwait-leave', type: 'button', disabled: busy, onclick: () => op(() => games.seats(room.id, { op: 'leave' })) }, t('family.games.lobby.leave')) : null,

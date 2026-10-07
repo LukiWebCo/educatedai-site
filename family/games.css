@@ -451,3 +451,100 @@ body.games-tv .toast { bottom: 3vh; }
 .gwait-opts { display: grid; gap: var(--eai-space-3); margin: var(--eai-space-4) 0; }
 .gwait-opts-edit { display: grid; gap: var(--eai-space-3); }
 .gwait-newbie { margin: 0; font-weight: 700; color: var(--eai-color-ink); }
+
+/* ---- the Games hub (#/games): two game tiles, then your games across both -------------------------------- */
+.ghub-head { margin-bottom: var(--eai-space-4); }
+.ghub-title { font-stretch: 85%; font-size: min(var(--eai-step-4), 12.5vw); }
+.ghub-tiles { display: grid; gap: var(--eai-space-4); margin: 0 0 var(--eai-space-4); }
+@media (min-width: 640px) { .ghub-tiles { grid-template-columns: 1fr 1fr; } }
+.ghub-tile { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "name art" "desc art" "foot foot";
+  align-items: center; gap: var(--eai-space-2) var(--eai-space-3); min-height: 168px; padding: var(--eai-space-4); border-radius: 22px;
+  color: var(--gm-chalk); text-decoration: none; overflow: hidden; -webkit-tap-highlight-color: transparent;
+  transition: transform var(--eai-motion-fast) var(--eai-ease), box-shadow var(--eai-motion-fast); }
+.ghub-tile:focus-visible { outline: 3px solid var(--eai-color-focus); outline-offset: 4px; }
+.ghub-tile:active { transform: scale(.985); }
+.ghub-tile-text { display: contents; }
+.ghub-tile-name { grid-area: name; min-width: 0; align-self: end; }
+.ghub-tile-desc { grid-area: desc; align-self: start; font-size: var(--eai-step-0); line-height: 1.35; color: color-mix(in srgb, var(--gm-chalk) 86%, transparent); }
+.ghub-tile-art { grid-area: art; display: flex; align-items: center; justify-content: center; }
+.ghub-tile-foot { grid-area: foot; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--eai-space-2); }
+.ghub-tile-go { margin-left: auto; flex: none; width: 44px; height: 44px; padding: 9px; border-radius: 50%; stroke: currentColor; fill: none; stroke-width: 2.6;
+  background: rgba(0, 0, 0, .28); box-shadow: inset 0 0 0 2px color-mix(in srgb, currentColor 30%, transparent); }
+.ghub-badge { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 6px 14px 6px 10px; border-radius: 999px;
+  background: var(--eai-color-accent); color: var(--eai-color-bg); font: 800 var(--eai-step-0)/1.15 var(--eai-font-body); box-shadow: 0 4px 0 color-mix(in oklab, var(--eai-color-accent) 55%, black); }
+.ghub-badge-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--eai-color-bg); flex: none; }
+/* Dots & Lines: green felt, chalk wordmark, the logo mark */
+.ghub-tile-dots { background-color: var(--gm-felt);
+  background-image: radial-gradient(120% 90% at 0% 0%, color-mix(in srgb, var(--gm-ball) 16%, transparent), transparent 60%),
+    radial-gradient(140% 110% at 50% 50%, transparent 55%, rgba(0, 0, 0, .4)), url(games-assets/felt.svg);
+  background-size: auto, auto, 96px 96px;
+  box-shadow: inset 0 0 0 2px var(--gm-chalk-soft), 0 14px 30px -18px rgba(0, 0, 0, .9); }
+.ghub-tile-dots:hover { box-shadow: inset 0 0 0 2px var(--gm-ball), 0 14px 30px -18px rgba(0, 0, 0, .9); }
+.ghub-wm { font-size: min(calc(2.3rem * var(--eai-text-scale)), 10.5vw); }
+.ghub-dots-art { display: block; width: min(96px, 24vw); height: auto; }
+/* Conquián: its own felt with the gold rail, the logo, a little fan of real cards */
+.ghub-tile-conquian { color: var(--cq-ivory); background-color: var(--cq-felt);
+  background-image: radial-gradient(120% 90% at 50% 30%, transparent, rgba(0, 0, 0, .38) 80%), url(games-assets/conquian/felt.svg);
+  background-size: auto, 160px 160px;
+  box-shadow: inset 0 0 0 3px var(--cq-rail), inset 0 0 0 5px color-mix(in srgb, var(--cq-gold) 45%, var(--cq-rail)), 0 14px 30px -18px rgba(0, 0, 0, .9); }
+.ghub-tile-conquian:hover { box-shadow: inset 0 0 0 3px var(--cq-rail), inset 0 0 0 5px var(--cq-gold), 0 14px 30px -18px rgba(0, 0, 0, .9); }
+.ghub-tile-conquian .ghub-badge { background: var(--cq-gold); color: var(--cq-ink); box-shadow: 0 4px 0 color-mix(in srgb, var(--cq-gold) 50%, black); }
+.ghub-tile-conquian .ghub-badge-dot { background: var(--cq-red); }
+.ghub-cq-logo { display: block; width: min(calc(190px * var(--eai-text-scale)), 100%); height: auto; }
+.ghub-tile-name-cq .cq-wordmark { font-size: min(calc(2.2rem * var(--eai-text-scale)), 10vw); }
+.ghub-fan { padding: 10px 14px 6px; }
+.ghub-fan .cq-card { --w: min(38px, 10vw); }
+.ghub-join { margin: 0 0 var(--eai-space-5); min-height: max(64px, calc(56px * var(--eai-text-scale))); }
+/* a room card says which game it is (the hub lists both) */
+.groom-text > .gtag-game { align-self: flex-start; }
+.gtag.gtag-game-dots { background: color-mix(in srgb, var(--gm-suit-g) 24%, var(--eai-color-surface)); }
+.groom-conquian.is-turn, a.groom-conquian:hover { border-color: var(--cq-gold); }
+
+/* ---- a game's own home (#/games/dots, #/games/conquian) ----------------------------------------------- */
+.ghome-back { margin-left: -6px; }
+.globby-head .ghead-row { justify-content: space-between; }
+
+/* ---- Conquián's home (#/games/conquian): the felt with the gold rail, the logo, a fan of cards ------------------- */
+.gfan { display: inline-flex; align-items: flex-end; justify-content: center; padding: 8px 0 4px; }
+.gfan .cq-card { transform-origin: 50% 140%; transform: rotate(calc(var(--i, 0) * 12deg)); }
+.gfan .cq-card + .cq-card { margin-left: calc(var(--w) * -.45); }
+.ghome-top { margin-bottom: var(--eai-space-3); }
+.gcq-hero { display: flex; flex-direction: column; align-items: center; gap: var(--eai-space-3); margin: 0 0 var(--eai-space-5);
+  padding: var(--eai-space-5) var(--eai-space-4) var(--eai-space-4); border-radius: 22px; text-align: center; overflow: hidden;
+  box-shadow: inset 0 2px 24px rgba(0, 0, 0, .45), inset 0 0 0 4px var(--cq-rail), inset 0 0 0 6px color-mix(in srgb, var(--cq-gold) 45%, var(--cq-rail)); }
+.gcq-hero-logo { width: 100%; display: flex; justify-content: center; }
+.gcq-hero .cq-logo { width: min(calc(300px * var(--eai-text-scale)), 88%); }
+.gcq-hero .cq-wordmark { font-size: min(calc(3rem * var(--eai-text-scale)), 13vw); align-items: center; }
+.gcq-fan .cq-card { --w: min(calc(62px * var(--eai-text-scale)), 18vw, 84px); }
+.gcq-tagline { margin: 0; max-width: 26em; font-size: var(--eai-step-0); line-height: 1.4; color: color-mix(in srgb, var(--cq-ivory) 90%, transparent); text-wrap: balance; }
+.ghome-cq .gpractice.is-first { border-color: var(--cq-gold);
+  background: radial-gradient(120% 90% at 0% 0%, color-mix(in srgb, var(--cq-gold) 16%, transparent), transparent 60%), var(--eai-color-surface); }
+.ghome-cq .btn-primary { background: var(--cq-red); border-color: var(--cq-red); color: var(--cq-ivory); box-shadow: 0 10px 28px -10px color-mix(in srgb, var(--cq-red) 70%, transparent); }
+.ghome-cq .ghero-new { box-shadow: 6px 6px 0 0 var(--cq-gold); }
+.ghome-cq .btn-primary:hover { background: color-mix(in srgb, var(--cq-red) 85%, white); }
+.ghome-cq .gpractice-rules { display: inline-flex; align-items: center; justify-content: center; gap: 10px; white-space: normal; }
+.ghome-cq .gpractice-rules .grules-q { flex: none; background: var(--cq-gold); color: var(--cq-ink); }
+.ghome-cq .gcard-turn.is-hot { border-color: var(--cq-gold);
+  background: radial-gradient(120% 90% at 0% 0%, color-mix(in srgb, var(--cq-gold) 18%, transparent), transparent 60%), var(--eai-color-surface); }
+.ghome-cq .gcount { background: var(--cq-gold); color: var(--cq-ink); }
+.gnew-game-conquian { color: var(--cq-gold); }
+
+/* ---- Conquián's two big ways in (Play with Claude / Play with family) and the waiting room's Invite family ---- */
+.gquick { display: grid; gap: var(--eai-space-2); margin: 0 0 var(--eai-space-4); }
+.gquick-btn { display: inline-flex; align-items: center; justify-content: center; gap: 12px; white-space: normal;
+  min-height: max(76px, calc(64px * var(--eai-text-scale))); font-size: var(--eai-step-2); font-weight: 800; }
+.gquick-btn .avatar { flex: none; width: 44px; height: 44px; box-shadow: 0 0 0 3px var(--cq-ivory); }
+.gquick-btn .icon { flex: none; width: 32px; height: 32px; stroke: currentColor; fill: none; stroke-width: 2.4; }
+.gquick .gpractice-sub { margin: 0 0 var(--eai-space-2); }
+.ghome-cq .ghero-join { margin: 0 0 var(--eai-space-3); min-height: max(64px, calc(56px * var(--eai-text-scale))); }
+.gcq-more { margin: 0 0 var(--eai-space-5); }
+.gcq-more .gopts-body { padding-top: var(--eai-space-3); }
+.gcq-wizard { white-space: normal; }
+.gwait-invite { display: flex; align-items: center; gap: var(--eai-space-3); width: 100%; min-height: 80px; margin-top: var(--eai-space-2); padding: var(--eai-space-2) var(--eai-space-3);
+  border-radius: var(--eai-radius-m); border: 2px dashed color-mix(in oklab, var(--eai-color-hit) 60%, transparent); background: transparent;
+  color: var(--eai-color-ink); font: 700 var(--eai-step-1)/1.2 var(--eai-font-body); text-align: left; cursor: pointer; }
+.gwait-invite:hover { border-style: solid; }
+.gwait-invite .gwait-plus { background: var(--eai-color-hit); }
+.gwait-invite-ic { display: grid; place-items: center; flex: none; width: 56px; height: 56px; border-radius: 50%; background: var(--eai-color-surface-2); }
+.gwait-invite-ic .icon { width: 30px; height: 30px; stroke: currentColor; fill: none; stroke-width: 2.2; }
+.gwait-people { margin-top: var(--eai-space-3); }

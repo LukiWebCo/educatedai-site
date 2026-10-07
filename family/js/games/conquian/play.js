@@ -2,26 +2,37 @@
 //
 //   import { playView } from './conquian/play.js';
 //   const stop = await playView(root, ctx);   // the same ctx index.js gives the Dots screen (getView, act, onView,
-//                                             // refresh, sfx, hint, reclaim, roomId, hideBack)
+//                                             // refresh, sfx, reclaim, roomId, hideBack)
 //
-// Layout, top to bottom (390 px first): whose turn · the other players (name, cards in hand, their melds) · the
-// felt with the pile, the card in the middle and the dead pile · your melds · the tray: what to do, your hand
-// (fanned) and the big buttons. Everything is a tap; building a take is "tap your cards, they join the middle
-// card", with live checking from melds.js. Full rebuild on every change (cheap), with one-render animation flags
-// so nothing replays. Motion lives in games-conquian.css under prefers-reduced-motion: no-preference.
-import { h, icon, clear } from '../../dom.js';
+// Made for a grandmother on a phone (owner, 2026-10-07: "everything was very crowded, real hard to use"):
+// - ONE voice: at every moment one big plain sentence says what to do (or what's happening), and there are at most
+//   two big buttons under your hand. Errors, the Practice lessons and the "good idea" suggestions all speak there.
+// - ¡Me sirve! does the work: when the card in the middle fits, the hand cards that go with it glow, and one tap
+//   lays down the best take (search.js, the server's own search ported). Arranging it by hand is a small link.
+// - Throwing is two taps: tap a card (it lifts), tap "Throw this one". Sharp Claude's pick glows softly (hints on).
+// - Simple view (default, per device; the switch is in the "?" sheet): no news line, no counters, no pile labels,
+//   no rule captions, no sort button; the other players are one line each (tap to see what they laid down).
+//   Full view adds all of that back.
+// - Your hand is one row of big cards, sorted by suit; hold a card to see it full size. "Your turn!" pops up
+//   (with the phone's sound setting and a buzz) when it becomes your move. On a tablet (768 px+) it's a big table.
+// Full rebuild on every change (cheap), with one-render animation flags so nothing replays. Motion lives in
+// games-conquian.css under prefers-reduced-motion: no-preference.
+import { h, clear } from '../../dom.js';
 import { currentLang, t } from '../../i18n.js';
 import { backPile, cardName, cardNode, hasArt, meldNode, probeArt } from './cards.js';
-import { fits, sortHand } from './melds.js';
+import { classify, fits, sortHand, sortMeld } from './melds.js';
+import { bestTake, loosest, takeKind, validTake } from './search.js';
 import { Take } from './stage.js';
-import { cambioPick, deciding, discarding, myMove, phaseOf } from './view.js';
+import { cambioPick, deciding, discarding, myMove, phaseOf, viewMode } from './view.js';
 import { cardSound } from './sound.js';
-import { errMsg, evText, hintWhy, newsLine, takeWhy, whyText } from './text.js';
+import { errMsg, evText, newsLine, takeWhy, whyText } from './text.js';
 import { cardBurst, celebrate, crownNode, restingPetals, stamp } from './fx.js';
 import { CqCoach } from './coach.js';
 import { maybeFirstRules } from './rules.js';
 
 const SORT_KEY = 'eai.games.cq.sort';
+const HOLD_MS = 450;          // tap-and-hold a card to see it big
+const POP_MS = 1600;          // the "Your turn!" banner
 
 export async function playView(root, ctx) {
   await probeArt();
@@ -54,17 +65,28 @@ function nameOf(v, s) {
 }
 const leftOf = (v, s) => (s + 1) % Math.max(1, (v.seats || []).length);
 const rightOf = (v, s) => (s - 1 + (v.seats || []).length) % Math.max(1, (v.seats || []).length);
+const hintsOn = (v) => !!(v && v.room && v.room.settings && v.room.settings.hints !== false);
+const forcingOn = (v) => !!(v && v.room && v.room.settings && v.room.settings.forcing !== false);
+// whose move it is right now (null in the Cambio / between hands)
+function moverOf(v) {
+  const ph = phaseOf(v);
+  if (ph === 'offer' && v.center) return v.center.to;
+  if (ph === 'discard' && v.turn) return v.turn.seat;
+  return null;
+}
 
 class CqScreen {
   constructor(root, ctx) {
     this.root = root;
     this.ctx = ctx;
     this.view = null;
-    this.take = null;          // the take being built (stage.js), only while you're deciding
-    this.building = false;
-    this.pick = null;          // the hand card chosen to discard / pass in the cambio
-    this.guide = null;         // the Smart Hint being shown
-    this.guideBusy = false;
+    this.mode = viewMode();    // 'simple' | 'full'
+    this.take = null;          // the take being arranged by hand (stage.js), only while you're deciding
+    this.building = false;     // "I'll arrange it myself" is open
+    this.best = null;          // the layout ¡Me sirve! lays down (search.js), while you're deciding
+    this.kind = null;          // out | fits | new_meld | rearrange
+    this.suggest = null;       // the card Sharp Claude would throw / pass (a soft glow)
+    this.pick = null;          // the hand card chosen to throw / give in the Cambio
     this.busy = false;
     this.msg = null;
     this.msgTimer = null;
@@ -72,7 +94,10 @@ class CqScreen {
     this.sortBy = 'suit';
     try { if (localStorage.getItem(SORT_KEY) === 'rank') this.sortBy = 'rank'; } catch { /* default */ }
     this.history = false;
+    this.open = new Set();     // the other players whose table is unfolded (Simple view)
     this.hideResultV = null;
+    this.popAt = 0;
+    this.zoom = null;
     this.alive = true;
     this.title0 = document.title;
     this.snd = cardSound(ctx.sfx);
@@ -81,6 +106,7 @@ class CqScreen {
   }
 
   sfx(name) { try { this.ctx.sfx && this.ctx.sfx.play(name); } catch { /* optional */ } }
+  get simple() { return this.mode !== 'full'; }
 
   async start() {
     document.body.classList.add('games-play', 'games-cq');
@@ -88,6 +114,10 @@ class CqScreen {
     this.hash0 = location.hash;
     this.onHash = () => { if (!this.root.isConnected || !location.hash.startsWith(this.hash0.split('/').slice(0, 4).join('/'))) this.destroy(); };
     window.addEventListener('hashchange', this.onHash);
+    this.onMode = (e) => { this.mode = e.detail === 'full' ? 'full' : 'simple'; if (this.alive && this.view) this.render(); };
+    window.addEventListener('eai-cq-view', this.onMode);
+    this.onKey = (e) => { if (e.key === 'Escape' && this.zoom) { this.zoom = null; this.render(); } };
+    window.addEventListener('keydown', this.onKey);
     const v = await this.ctx.getView();
     if (v.room && v.room.settings && v.room.settings.coach && v.me) this.coach = new CqCoach(this, this.ctx.roomId);
     this.setView(v, null);
@@ -100,12 +130,15 @@ class CqScreen {
   destroy() {
     if (!this.alive) return;
     this.alive = false;
-    document.body.classList.remove('games-play', 'games-cq');
+    document.body.classList.remove('games-play', 'games-cq', 'cq-simple-on', 'cq-full-on');
     document.title = this.title0;
     window.removeEventListener('hashchange', this.onHash);
+    window.removeEventListener('eai-cq-view', this.onMode);
+    window.removeEventListener('keydown', this.onKey);
     clearInterval(this.tick);
     clearTimeout(this.msgTimer);
-    if (this.coach && this.coach.unwatch) this.coach.unwatch();
+    clearTimeout(this.popTimer);
+    clearTimeout(this.holdT);
     if (this.unsub) this.unsub();
   }
 
@@ -124,24 +157,21 @@ class CqScreen {
       && !!prev.center.forced === !!v.center.forced && ids(prev) === ids(v) && table(prev) === table(v);
     if (!sameDecision) {
       this.take = deciding(v) ? new Take(v) : null;
-      this.building = !!(this.take && v.center && v.center.forced);
-      // Forced: the card fits one of your melds as it is (that's the rule), so it's already sitting there.
-      if (this.building) {
-        const me = (v.seats || []).find((s) => s.seat === v.me.seat) || {};
-        const i = (me.melds || []).findIndex((m) => fits(m, v.center.card));
-        if (i >= 0) { this.take.pick(v.center.card.id); this.take.drop('t' + i); this.take.sig0 = this.take.sig(); }
-      }
-      if (!prev || prev.v !== v.v) this.guide = null;
+      this.building = false;
+      // what ¡Me sirve! will lay down (the server says whether any take exists; we find the best one)
+      const may = deciding(v) && (v.center.forced || !(v.me.can && v.me.can.take === false));
+      this.best = may ? bestTake(v) : null;
+      if (this.best && !validTake(v, this.best, classify)) this.best = null;
+      this.kind = this.best ? takeKind(v, this.best) : null;
     }
     const hand = (v.me && v.me.hand) || [];
     if (this.pick != null && !hand.some((c) => c.id === this.pick)) this.pick = null;
     if (!discarding(v) && !cambioPick(v)) this.pick = null;
+    this.suggest = (discarding(v) || cambioPick(v)) && hintsOn(v) ? loosest(v) : null;
     if (prev) this.diffFx(prev, v); else this.fx = { deal: true };
-    if (deciding(v) && (!prev || this.fx.flip || this.fx.yourTurn)) this.scrollTo = this.building ? '.cq-mine' : '.cq-mid';
-    else if (myMove(v) && (!prev || this.fx.yourTurn)) this.scrollTo = '.cq-mid';
+    // the middle card in sight (and your melds under it, when the card goes onto one of them)
+    if (myMove(v) && (!prev || this.fx.yourTurn || this.fx.flip)) this.scrollTo = deciding(v) && this.best && this.kind !== 'new_meld' ? ['.cq-mid', '.cq-mine'] : '.cq-mid';
     if (this.coach) this.coach.onView(v, prev);
-    // a lesson on screen: keep its words in sight (the hand and the card on offer are in the tray anyway)
-    if (this.scrollTo && this.coach && this.coach.step) this.scrollTo = '.cq-coach';
     this.render();
   }
 
@@ -155,7 +185,12 @@ class CqScreen {
     fx.enter = new Set((v.seats || []).flatMap((s) => (s.melds || []).flat().map((c) => c.id)).filter((id) => !before.has(id)));
     if (fx.enter.size) this.snd.play('snap');
     if (v.center && v.center.forced && !(prev.center && prev.center.forced && prev.center.card.id === v.center.card.id)) fx.stamp = true;
-    if (myMove(v) && !myMove(prev)) { fx.yourTurn = true; this.sfx('your_turn'); }
+    if (myMove(v) && !myMove(prev)) {
+      // the moment it becomes your move: the banner, the chime and the buzz (sfx.js follows the phone's sound setting)
+      fx.yourTurn = true;
+      this.popAt = Date.now();
+      this.sfx('your_turn');
+    }
     const lastEv = (x) => ((x.events || []).slice(-1)[0] || {}).v;
     fx.ticker = lastEv(prev) !== lastEv(v);
     if (v.result && (!prev.result || prev.hand_no !== v.hand_no || prev.result.reason !== v.result.reason)) {
@@ -165,7 +200,7 @@ class CqScreen {
     this.fx = fx;
   }
 
-  flash(text, kind = 'info', ms = 3600) {
+  flash(text, kind = 'info', ms = 4200) {
     this.msg = { text, kind };
     clearTimeout(this.msgTimer);
     this.msgTimer = setTimeout(() => { this.msg = null; if (this.alive) this.render(); }, ms);
@@ -193,18 +228,20 @@ class CqScreen {
   }
 
   tapHand(id) {
-    if (this.busy) return;
+    if (this.busy || this.held()) return;
     const v = this.view;
     if (deciding(v)) {
-      if (!this.take) return;
-      if (!this.building) this.scrollTo = '.cq-mine';
-      this.building = true;
+      if (!this.building) {
+        // the cards glow on their own; ¡Me sirve! (or Pass) is the thing to tap. Say it again, gently.
+        this.nudge = true;
+        this.render();
+        return;
+      }
       const res = this.take.tapHand(id);
       if (res.ok) {
         const g = res.key && this.take.info(this.take.group(res.key));
         this.fx = { put: id };
         this.snd.play(g && g.valid ? 'snap' : 'flip');
-        this.followGuide(id);
       }
     } else if (discarding(v) || cambioPick(v)) {
       this.pick = this.pick === id ? null : id;
@@ -214,8 +251,16 @@ class CqScreen {
     this.render();
   }
 
+  // "I'll arrange it myself": the builder (stage.js), with the card already where it fits when you were forced.
   startBuild() {
     if (!this.take) return;
+    this.take.reset();
+    const v = this.view;
+    if (v.center && v.center.forced) {
+      const me = seatOf(v, v.me.seat) || {};
+      const i = (me.melds || []).findIndex((m) => fits(m, v.center.card));
+      if (i >= 0) { this.take.pick(v.center.card.id); this.take.drop('t' + i); this.take.sig0 = this.take.sig(); }
+    }
     this.building = true;
     this.scrollTo = '.cq-mine';
     this.render();
@@ -224,13 +269,12 @@ class CqScreen {
   cancelBuild() {
     if (!this.take) return;
     this.take.reset();
-    this.building = !!(this.view.center && this.view.center.forced);
+    this.building = false;
     this.render();
   }
 
   pickTable(id) {
-    if (!this.take || this.busy) return;
-    this.building = true;
+    if (!this.take || this.busy || !this.building) return;
     this.take.pick(id);
     this.render();
   }
@@ -254,19 +298,23 @@ class CqScreen {
     this.render();
   }
 
+  // ¡Me sirve! (and "Lay it down" when forced): one tap lays the best take down. Arranging by hand: its own button.
   async meSirve() {
     if (!this.take) return;
-    if (!this.building) { this.startBuild(); return; }
-    const st = this.take.status();
-    if (!st.ok) {
-      this.snd.play('bad');
-      this.flash(takeWhy(st.why) || t('family.games.cq.take.bad'), 'warn');
-      this.shake = true;
-      this.render();
+    if (this.building) {
+      const st = this.take.status();
+      if (!st.ok) {
+        this.snd.play('bad');
+        this.flash(takeWhy(st.why) || t('family.games.cq.take.bad'), 'warn');
+        this.shake = true;
+        this.render();
+        return;
+      }
+      if (await this.send(this.take.action())) this.snd.play('snap');
       return;
     }
-    const ok = await this.send(this.take.action());
-    if (ok) this.snd.play('snap');
+    if (!this.best) { this.startBuild(); return; }
+    if (await this.send({ type: 'take', melds: this.best.map((m) => m.slice()) })) this.snd.play('snap');
   }
 
   async pass(force) {
@@ -275,7 +323,7 @@ class CqScreen {
   }
 
   async discard(force) {
-    if (this.pick == null) { this.flash(t('family.games.cq.msg.pick_discard'), 'warn'); this.render(); return; }
+    if (this.pick == null) { this.flash(t('family.games.cq.msg.pick_discard'), 'warn'); this.nudge = true; this.render(); return; }
     const id = this.pick;
     if (force) await stamp(this.root.querySelector(`.cq-hand [data-id="${id}"]`) || this.root, { sound: () => this.snd.play('stamp') });
     const ok = await this.send(force ? { type: 'discard', card: id, force: true } : { type: 'discard', card: id });
@@ -283,7 +331,7 @@ class CqScreen {
   }
 
   async cambio() {
-    if (this.pick == null) { this.flash(t('family.games.cq.msg.pick_cambio'), 'warn'); this.render(); return; }
+    if (this.pick == null) { this.flash(t('family.games.cq.msg.pick_cambio'), 'warn'); this.nudge = true; this.render(); return; }
     const ok = await this.send({ type: 'cambio', card: this.pick });
     if (ok) this.pick = null;
   }
@@ -297,54 +345,62 @@ class CqScreen {
     this.render();
   }
 
-  // ---- the Smart Hint ----------------------------------------------------------------------------------------------
-  async toggleHint() {
-    if (this.guide) { this.guide = null; this.render(); return; }
-    if (this.guideBusy || this.busy || !this.ctx.hint || !myMove(this.view)) return;
-    this.guideBusy = true;
-    this.render();
-    const v0 = this.view.v;
-    let res = null;
-    try { res = await this.ctx.hint(); } catch { res = null; }
-    this.guideBusy = false;
-    if (!this.alive) return;
-    if (!res || !res.hint) this.flash(t('family.games.cq.msg.refused'), 'warn');
-    else if (v0 === this.view.v) this.guide = { ...res.hint };
-    this.render();
+  // ---- tap-and-hold: a card full size ------------------------------------------------------------------------------
+  held() { return Date.now() - (this.holdFired || 0) < 700; }
+
+  holdable(node, card) {
+    const stop = () => clearTimeout(this.holdT);
+    node.addEventListener('pointerdown', (e) => {
+      if (e.button > 0) return;
+      stop();
+      const x0 = e.clientX;
+      const y0 = e.clientY;
+      node.__hold = { x0, y0 };
+      this.holdT = setTimeout(() => { this.holdFired = Date.now(); this.zoom = { card, at: Date.now() }; this.render(); }, HOLD_MS);
+    });
+    node.addEventListener('pointermove', (e) => {
+      const h0 = node.__hold;
+      if (h0 && Math.hypot(e.clientX - h0.x0, e.clientY - h0.y0) > 10) stop();
+    });
+    ['pointerup', 'pointercancel', 'pointerleave'].forEach((ev) => node.addEventListener(ev, stop));
+    node.addEventListener('contextmenu', (e) => e.preventDefault());
+    return node;
   }
 
-  // Lay the suggested take out on your table (you still tap ¡Me sirve! yourself).
-  showMe() {
-    const g = this.guide;
-    if (!g || !g.melds || !this.take) return;
-    this.take.reset();
-    if (this.take.applyLayout(g.melds)) { this.building = true; this.scrollTo = '.cq-mine'; this.guide = { ...g, shown: true }; this.snd.play('snap'); }
-    this.render();
-  }
-
-  followGuide(id) {
-    const g = this.guide;
-    if (!g || g.kind !== 'take' || !g.melds) return;
-    if (!g.melds.flat().includes(id)) { this.guide = null; this.flash(t('family.games.cq.hint.off'), 'info'); }
+  renderZoom() {
+    const z = this.zoom;
+    if (!z) return null;
+    const close = () => { if (Date.now() - z.at < 350) return; this.zoom = null; this.render(); };
+    return h('div', { class: 'cq-zoom', role: 'dialog', 'aria-modal': 'true', 'aria-label': cardName(z.card), onclick: close },
+      cardNode(z.card, { size: 'z', cls: 'cq-zoom-card' }),
+      h('p', { class: 'cq-zoom-name' }, cardName(z.card)),
+      h('button', { class: 'gm-btn gp-btn gp-btn-quiet cq-zoom-x', type: 'button', 'data-fk': 'zoom-x', onclick: (e) => { e.stopPropagation(); this.zoom = null; this.render(); } },
+        t('family.games.common.close')));
   }
 
   // ---- render --------------------------------------------------------------------------------------------------
   render() {
     if (!this.alive) return;
     const v = this.view;
+    document.body.classList.toggle('cq-simple-on', this.simple);
+    document.body.classList.toggle('cq-full-on', !this.simple);
     const fk = document.activeElement && document.activeElement.dataset ? document.activeElement.dataset.fk : null;
-    const node = h('div', { class: 'gp cq' + (hasArt() ? ' cq-art-on' : '') + (this.busy ? ' gp-busy' : '') + (this.building ? ' cq-building' : '') + (v.reina ? ' cq-reina' : '') },
-      this.renderStrip(v),
-      this.coach ? this.coach.node() : null,
+    const cls = ['gp', 'cq', this.simple ? 'cq-simple' : 'cq-full'];
+    if (hasArt()) cls.push('cq-art-on');
+    if (this.busy) cls.push('gp-busy');
+    if (this.building) cls.push('cq-building');
+    if (v.reina) cls.push('cq-reina');
+    const node = h('div', { class: cls.join(' ') },
+      this.simple ? null : this.renderStrip(v),
       h('section', { class: 'cq-table gm-felt cq-felt', 'aria-label': t('family.games.cq.table') },
         this.renderOpps(v),
-        this.renderMiddle(v),
-        this.renderForced(v)),
+        this.renderMiddle(v)),
       this.renderMine(v),
-      v.me ? this.renderTray(v) : h('p', { class: 'gp-watch' }, icon('help', 'icon icon-inline'), t('family.games.cq.watching')),
-      this.renderResult(v));
+      this.renderTray(v),
+      this.renderResult(v),
+      this.renderPop(),
+      this.renderZoom());
     clear(this.root).append(node);
-    this.decorateGuide();
     if (this.coach) this.coach.decorate(this.root);
     if (this.fx.stamp) { const el = this.root.querySelector('.cq-center-card'); if (el) stamp(el, { sound: () => this.snd.play('stamp'), stay: true }); }
     if (this.fx.result && v.result && v.result.reason === 'out') {
@@ -353,6 +409,7 @@ class CqScreen {
     }
     this.fx = {};
     this.shake = false;
+    this.nudge = false;
     document.title = myMove(v) ? '● ' + t('family.games.cq.turn.you_short') : this.title0;
     if (fk) {
       const again = this.root.querySelector(`[data-fk="${CSS.escape(fk)}"]`);
@@ -360,15 +417,26 @@ class CqScreen {
     }
     const tray = this.root.querySelector('.cq-tray');
     this.root.style.setProperty('--gp-tray-h', (tray ? Math.ceil(tray.getBoundingClientRect().height) : 0) + 'px');
+    // the picked card (or the first glowing one) in sight in the hand's row
+    const hand = this.root.querySelector('.cq-hand');
+    const focusCard = hand && hand.querySelector('.is-picked, .is-goes, .is-suggest');
+    if (hand && focusCard && hand.scrollWidth > hand.clientWidth) {
+      const r = focusCard.getBoundingClientRect();
+      const hr = hand.getBoundingClientRect();
+      if (r.left < hr.left || r.right > hr.right) hand.scrollLeft += r.left - hr.left - (hr.width - r.width) / 2;
+    }
     if (this.scrollTo) { const sel = this.scrollTo; this.scrollTo = null; requestAnimationFrame(() => this.reveal(sel)); }
   }
 
-  // Bring a part of the table into view just above the tray (it covers the bottom of the screen).
+  // Bring a part of the table into view just above the tray (it covers the bottom of the screen). Two selectors:
+  // from the top of the first to the bottom of the second, as much as fits (the first one's top wins).
   reveal(sel) {
-    const el = this.root.querySelector(sel);
+    const [a, b] = Array.isArray(sel) ? sel : [sel, sel];
+    const el = this.root.querySelector(a);
+    const el2 = this.root.querySelector(b) || el;
     const tray = this.root.querySelector('.cq-tray');
     if (!el || !tray) return;
-    const r = el.getBoundingClientRect();
+    const r = { top: el.getBoundingClientRect().top, bottom: el2.getBoundingClientRect().bottom };
     const bottom = window.innerHeight - tray.getBoundingClientRect().height - 10;
     // the app's top bar is sticky: never tuck the top of the part under it
     const bar = document.querySelector('.topbar');
@@ -377,19 +445,6 @@ class CqScreen {
     if (r.bottom > bottom) dy = r.bottom - bottom;
     if (r.top - dy < top) dy = r.top - top;
     if (Math.abs(dy) > 4) window.scrollBy({ top: dy, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
-  }
-
-  turnText(v) {
-    const ph = phaseOf(v);
-    if (ph === 'over' || (v.result && v.result.match_over)) return t('family.games.cq.turn.over');
-    if (ph === 'between') return t('family.games.cq.turn.between');
-    if (ph === 'cambio') return cambioPick(v) ? t('family.games.cq.turn.cambio_you', { name: nameOf(v, leftOf(v, v.me.seat)) }) : t('family.games.cq.turn.cambio_wait');
-    if (ph === 'offer' && v.center) {
-      if (deciding(v)) return v.center.forced ? t('family.games.cq.turn.forced') : t('family.games.cq.turn.offer_you');
-      return t('family.games.cq.turn.offer_other', { name: nameOf(v, v.center.to) });
-    }
-    if (ph === 'discard') return discarding(v) ? t('family.games.cq.turn.discard_you') : t('family.games.cq.turn.discard_other', { name: nameOf(v, v.turn.seat) });
-    return '';
   }
 
   clockText() {
@@ -405,72 +460,81 @@ class CqScreen {
     if (el) el.textContent = this.clockText();
   }
 
+  // ---- Full view only: what kind of game, and the news line -------------------------------------------------------
   renderStrip(v) {
-    const mine = myMove(v);
-    const turn = h('div', { class: 'gp-turn' + (mine ? ' gp-turn-mine' : '') + (this.fx.yourTurn ? ' gp-turn-pop' : ''), role: 'status', 'aria-live': 'polite' },
-      mine ? h('span', { class: 'gp-ball', 'aria-hidden': 'true' }) : null,
-      h('span', { class: 'gp-turn-lines' },
-        h('span', { class: 'gp-turn-text' }, this.turnText(v)),
-        h('span', { class: 'gp-clock' }, this.clockText())));
     const info = h('p', { class: 'cq-info' },
       h('span', null, v.variant === 'familia' ? t('family.games.cq.variant.familia') : t('family.games.cq.variant.classic')),
       h('span', null, t('family.games.cq.hand_no', { n: v.hand_no || 1 })),
       v.stake > 1 ? h('span', { class: 'cq-stake' }, t('family.games.cq.stake', { n: v.stake })) : null,
       h('span', null, t('family.games.cq.goal', { n: v.target })));
-    return h('header', { class: 'gp-strip cq-strip' },
-      h('div', { class: 'gp-strip-row' }, turn),
-      info,
-      this.renderCovered(v),
-      this.renderTicker(v));
-  }
-
-  renderCovered(v) {
-    const mine = v.me && seatOf(v, v.me.seat);
-    if (!mine || !mine.covering_bot || !this.ctx.reclaim || phaseOf(v) === 'over') return null;
-    return h('div', { class: 'gp-covered', role: 'status' },
-      h('span', { class: 'gp-covered-text' }, t('family.games.cq.covered')),
-      h('button', {
-        class: 'gm-btn gm-btn--go gp-btn gp-takeback', type: 'button', 'data-fk': 'takeback', disabled: this.busy,
-        onclick: async () => { try { await this.ctx.reclaim(); } catch { this.flash(t('family.games.cq.msg.refused'), 'warn'); this.render(); } },
-      }, t('family.games.cq.take_back')));
+    return h('header', { class: 'gp-strip cq-strip' }, info, this.renderTicker(v));
   }
 
   renderTicker(v) {
     const evs = (v.events || []).map(evText).filter(Boolean);
     if (!evs.length) return null;
     const news = newsLine(v.events);
-    const last = news.text;
     const btn = h('button', { class: 'cq-ticker' + (this.fx.ticker ? ' gp-ticker-new' : ''), type: 'button', 'data-fk': 'ticker', 'aria-expanded': String(this.history),
       onclick: () => { this.history = !this.history; this.render(); } },
-    h('span', { class: 'gp-tick-dot', 'aria-hidden': 'true' }), h('span', { class: 'cq-ticker-text', 'aria-live': 'polite' }, last),
+    h('span', { class: 'gp-tick-dot', 'aria-hidden': 'true' }), h('span', { class: 'cq-ticker-text' }, news.text),
     h('span', { class: 'cq-ticker-more', 'aria-hidden': 'true' }, this.history ? '−' : '+'));
     return h('div', { class: 'cq-tick-wrap' }, btn,
       this.history ? h('ol', { class: 'cq-history', 'aria-label': t('family.games.cq.history') }, evs.slice(0, evs.length - news.n).slice(-7).reverse().map((x) => h('li', null, x))) : null);
   }
 
-  // The other players: one row each, top of the felt.
+  // The other players. Simple: one line each ("Claude · 3 of 11 down" and a little fan of their cards); tap to see
+  // what they laid down. Full: their melds always, the dealer, points.
   renderOpps(v) {
     const others = (v.seats || []).filter((s) => !v.me || s.seat !== v.me.seat);
     const ph = phaseOf(v);
+    const mover = moverOf(v);
     return h('ul', { class: 'cq-opps', 'aria-label': t('family.games.cq.players') }, others.map((s) => {
-      const on = (ph === 'offer' && v.center && v.center.to === s.seat) || (ph === 'discard' && v.turn.seat === s.seat);
+      const on = mover === s.seat || (ph === 'cambio' && !s.cambio_done);
       const label = t('family.games.cq.opp_aria', { name: s.name, n: s.hand_count, m: s.melded || 0, target: v.target });
-      return h('li', { class: 'cq-opp' + (on ? ' is-on' : '') + (s.away ? ' is-away' : ''), 'aria-label': label },
-        h('div', { class: 'cq-opp-head' },
-          h('span', { class: 'cq-opp-name' }, s.name, s.bot || s.covering_bot ? h('span', { class: 'gp-bot', 'aria-hidden': 'true' }, ' ✦') : null),
+      const name = h('span', { class: 'cq-opp-name' }, s.name, s.bot || s.covering_bot ? h('span', { class: 'gp-bot', 'aria-hidden': 'true' }, ' ✦') : null);
+      const melds = (s.melds || []).length ? h('div', { class: 'cq-opp-melds' }, s.melds.map((m) => this.holdMeld(meldNode(sortMeld(m), { size: 's', fresh: this.fx.enter }), m))) : null;
+      const li = (kids) => h('li', { class: 'cq-opp' + (on ? ' is-on' : '') + (s.away ? ' is-away' : ''), 'data-seat': s.seat }, kids);
+      if (this.simple) {
+        const open = this.open.has(s.seat);
+        const can = !!melds;
+        const line = h(can ? 'button' : 'div', { class: 'cq-opp-line', 'aria-label': label, ...(can ? { type: 'button', 'aria-expanded': String(open), 'data-fk': 'opp-' + s.seat,
+          onclick: () => { if (open) this.open.delete(s.seat); else this.open.add(s.seat); this.render(); } } : { role: 'group' }) },
+        name,
+        h('span', { class: 'cq-opp-down', 'aria-hidden': 'true' }, t('family.games.cq.down', { n: s.melded || 0, target: v.target })),
+        h('span', { class: 'grow' }),
+        this.fan(s.hand_count, !!v.reina),
+        can ? h('span', { class: 'cq-opp-more', 'aria-hidden': 'true' }, open ? '−' : '+') : null);
+        return li([line, open ? melds : null]);
+      }
+      return li([
+        h('div', { class: 'cq-opp-head', 'aria-label': label, role: 'group' },
+          name,
           v.dealer === s.seat ? h('span', { class: 'cq-chip cq-chip-dealer' }, t('family.games.cq.dealer')) : null,
           ph === 'cambio' ? h('span', { class: 'cq-chip' + (s.cambio_done ? ' is-done' : '') }, s.cambio_done ? t('family.games.cq.cambio_ready') : t('family.games.cq.cambio_choosing')) : null,
           h('span', { class: 'grow' }),
           backPile(s.hand_count, { reina: !!v.reina, size: 'xs', cls: 'cq-opp-hand' }),
           h('span', { class: 'cq-chip cq-chip-melded', 'aria-hidden': 'true' }, `${s.melded || 0}/${v.target}`),
           v.room.settings.match_to ? h('span', { class: 'cq-chip cq-chip-pts', 'aria-hidden': 'true' }, t('family.games.cq.pts', { n: s.points || 0 })) : null),
-        (s.melds || []).length ? h('div', { class: 'cq-opp-melds' }, s.melds.map((m) => meldNode(m, { size: 's', fresh: this.fx.enter }))) : null);
+        melds]);
     }));
   }
 
-  // The pile, the card in the middle, the dead pile.
+  // A little fan of card backs: how many cards someone holds, without a number to read.
+  fan(n, reina) {
+    const k = Math.max(0, Math.min(n || 0, 10));
+    return h('span', { class: 'cq-fan', 'aria-hidden': 'true', style: { '--k': String(k) } },
+      Array.from({ length: k }, (_, i) => { const c = cardNode(null, { back: true, reina, size: 'xs' }); c.style.setProperty('--i', String(i - (k - 1) / 2)); return c; }));
+  }
+
+  holdMeld(node, cards) {
+    node.querySelectorAll('.cq-card').forEach((el, i) => this.holdable(el, cards.find((c) => String(c.id) === el.dataset.id) || cards[i]));
+    return node;
+  }
+
+  // The pile, the card in the middle, the dead pile. Simple: the piles are small pictures, no words or numbers.
   renderMiddle(v) {
     const c = v.center;
+    const simple = this.simple;
     let centerEl;
     if (c && c.card && phaseOf(v) === 'offer') {
       const taken = this.building && this.take && this.take.where(c.card.id);
@@ -479,48 +543,49 @@ class CqScreen {
         ? (byMe ? t('family.games.cq.center.turned_you') : t('family.games.cq.center.turned', { name: nameOf(v, c.by) }))
         : (byMe ? t('family.games.cq.center.thrown_you') : t('family.games.cq.center.thrown', { name: nameOf(v, c.by) }));
       const to = v.me && c.to === v.me.seat ? t('family.games.cq.center.for_you') : t('family.games.cq.center.for', { name: nameOf(v, c.to) });
+      const card = taken
+        ? h('span', { class: 'cq-card cq-l cq-slot cq-center-card', 'aria-label': t('family.games.cq.center.in_meld') }, h('span', { class: 'cq-slot-arrow', 'aria-hidden': 'true' }, '↓'))
+        : this.holdable(cardNode(c.card, { size: 'l', cls: 'cq-center-card' + (this.fx.flip ? ' is-flip' : '') + (c.forced ? ' is-forced' : '') + (deciding(v) && this.best ? ' is-goes' : ''),
+          tag: deciding(v) && this.building ? 'button' : 'span', onclick: () => this.pickTable(c.card.id), attrs: { 'data-fk': 'center' } }), c.card);
       centerEl = h('div', { class: 'cq-center' + (v.me && c.to === v.me.seat ? ' is-mine' : '') },
-        taken
-          ? h('span', { class: 'cq-card cq-l cq-slot cq-center-card', 'aria-label': t('family.games.cq.center.in_meld') }, h('span', { class: 'cq-slot-arrow', 'aria-hidden': 'true' }, '↓'))
-          : cardNode(c.card, { size: 'l', cls: 'cq-center-card' + (this.fx.flip ? ' is-flip' : '') + (c.forced ? ' is-forced' : ''),
-            tag: deciding(v) && this.building ? 'button' : 'span', onclick: () => this.pickTable(c.card.id), attrs: { 'data-fk': 'center' } }),
+        card,
         h('span', { class: 'cq-center-from' }, from),
-        h('span', { class: 'cq-center-to' }, to, c.step === 2 ? h('span', { class: 'cq-last' }, ' · ', t('family.games.cq.center.last')) : null));
-    } else if (phaseOf(v) === 'discard' && v.turn) {
-      centerEl = h('div', { class: 'cq-center' }, h('span', { class: 'cq-card cq-l cq-slot cq-center-card' }),
-        h('span', { class: 'cq-center-from' }, discarding(v) ? t('family.games.cq.center.your_throw') : t('family.games.cq.center.waiting_throw', { name: nameOf(v, v.turn.seat) })));
+        simple ? null : h('span', { class: 'cq-center-to' }, to, c.step === 2 ? h('span', { class: 'cq-last' }, ' · ', t('family.games.cq.center.last')) : null));
     } else {
-      centerEl = h('div', { class: 'cq-center' }, h('span', { class: 'cq-card cq-l cq-slot cq-center-card' }));
+      centerEl = h('div', { class: 'cq-center' }, h('span', { class: 'cq-card cq-l cq-slot cq-center-card', 'aria-hidden': 'true' }));
     }
+    const small = simple ? 's' : 'm';
     const stock = h('div', { class: 'cq-pilebox' },
-      backPile(v.stock_left || 0, { reina: !!v.reina, size: 'm', label: t('family.games.cq.stock_aria', { n: v.stock_left || 0 }), cls: 'cq-stock' + ((v.stock_left || 0) <= 3 ? ' is-low' : '') }),
-      h('span', { class: 'cq-pile-l', 'aria-hidden': 'true' }, t('family.games.cq.stock')));
+      simple
+        ? h('span', { class: 'cq-stock-s', role: 'img', 'aria-label': t('family.games.cq.stock_aria', { n: v.stock_left || 0 }) },
+          (v.stock_left || 0) > 0 ? cardNode(null, { back: true, reina: !!v.reina, size: small }) : h('span', { class: 'cq-card cq-' + small + ' cq-empty' }))
+        : backPile(v.stock_left || 0, { reina: !!v.reina, size: 'm', label: t('family.games.cq.stock_aria', { n: v.stock_left || 0 }), cls: 'cq-stock' + ((v.stock_left || 0) <= 3 ? ' is-low' : '') }),
+      simple ? null : h('span', { class: 'cq-pile-l', 'aria-hidden': 'true' }, t('family.games.cq.stock')));
     const dead = h('div', { class: 'cq-pilebox' },
       h('span', { class: 'cq-dead', role: 'img', 'aria-label': v.dead_top ? t('family.games.cq.dead_aria', { n: v.dead_count || 0, card: cardName(v.dead_top) }) : t('family.games.cq.dead_none') },
-        v.dead_top ? cardNode(v.dead_top, { size: 'm', label: '', cls: 'cq-dead-top' }) : h('span', { class: 'cq-card cq-m cq-empty', 'aria-hidden': 'true' }),
-        v.dead_count ? h('b', { class: 'cq-pile-n', 'aria-hidden': 'true' }, String(v.dead_count)) : null),
-      h('span', { class: 'cq-pile-l', 'aria-hidden': 'true' }, t('family.games.cq.dead')));
+        v.dead_top ? this.holdable(cardNode(v.dead_top, { size: small, label: '', cls: 'cq-dead-top' }), v.dead_top) : h('span', { class: 'cq-card cq-' + small + ' cq-empty', 'aria-hidden': 'true' }),
+        !simple && v.dead_count ? h('b', { class: 'cq-pile-n', 'aria-hidden': 'true' }, String(v.dead_count)) : null),
+      simple ? null : h('span', { class: 'cq-pile-l', 'aria-hidden': 'true' }, t('family.games.cq.dead')));
     return h('div', { class: 'cq-mid' }, stock, centerEl, dead);
   }
 
-  renderForced(v) {
-    if (!v.center || !v.center.forced || phaseOf(v) !== 'offer') return null;
-    const mine = deciding(v);
-    return h('p', { class: 'cq-forced' + (mine ? ' is-mine' : ''), role: 'status' },
-      h('b', null, t('family.games.cq.btn.force')), ' ',
-      mine ? t('family.games.cq.forced.you', { name: nameOf(v, v.center.by) }) : t('family.games.cq.forced.other', { a: nameOf(v, v.center.by), b: nameOf(v, v.center.to) }));
-  }
-
-  // Your melds: as they are, or (while building a take) the groups you're arranging, each checked live.
+  // Your melds: as they are, or (while arranging by hand) the groups you're arranging, each checked live.
   renderMine(v) {
     if (!v.me) return null;
     const meSeat = seatOf(v, v.me.seat) || {};
+    const melds = meSeat.melds || [];
+    const count = (this.building && this.take ? this.take.status().count : meSeat.melded) || 0;
     const head = h('h2', { class: 'cq-mine-h' }, h('span', null, t('family.games.cq.your_melds')),
-      h('span', { class: 'cq-count' }, t('family.games.cq.melded', { n: (this.building && this.take ? this.take.status().count : meSeat.melded) || 0, target: v.target })));
+      this.simple ? null : h('span', { class: 'cq-count' }, t('family.games.cq.melded', { n: count, target: v.target })));
     if (!(this.building && this.take)) {
-      const melds = meSeat.melds || [];
+      if (!melds.length && this.simple) return null;
+      // ¡Me sirve! puts the middle card onto one of these: that one glows
+      const home = deciding(v) && this.best && this.kind !== 'rearrange' ? this.best.find((m) => m.includes(v.center.card.id)) : null;
       return h('section', { class: 'cq-mine' }, head,
-        melds.length ? h('div', { class: 'cq-mine-melds' }, melds.map((m) => meldNode(m, { size: 'm', fresh: this.fx.enter })))
+        melds.length ? h('div', { class: 'cq-mine-melds' }, melds.map((m) => {
+          const goes = home && m.every((c) => home.includes(c.id));
+          return this.holdMeld(meldNode(sortMeld(m), { size: this.simple ? 'h' : 'm', fresh: this.fx.enter, cls: goes ? 'is-goes' : '' }), m);
+        }))
           : h('p', { class: 'cq-empty-note' }, t('family.games.cq.no_melds')));
     }
     const tk = this.take;
@@ -539,6 +604,8 @@ class CqScreen {
         if (g.orig && !g.changed) cls.push('is-orig');
         if (!g.valid && this.shake) cls.push('gp-shake');
         const label = g.valid ? (g.kind === 'run' ? t('family.games.cq.kind.run') : t('family.games.cq.kind.set')) : whyText(g.why);
+        // Simple: a tick for a good group (no rule captions); what's wrong when it isn't
+        const caption = !g.cards.length ? '' : g.valid ? (this.simple ? '✓' : '✓ ' + label) : label;
         return h('div', { class: cls.join(' '), 'data-key': g.key, role: 'group', 'aria-label': label },
           h('div', { class: 'cq-group-cards' }, g.cards.map((c) => {
             const fromHand = tk.isHandCard(c.id);
@@ -549,7 +616,7 @@ class CqScreen {
           }),
           !g.cards.length ? h('span', { class: 'cq-group-empty' }, t('family.games.cq.tap_cards')) : null),
           h('div', { class: 'cq-group-foot' },
-            h('span', { class: 'cq-group-why' + (g.valid ? ' is-ok' : '') }, g.cards.length ? (g.valid ? '✓ ' + label : label) : ''),
+            h('span', { class: 'cq-group-why' + (g.valid ? ' is-ok' : '') }, caption),
             holding && tk.where(tk.held) && tk.where(tk.held).key !== g.key
               ? h('button', { class: 'cq-put gm-target', type: 'button', 'data-fk': 'put-' + g.key, onclick: () => this.dropOn(g.key) }, h('span', { 'aria-hidden': 'true' }, '↓ '), t('family.games.cq.put_here'))
               : !holding && centerLoose && g.orig && g.valid && fits(g.cards, center) ? h('button', { class: 'cq-put gm-target', type: 'button', 'data-fk': 'put-' + g.key, onclick: () => this.moveCenter(g.key) },
@@ -560,178 +627,185 @@ class CqScreen {
         h('span', { class: 'gp-plus', 'aria-hidden': 'true' }, '+'), holding ? t('family.games.cq.put_new') : t('family.games.cq.new_meld'))));
   }
 
-  // ---- the tray ------------------------------------------------------------------------------------------------
-  statusText(v) {
-    if (this.busy) return t('family.games.cq.msg.sending');
-    if (this.msg) return this.msg.text;
+  // ---- the one voice -------------------------------------------------------------------------------------------
+  // {text, kicker?, kind?}: the single sentence on screen. Lessons, errors and suggestions all speak here.
+  voice(v) {
+    const lesson = this.coach && v.me && !v.result ? this.coach.say() : null;
+    const kicker = lesson ? lesson.kicker : null;
+    if (this.busy) return { text: t('family.games.cq.msg.sending'), kicker };
+    if (this.msg) return { text: this.msg.text, kind: this.msg.kind, kicker };
+    if (lesson && lesson.text) return { text: lesson.text, kicker, kind: 'lesson' };
+    if (!v.me) return { text: t('family.games.cq.watching') };
     const ph = phaseOf(v);
-    // what the Cambio brought (the card also wears a NEW tag) — unless there's something to do right now
-    if (v.me.got && ph !== 'cambio' && !deciding(v) && !discarding(v)) return t('family.games.cq.msg.got', { card: cardName(v.me.got), name: nameOf(v, rightOf(v, v.me.seat)) });
-    if (cambioPick(v)) return this.pick != null ? t('family.games.cq.msg.cambio_ready', { card: cardName(this.cardById(this.pick)), name: nameOf(v, leftOf(v, v.me.seat)) }) : t('family.games.cq.msg.cambio_pick');
-    if (ph === 'cambio') return v.me.pick ? t('family.games.cq.msg.cambio_sent', { card: cardName(v.me.pick), name: nameOf(v, leftOf(v, v.me.seat)) }) : t('family.games.cq.msg.cambio_wait');
+    const mine = seatOf(v, v.me.seat);
+    if (mine && mine.covering_bot && this.ctx.reclaim && ph !== 'over') return { text: t('family.games.cq.covered') };
+    if (ph === 'over' || (v.result && v.result.match_over)) return { text: t('family.games.cq.turn.over') };
+    if (ph === 'between') return { text: t('family.games.cq.turn.between') };
+    const next = nameOf(v, leftOf(v, v.me.seat));
+    if (cambioPick(v)) {
+      if (this.pick != null) return { text: t('family.games.cq.say.cambio_ready', { card: cardName(this.cardById(this.pick)), name: next }), kicker };
+      return { text: this.suggest != null ? t('family.games.cq.say.cambio_hint', { name: next }) : t('family.games.cq.say.cambio', { name: next }), kicker };
+    }
+    if (ph === 'cambio') return { text: v.me.pick ? t('family.games.cq.msg.cambio_sent', { card: cardName(v.me.pick), name: next }) : t('family.games.cq.msg.cambio_wait'), kicker };
     if (deciding(v)) {
-      if (!this.building) {
-        if (v.me.can && v.me.can.take === false) return v.me.hand.length ? t('family.games.cq.msg.no_fit') : t('family.games.cq.msg.last_one_pass');
-        return t('family.games.cq.msg.offer');
+      const card = cardName(v.center.card);
+      if (this.building) return { ...this.buildText(v), kicker };
+      if (v.center.forced) return { text: t('family.games.cq.say.forced', { name: nameOf(v, v.center.by) }), kicker, kind: 'forced' };
+      if (this.best) {
+        let text;
+        if (this.kind === 'out') text = t('family.games.cq.say.offer_out', { card });
+        else if (this.kind === 'fits') text = t('family.games.cq.say.offer_fits', { card });
+        else if (this.kind === 'rearrange') text = t('family.games.cq.say.offer_move', { card });
+        else text = t('family.games.cq.say.offer_goes', { card });
+        return { text, kicker, kind: 'good' };
       }
-      const st = this.take.status();
-      if (this.take.held != null) return t('family.games.cq.take.holding');   // mid-move: finish it first
-      if (st.out) return t('family.games.cq.msg.out_ready');
-      if (st.ok && v.center.forced && !this.take.dirty()) return t('family.games.cq.msg.forced_ready');
-      if (st.ok) return t('family.games.cq.msg.take_ready');
-      if (st.why === 'holding') return t('family.games.cq.take.holding');
-      if (this.take.groups.every((g) => g.orig || g.cards.length <= 1)) return t('family.games.cq.msg.build');
-      return takeWhy(st.why);
+      if (!(v.me.can && v.me.can.take === false)) return { text: t('family.games.cq.msg.build'), kicker };
+      if (this.forcePassShown(v)) return { text: t('family.games.cq.say.no_fit_force', { card, name: next }), kicker };
+      return { text: t('family.games.cq.say.no_fit', { card }), kicker };
     }
     if (discarding(v)) {
-      if (this.pick == null) return t('family.games.cq.msg.discard');
-      const fc = (v.me.can && v.me.can.force_discard) || [];
-      return fc.includes(this.pick) ? t('family.games.cq.msg.discard_force', { card: cardName(this.cardById(this.pick)), name: nameOf(v, leftOf(v, v.me.seat)) })
-        : t('family.games.cq.msg.discard_ready', { card: cardName(this.cardById(this.pick)) });
+      if (this.pick == null) return { text: this.suggest != null ? t('family.games.cq.say.discard_hint') : t('family.games.cq.say.discard'), kicker };
+      const card = cardName(this.cardById(this.pick));
+      if (this.forceDiscardShown(v)) return { text: t('family.games.cq.msg.discard_force', { card, name: next }), kicker };
+      return { text: t('family.games.cq.say.discard_ready', { card }), kicker };
     }
-    if (ph === 'between' || ph === 'over') return '';
-    if (!(v.me.hand || []).length) return t('family.games.cq.msg.last_one');
-    return t('family.games.cq.msg.wait');
+    // waiting: who we're waiting for, calmly
+    if (v.me.got) return { text: t('family.games.cq.msg.got', { card: cardName(v.me.got), name: nameOf(v, rightOf(v, v.me.seat)) }), kicker };
+    if (ph === 'offer' && v.center && v.center.forced) return { text: t('family.games.cq.forced.other', { a: nameOf(v, v.center.by), b: nameOf(v, v.center.to) }), kicker };
+    const who = moverOf(v);
+    const st = who == null ? null : seatOf(v, who);
+    if (!st) return { text: (v.me.hand || []).length ? t('family.games.cq.msg.wait') : t('family.games.cq.msg.last_one'), kicker };
+    const wait = st.bot || st.covering_bot ? t('family.games.cq.say.thinking', { name: st.name }) : t('family.games.cq.say.waiting', { name: st.name });
+    return { text: wait, kicker, kind: 'wait' };
+  }
+
+  buildText(v) {
+    const st = this.take.status();
+    if (this.take.held != null || st.why === 'holding') return { text: t('family.games.cq.take.holding') };
+    if (st.out) return { text: t('family.games.cq.msg.out_ready'), kind: 'good' };
+    if (st.ok && v.center.forced && !this.take.dirty()) return { text: t('family.games.cq.msg.forced_ready'), kind: 'good' };
+    if (st.ok) return { text: t('family.games.cq.msg.take_ready'), kind: 'good' };
+    if (this.take.groups.every((g) => g.orig || g.cards.length <= 1)) return { text: t('family.games.cq.msg.build') };
+    return { text: takeWhy(st.why) };
+  }
+
+  // ¡Te obligo! on a pass: whenever it applies and ¡Me sirve! isn't there (Simple: only then; Full adds a link).
+  forcePassShown(v) { return !!(deciding(v) && !v.center.forced && v.me.can && v.me.can.force_pass && forcingOn(v) && !this.best && v.me.can.take === false); }
+  // "Throw and ¡Te obligo!": Full view only.
+  forceDiscardShown(v) {
+    return !this.simple && forcingOn(v) && this.pick != null && ((v.me.can && v.me.can.force_discard) || []).includes(this.pick);
   }
 
   cardById(id) { return ((this.view.me && this.view.me.hand) || []).find((c) => c.id === id) || null; }
 
+  // ---- the tray: the voice, your hand, two buttons at most ----------------------------------------------------------
   renderTray(v) {
-    const me = v.me;
-    const ph = phaseOf(v);
-    const parts = [];
-    if (this.guide || this.guideBusy) parts.push(this.renderGuide());
-    const hintsOn = v.room.settings.hints !== false && !!this.ctx.hint;
-    const hintBtn = hintsOn && myMove(v)
-      ? h('button', { class: 'gp-hint-btn cq-hint-btn' + (this.guide ? ' on' : '') + (this.guideBusy ? ' is-busy' : ''), type: 'button', 'data-fk': 'hint',
-        'aria-pressed': String(!!this.guide), 'aria-label': this.guide ? t('family.games.cq.hint.close') : t('family.games.cq.hint.open'), onclick: () => this.toggleHint() },
-      icon('lamp', 'icon gp-hint-bulb'), h('span', { class: 'gp-hint-word', 'aria-hidden': 'true' }, t('family.games.cq.hint.btn')))
-      : null;
-    const kind = this.msg ? this.msg.kind : (deciding(v) && this.building ? (this.take.status().ok ? 'good' : 'info') : 'info');
-    const sortBtn = (me.hand || []).length > 1
-      ? h('button', { class: 'cq-sort-btn', type: 'button', 'data-fk': 'sort', title: t('family.games.cq.sort'),
-        'aria-label': t('family.games.cq.sort') + ': ' + (this.sortBy === 'rank' ? t('family.games.cq.sort_rank') : t('family.games.cq.sort_suit')),
-        onclick: () => this.setSort(this.sortBy === 'rank' ? 'suit' : 'rank') },
-      h('span', { class: 'cq-sort-ico', 'aria-hidden': 'true' }, '⇅'), h('span', { 'aria-hidden': 'true' }, this.sortBy === 'rank' ? t('family.games.cq.sort_rank') : t('family.games.cq.sort_suit')))
-      : null;
-    // the card on offer, small, right where you decide (the big one sits on the felt above)
-    const c = v.center;
-    const mini = deciding(v) && c && !this.building
-      ? cardNode(c.card, { size: 's', cls: 'cq-mini' + (c.forced ? ' is-forced' : '') }) : null;
-    // Big text (sizes 3-4): the tray must stay low, so the Hint lamp moves into the button row and the sort
-    // switch goes (the hand stays sorted by suit, or as last chosen).
-    const big = Number(document.documentElement.dataset.textSize || 1) >= 3;
-    parts.push(h('div', { class: 'gp-rack cq-rack' },
-      mini,
-      h('p', { class: 'gp-status gp-status-' + kind, role: 'status', 'aria-live': 'polite' }, this.statusText(v)),
-      big ? null : h('span', { class: 'cq-tools' }, sortBtn, hintBtn)));
-
-    // the hand, fanned
-    const handCards = this.take && this.building ? this.take.handLeft() : (me.hand || []);
-    const sorted = sortHand(handCards, this.sortBy);
-    const canTap = !this.busy && (deciding(v) || discarding(v) || cambioPick(v));
-    const fitsNext = new Set((me.can && me.can.force_discard) || []);
-    const perRow = 5;
-    const hand = h('div', { class: 'cq-hand' + (this.fx.deal ? ' is-dealing' : ''), role: 'group', 'aria-label': t('family.games.cq.your_hand', { n: me.hand.length }) },
-      sorted.map((c, i) => {
-        const col = i % perRow;
-        const off = col - (Math.min(perRow, sorted.length - (i - col)) - 1) / 2;
-        const cls = ['cq-hcard'];
-        if (this.pick === c.id) cls.push('is-picked');
-        if (this.fx.lift === c.id) cls.push('is-lift');
-        if (me.got && me.got.id === c.id) cls.push('is-got');
-        if (discarding(v) && fitsNext.has(c.id)) cls.push('is-fits-next');
-        if (this.fx.deal) cls.push('is-deal');
-        const node = cardNode(c, canTap ? { size: 'h', tag: 'button', cls: cls.join(' '), onclick: () => this.tapHand(c.id), attrs: { 'data-fk': 'h' + c.id } } : { size: 'h', cls: cls.join(' ') });
-        node.style.setProperty('--i', String(i));
-        node.style.setProperty('--rot', (off * 2.5).toFixed(2) + 'deg');
-        node.style.setProperty('--dy', (off * off * 2).toFixed(1) + 'px');
-        if (me.got && me.got.id === c.id) node.append(h('span', { class: 'gm-new', 'aria-hidden': 'true' }, t('family.games.cq.new_tag')));
-        return node;
-      }),
-      !sorted.length ? h('span', { class: 'gp-hand-empty' }, t('family.games.cq.hand_empty')) : null);
-    hand.style.setProperty('--n', String(Math.max(1, sorted.length)));   // big text: one overlapping row (CSS)
-    parts.push(hand);
-
-    // the big buttons
-    const acts = h('div', { class: 'gp-actions cq-actions' });
-    const can = me.can || {};
-    if (cambioPick(v)) {
-      acts.append(h('button', { class: 'gm-btn gm-btn--go gp-btn gp-btn-main cq-cambio-btn', type: 'button', 'data-fk': 'cambio', 'aria-disabled': String(this.pick == null), onclick: () => this.cambio() },
-        t('family.games.cq.btn.cambio')));
-    } else if (deciding(v)) {
-      const forced = v.center.forced;
-      const st = this.take ? this.take.status() : { ok: false };
-      if (this.building && !forced) acts.append(h('button', { class: 'gm-btn gp-btn gp-btn-quiet cq-cancel', type: 'button', 'data-fk': 'cancel', disabled: this.busy, onclick: () => this.cancelBuild() }, t('family.games.cq.btn.cancel')));
-      else if (this.building && forced && this.take.dirty()) acts.append(h('button', { class: 'gm-btn gp-btn gp-btn-quiet cq-cancel', type: 'button', 'data-fk': 'cancel', disabled: this.busy, onclick: () => this.cancelBuild() }, t('family.games.cq.btn.reset')));
-      if (!this.building) {
-        acts.append(h('button', { class: 'gm-btn gp-btn gp-btn-quiet cq-pass', type: 'button', 'data-fk': 'pass', disabled: this.busy || forced || can.pass === false, onclick: () => this.pass(false) }, t('family.games.cq.btn.pass')));
-        if (can.force_pass && v.room.settings.forcing !== false) {
-          acts.append(h('button', { class: 'gm-btn gp-btn cq-force', type: 'button', 'data-fk': 'force', disabled: this.busy, onclick: () => this.pass(true) },
-            h('span', { class: 'cq-force-l' }, t('family.games.cq.btn.force')), h('small', null, t('family.games.cq.btn.force_pass_sub'))));
-        }
-      }
-      acts.append(h('button', { class: 'gm-btn gm-btn--go gp-btn gp-btn-main cq-take' + (this.building && st.ok ? ' ready' : '') + (st.out ? ' is-out' : ''), type: 'button', 'data-fk': 'take',
-        'aria-disabled': String(this.busy || (this.building && !st.ok) || can.take === false), disabled: can.take === false ? true : null, onclick: () => this.meSirve() },
-      h('span', null, t('family.games.cq.btn.take')),
-      this.building && st.out ? h('small', null, t('family.games.cq.btn.take_out')) : !this.building ? h('small', null, t('family.games.cq.btn.take_sub')) : null));
-    } else if (discarding(v)) {
-      const forceable = this.pick != null && fitsNext.has(this.pick) && v.room.settings.forcing !== false;
-      acts.append(h('button', { class: 'gm-btn gm-btn--go gp-btn gp-btn-main cq-discard', type: 'button', 'data-fk': 'discard', 'aria-disabled': String(this.pick == null || this.busy), onclick: () => this.discard(false) },
-        t('family.games.cq.btn.discard')));
-      if (forceable) {
-        acts.append(h('button', { class: 'gm-btn gp-btn cq-force', type: 'button', 'data-fk': 'discard-force', disabled: this.busy, onclick: () => this.discard(true) },
-          h('span', { class: 'cq-force-l' }, t('family.games.cq.btn.force')), h('small', null, t('family.games.cq.btn.force_discard_sub'))));
-      }
-    } else if (ph === 'between' && this.hideResultV === v.v) {
-      acts.append(h('button', { class: 'gm-btn gm-btn--go gp-btn', type: 'button', 'data-fk': 'show-result', onclick: () => { this.hideResultV = null; this.render(); } }, t('family.games.cq.result.show')));
-    }
-    if (big && hintBtn) acts.append(hintBtn);
-    if (acts.childNodes.length) parts.push(acts);
+    const say = this.voice(v);
+    const voice = h('div', { class: 'cq-voice' + (say.kind ? ' cq-voice-' + say.kind : '') + (this.nudge ? ' is-nudge' : ''), role: 'status', 'aria-live': 'polite' },
+      say.kicker ? h('p', { class: 'cq-voice-kicker' }, say.kicker) : null,
+      h('p', { class: 'cq-say' }, say.text),
+      v.turn && v.turn.deadline && !v.result ? h('p', { class: 'gp-clock' }, this.clockText()) : null);
+    if (!v.me) return h('footer', { class: 'gp-tray gm-tray cq-tray' }, h('div', { class: 'gp-tray-in' }, voice));
+    const parts = [voice, this.renderHand(v)];
+    const { buttons, links } = this.controls(v);
+    if (buttons.length) parts.push(h('div', { class: 'gp-actions cq-actions' }, buttons));
+    if (links.length) parts.push(h('div', { class: 'cq-links' }, links));
     return h('footer', { class: 'gp-tray gm-tray cq-tray' + (myMove(v) ? ' gp-tray-mine' : '') }, h('div', { class: 'gp-tray-in' }, parts));
   }
 
-  renderGuide() {
-    const g = this.guide;
-    if (!g) return h('div', { class: 'gp-guide', role: 'status', 'aria-live': 'polite' }, icon('lamp', 'icon gp-guide-bulb'), h('b', { class: 'gp-guide-why' }, t('family.games.cq.hint.thinking')));
-    let step = '';
-    if (g.kind === 'take') step = g.shown ? t('family.games.cq.hint.step.take_shown') : t('family.games.cq.hint.step.take');
-    else if (g.kind === 'pass') step = g.force ? t('family.games.cq.hint.step.force') : t('family.games.cq.hint.step.pass');
-    else if (g.kind === 'discard') {
-      const card = cardName(this.cardById(g.card));
-      step = g.force ? t('family.games.cq.hint.step.discard_force', { card }) : t('family.games.cq.hint.step.discard', { card });
-    }
-    else if (g.kind === 'cambio') step = t('family.games.cq.hint.step.cambio', { card: cardName(this.cardById(g.card)) });
-    return h('div', { class: 'gp-guide', role: 'status', 'aria-live': 'polite' },
-      icon('lamp', 'icon gp-guide-bulb'),
-      h('div', { class: 'gp-guide-text' },
-        h('b', { class: 'gp-guide-why' }, hintWhy(g)),
-        step ? h('span', { class: 'gp-guide-step' }, step) : null,
-        g.kind === 'take' && g.melds && !g.shown ? h('button', { class: 'gm-btn gp-btn cq-showme', type: 'button', 'data-fk': 'showme', onclick: () => this.showMe() }, t('family.games.cq.hint.show_me')) : null),
-      h('button', { class: 'gp-guide-x', type: 'button', 'data-fk': 'guide-x', 'aria-label': t('family.games.cq.hint.close'), onclick: () => { this.guide = null; this.render(); } }, '×'));
+  // Your hand: ONE row of big cards (sorted by suit; Full view may sort by number), overlapping only as much as they
+  // must, the row scrolls sideways if it still doesn't fit. Tap to choose, hold to see a card big.
+  renderHand(v) {
+    const me = v.me;
+    const handCards = this.take && this.building ? this.take.handLeft() : (me.hand || []);
+    const sorted = sortHand(handCards, this.simple ? 'suit' : this.sortBy);
+    const canTap = !this.busy && (deciding(v) || discarding(v) || cambioPick(v));
+    const goes = new Set(deciding(v) && !this.building && this.best ? this.best.flat() : []);
+    const fitsNext = new Set(!this.simple && discarding(v) ? (me.can && me.can.force_discard) || [] : []);
+    const hand = h('div', { class: 'cq-hand' + (this.fx.deal ? ' is-dealing' : ''), role: 'group', 'aria-label': t('family.games.cq.your_hand', { n: me.hand.length }) },
+      sorted.map((c, i) => {
+        const cls = ['cq-hcard'];
+        if (this.pick === c.id) cls.push('is-picked');
+        if (this.fx.lift === c.id) cls.push('is-lift');
+        if (goes.has(c.id)) cls.push('is-goes');
+        if (this.suggest === c.id && this.pick == null) cls.push('is-suggest');
+        if (me.got && me.got.id === c.id) cls.push('is-got');
+        if (fitsNext.has(c.id)) cls.push('is-fits-next');
+        if (this.fx.deal) cls.push('is-deal');
+        const node = cardNode(c, canTap ? { size: 'h', tag: 'button', cls: cls.join(' '), onclick: () => this.tapHand(c.id), attrs: { 'data-fk': 'h' + c.id } } : { size: 'h', cls: cls.join(' ') });
+        node.style.setProperty('--i', String(i));
+        if (me.got && me.got.id === c.id) node.append(h('span', { class: 'gm-new', 'aria-hidden': 'true' }, t('family.games.cq.new_tag')));
+        return this.holdable(node, c);
+      }),
+      !sorted.length ? h('span', { class: 'gp-hand-empty' }, t('family.games.cq.hand_empty')) : null);
+    hand.style.setProperty('--n', String(Math.max(1, sorted.length)));
+    return hand;
   }
 
-  decorateGuide() {
-    const g = this.guide;
-    if (!g || !myMove(this.view)) return;
-    const r = this.root;
-    const mark = (el, n) => {
-      if (!el) return;
-      el.classList.add('gp-target');
-      if (n) el.append(h('span', { class: 'gp-target-n', 'aria-hidden': 'true' }, String(n)));
-    };
-    if (g.kind === 'take') {
-      if (g.shown) mark(r.querySelector('.cq-take'));
-      else if (g.melds) {
-        let n = 0;
-        const hand = new Set(((this.view.me && this.view.me.hand) || []).map((c) => c.id));
-        g.melds.flat().filter((id) => hand.has(id)).forEach((id) => mark(r.querySelector(`.cq-hand [data-id="${id}"]`), ++n));
+  // The buttons (two at most) and the small links under them.
+  controls(v) {
+    const me = v.me;
+    const can = me.can || {};
+    const ph = phaseOf(v);
+    const buttons = [];
+    const links = [];
+    const btn = (fk, label, onclick, { main = false, quiet = false, cls = '', sub = null, off = false, disabled = false } = {}) => h('button', {
+      class: 'gm-btn gp-btn ' + (main ? 'gm-btn--go gp-btn-main ' : '') + (quiet ? 'gp-btn-quiet ' : '') + cls, type: 'button', 'data-fk': fk,
+      'aria-disabled': off ? 'true' : null, disabled: disabled || this.busy ? true : null, onclick,
+    }, h('span', { class: 'cq-btn-l' }, label), sub ? h('small', null, sub) : null);
+    const link = (fk, label, onclick, cls = '') => h('button', { class: 'cq-link ' + cls, type: 'button', 'data-fk': fk, onclick, disabled: this.busy ? true : null }, label);
+    const lesson = this.coach && !v.result ? this.coach.say() : null;
+    const mine = seatOf(v, me.seat);
+    if (lesson && lesson.text) {
+      buttons.push(btn('coach-ok', lesson.okLabel, () => this.coach.next(), { main: true, cls: 'gp-coach-ok' }));
+    } else if (mine && mine.covering_bot && this.ctx.reclaim && ph !== 'over') {
+      buttons.push(btn('takeback', t('family.games.cq.take_back'), async () => { try { await this.ctx.reclaim(); } catch { this.flash(t('family.games.cq.msg.refused'), 'warn'); this.render(); } }, { main: true, cls: 'gp-takeback' }));
+    } else if (cambioPick(v)) {
+      buttons.push(btn('cambio', t('family.games.cq.btn.cambio'), () => this.cambio(), { main: true, cls: 'cq-cambio-btn', off: this.pick == null }));
+    } else if (deciding(v)) {
+      const forced = v.center.forced;
+      if (this.building) {
+        const st = this.take.status();
+        if (!forced || this.take.dirty()) buttons.push(btn('cancel', forced ? t('family.games.cq.btn.reset') : t('family.games.cq.btn.cancel'), () => this.cancelBuild(), { quiet: true, cls: 'cq-cancel' }));
+        buttons.push(btn('take', t('family.games.cq.btn.take'), () => this.meSirve(), { main: true, cls: 'cq-take' + (st.ok ? ' ready' : '') + (st.out ? ' is-out' : ''),
+          off: !st.ok, sub: st.out ? t('family.games.cq.btn.take_out') : null }));
+      } else if (forced) {
+        buttons.push(btn('take', t('family.games.cq.btn.lay'), () => this.meSirve(), { main: true, cls: 'cq-take cq-lay ready' }));
+      } else if (this.best || can.take !== false) {
+        buttons.push(btn('pass', t('family.games.cq.btn.pass'), () => this.pass(false), { quiet: true, cls: 'cq-pass', disabled: can.pass === false }));
+        buttons.push(btn('take', t('family.games.cq.btn.take'), () => this.meSirve(), { main: true, cls: 'cq-take ready' + (this.kind === 'out' ? ' is-out' : ''),
+          sub: this.kind === 'out' ? t('family.games.cq.btn.take_out') : t('family.games.cq.btn.take_sub') }));
+        if (!this.simple && can.force_pass && forcingOn(v)) links.push(link('force-link', t('family.games.cq.btn.force_pass_link'), () => this.pass(true), 'cq-force-link'));
+      } else {
+        buttons.push(btn('pass', t('family.games.cq.btn.pass'), () => this.pass(false), { main: true, cls: 'cq-pass', disabled: can.pass === false }));
+        if (this.forcePassShown(v)) {
+          buttons.push(btn('force', t('family.games.cq.btn.force'), () => this.pass(true), { cls: 'cq-force', sub: t('family.games.cq.btn.force_pass_sub') }));
+        }
       }
-    } else if (g.kind === 'pass') mark(r.querySelector(g.force ? '.cq-force' : '.cq-pass'));
-    else if (g.kind === 'discard' || g.kind === 'cambio') {
-      if (this.pick === g.card) mark(r.querySelector(g.kind === 'cambio' ? '.cq-cambio-btn' : g.force ? '.cq-force' : '.cq-discard'));
-      else mark(r.querySelector(`.cq-hand [data-id="${g.card}"]`), 1);
+      if (!this.building && this.take && (this.best || forced || can.take !== false)) links.push(link('arrange', t('family.games.cq.btn.arrange'), () => this.startBuild(), 'cq-arrange'));
+    } else if (discarding(v)) {
+      buttons.push(btn('discard', t('family.games.cq.btn.discard'), () => this.discard(false), { main: true, cls: 'cq-discard', off: this.pick == null }));
+      if (this.forceDiscardShown(v)) {
+        buttons.push(btn('discard-force', t('family.games.cq.btn.force'), () => this.discard(true), { cls: 'cq-force', sub: t('family.games.cq.btn.force_discard_sub') }));
+      }
+    } else if (ph === 'between' && this.hideResultV === v.v) {
+      buttons.push(btn('show-result', t('family.games.cq.result.show'), () => { this.hideResultV = null; this.render(); }, { main: true }));
     }
+    if (!this.simple && (me.hand || []).length > 1) {
+      links.push(link('sort', t('family.games.cq.sort') + ': ' + (this.sortBy === 'rank' ? t('family.games.cq.sort_rank') : t('family.games.cq.sort_suit')),
+        () => this.setSort(this.sortBy === 'rank' ? 'suit' : 'rank'), 'cq-sort-btn'));
+    }
+    if (this.coach && this.coach.step) links.push(link('coach-skip', t('family.games.cq.coach.skip'), () => this.coach.finish(), 'gp-coach-skip'));
+    return { buttons, links };
+  }
+
+  // "Your turn!" for a moment when it becomes your move (it never blocks a tap).
+  renderPop() {
+    const left = POP_MS - (Date.now() - this.popAt);
+    if (!this.popAt || left <= 0 || !myMove(this.view)) return null;
+    clearTimeout(this.popTimer);
+    this.popTimer = setTimeout(() => { if (this.alive) this.render(); }, left + 20);
+    return h('div', { class: 'cq-turnpop', 'aria-hidden': 'true' }, h('span', { class: 'cq-turnpop-in' }, t('family.games.cq.say.your_turn')));
   }
 
   // ---- between hands, and the end -----------------------------------------------------------------------------
@@ -776,7 +850,7 @@ class CqScreen {
           !over && !nextOk ? h('p', { class: 'cq-wait-next' }, t('family.games.cq.result.next_soon')) : null,
           !over ? h('button', { class: 'gm-btn gp-btn gp-btn-quiet', type: 'button', 'data-fk': 'see-table', onclick: () => { this.hideResultV = v.v; this.render(); } }, t('family.games.cq.result.see_table')) : null,
           over && v.me ? h('button', { class: 'gm-btn gm-btn--go gp-btn cq-rematch', type: 'button', 'data-fk': 'rematch', disabled: this.busy, onclick: () => this.rematch() }, t('family.games.cq.result.again')) : null,
-          over ? h('a', { class: 'gm-btn gp-btn gp-btn-quiet', href: '#/games', 'data-fk': 'back2' }, t('family.games.cq.back')) : null)));
+          over ? h('a', { class: 'gm-btn gp-btn gp-btn-quiet', href: this.ctx.backHash || '#/games/conquian', 'data-fk': 'back2' }, t('family.games.cq.back')) : null)));
   }
 }
 

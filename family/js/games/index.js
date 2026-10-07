@@ -1,4 +1,5 @@
-// Games sub-router: #/games (lobby), #/games/new, #/games/join[/CODE], #/games/r/:id (room), #/games/tv/:id (TV).
+// Games sub-router: #/games (the hub: both games), #/games/dots and #/games/conquian (each game's home),
+// #/games/new[?game=…], #/games/join[/CODE], #/games/r/:id (room), #/games/tv/:id (TV).
 // main.js calls gamesView(parts) with the hash parts after "games" and puts the returned node in #view.
 // The room and TV screens own a poller (net.js) that long-polls /wait, falls back to 3 s polling, refetches
 // when the tab comes back, and stops itself once its root leaves the page.
@@ -6,7 +7,8 @@ import { h, icon } from '../dom.js';
 import { t } from '../i18n.js';
 import { errorBox, state, toast } from '../ui.js';
 import { createPoller, games } from './net.js';
-import { joinView, lobbyView, newGameView, roomLobbyView } from './lobby.js';
+import { cqView, dotsView, hubView } from './home.js';
+import { gameHome, joinView, newGameView, roomLobbyView } from './lobby.js';
 import { bellMoment, loadArt, marketCard, marketSheet } from './market.js';
 import { openRules, rulesButton, rulesSeen } from './rules_card.js';
 import { resultBoard, seatRail, tableBoard, turnText, tvScreen } from './tv.js';
@@ -54,7 +56,9 @@ export async function gamesView(parts = []) {
   const a = a0 == null ? a0 : a0.split('?')[0];   // #/games/new?game=conquian opens New game on that game
   if (a !== 'tv') document.body.classList.remove('games-tv');
   switch (a) {
-    case undefined: return lobbyView();
+    case undefined: return hubView();
+    case 'dots': return dotsView();
+    case 'conquian': return cqView();
     case 'new': return newGameView();
     case 'join': return joinView(b);
     case 'r': return ID.test(b || '') ? roomView(b) : errorBox({ key: 'family.errors.not_found' });
@@ -141,6 +145,7 @@ async function roomView(id) {
     me: state.me,
     bell: (el) => bellMoment(sfx, el),
     hideBack: true,   // the room bar above already has "Games" and the "?"
+    backHash: gameHome(first.room.game || 'dots'),   // "Back to games" after the game: that game's home
     // Take your seat back from Claude (it covered you after missed turns).
     reclaim: async () => { await games.seats(id, { op: 'reclaim' }); live.refresh(); },
     // The Smart Hint (read-only): the best move the server sees for your own dots.
@@ -158,7 +163,7 @@ async function roomView(id) {
 
   function drawBar(view) {
     bar.replaceChildren(
-      h('a', { class: 'back gback', href: '#/games', 'aria-label': t('family.games.common.games') }, icon('back'), h('span', { class: 'gback-l', text: t('family.games.common.games') })),
+      h('a', { class: 'back gback', href: gameHome(view.room.game || 'dots'), 'aria-label': t('family.games.common.games') }, icon('back'), h('span', { class: 'gback-l', text: t('family.games.common.games') })),
       view.room.code ? h('span', { class: 'groomv-code', 'aria-label': t('family.games.common.code_aria', { code: view.room.code.split('').join(' ') }) },
         h('span', { class: 'groomv-code-k', 'aria-hidden': 'true', text: t('family.games.common.code_short') }), h('span', { 'aria-hidden': 'true', text: view.room.code })) : h('span', { class: 'grow' }),
       h('a', { class: 'groomv-tv', href: '#/games/tv/' + view.room.id, 'aria-label': t('family.games.lobby.show_tv') }, tvIcon()),
