@@ -70,17 +70,31 @@
   </url>
   <url>
     <loc>https://educatedai.org/notes/</loc>
-    <lastmod>2026-10-05</lastmod>
+    <lastmod>2026-10-07</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/notes/"/>
     <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/notes/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/notes/"/>
   </url>
   <url>
     <loc>https://educatedai.org/es/notes/</loc>
-    <lastmod>2026-10-05</lastmod>
+    <lastmod>2026-10-07</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/notes/"/>
     <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/notes/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/notes/"/>
+  </url>
+  <url>
+    <loc>https://educatedai.org/notes/birds-and-planes/</loc>
+    <lastmod>2026-10-07</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/notes/birds-and-planes/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/notes/birds-and-planes/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/notes/birds-and-planes/"/>
+  </url>
+  <url>
+    <loc>https://educatedai.org/es/notes/birds-and-planes/</loc>
+    <lastmod>2026-10-07</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/notes/birds-and-planes/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/notes/birds-and-planes/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/notes/birds-and-planes/"/>
   </url>
   <url>
     <loc>https://educatedai.org/notes/the-morning-tape/</loc>
