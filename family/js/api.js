@@ -3,7 +3,7 @@ const TOKEN_KEY = 'eai.token';
 let onSignedOut = () => {};
 
 export class ApiErr extends Error {
-  constructor(status, key, code) { super(code || key); this.status = status; this.key = key; this.code = code; }
+  constructor(status, key, code, vars) { super(code || key); this.status = status; this.key = key; this.code = code; this.vars = vars || null; }
 }
 
 export function setSignedOutHandler(fn) { onSignedOut = fn; }
@@ -43,11 +43,12 @@ export async function api(method, path, body, opts = {}) {
   if (!res.ok) {
     const key = (json && json.error && json.error.key) || 'family.errors.server';
     const code = json && json.error && json.error.code;
+    const vars = json && json.error && json.error.vars;
     if (res.status === 401 && tok && !opts.token && code === 'unauthorized') {
       setToken(null);
       onSignedOut();
     }
-    throw new ApiErr(res.status, key, code);
+    throw new ApiErr(res.status, key, code, vars);
   }
   return json;
 }

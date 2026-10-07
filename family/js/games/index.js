@@ -13,7 +13,7 @@ import { resultBoard, seatRail, tableBoard, turnText, tvScreen } from './tv.js';
 
 // ---- styles (CSP style-src 'self': same-origin <link>s only) ---------------------------------------
 export function ensureCss() {
-  for (const href of ['games-theme.css', 'games.css', 'games-play.css']) {
+  for (const href of ['games-theme.css', 'games.css', 'games-play.css', 'games-conquian.css']) {
     if (!document.querySelector(`link[data-games-css="${href}"]`)) {
       document.head.append(h('link', { rel: 'stylesheet', href, 'data-games-css': href }));
     }
@@ -50,7 +50,8 @@ export async function gamesView(parts = []) {
   ensureCss();
   loadSfx();
   await loadArt();
-  const [a, b] = parts;
+  const [a0, b] = parts;
+  const a = a0 == null ? a0 : a0.split('?')[0];   // #/games/new?game=conquian opens New game on that game
   if (a !== 'tv') document.body.classList.remove('games-tv');
   switch (a) {
     case undefined: return lobbyView();
@@ -162,12 +163,13 @@ async function roomView(id) {
         h('span', { class: 'groomv-code-k', 'aria-hidden': 'true', text: t('family.games.common.code_short') }), h('span', { 'aria-hidden': 'true', text: view.room.code })) : h('span', { class: 'grow' }),
       h('a', { class: 'groomv-tv', href: '#/games/tv/' + view.room.id, 'aria-label': t('family.games.lobby.show_tv') }, tvIcon()),
       soundButton(),
-      rulesButton('grules-btn-s'));
+      rulesButton('grules-btn-s', view.room.game));
   }
 
   async function mountPlay() {
     let mod = null;
-    try { mod = await import('./play.js'); } catch { mod = null; }
+    const game = live.getView().room.game;
+    try { mod = await (game === 'conquian' ? import('./conquian/play.js') : import('./play.js')); } catch (e) { console.error(e); mod = null; }
     if (mod && typeof mod.playView === 'function') {
       playMounted = true;
       try { await mod.playView(main, ctx); } catch (e) { console.error(e); playMounted = false; main.replaceChildren(errorBox(e)); }
@@ -221,7 +223,7 @@ async function roomView(id) {
   live.onView(render);
   render(first);
   // Someone who came in by a code (never saw the lobby) gets the one-screen rules before their first game.
-  if (!rulesSeen() && first.me) setTimeout(() => { if (root.isConnected && !document.querySelector('dialog.grules-sheet')) openRules(); }, 400);
+  if (first.room.game !== 'conquian' && !rulesSeen() && first.me) setTimeout(() => { if (root.isConnected && !document.querySelector('dialog.grules-sheet')) openRules(); }, 400);
   // the sheet lives on <body>; take it down when the room leaves the page
   live.poller.done.then(closeSheet);
   window.addEventListener('hashchange', function off() {
@@ -295,7 +297,9 @@ async function tvView(id) {
   const live = liveRoom(root, id, first, () => {
     root.append(h('p', { class: 'gtv-lost', role: 'status', text: t('family.games.common.lost') }));
   });
-  const screen = tvScreen(root, { getView: live.getView, sfx: sfxTv, bell: (el) => bellMoment(sfxTv, el) });
+  const screen = first.room.game === 'conquian'
+    ? await (await import('./conquian/tv.js')).cqTvScreen(root, { getView: live.getView, sfx: sfxTv })
+    : tvScreen(root, { getView: live.getView, sfx: sfxTv, bell: (el) => bellMoment(sfxTv, el) });
   live.onView((v) => screen.update(v));
   // Leaving the TV restores the chrome (main.js also clears it on every route).
   live.poller.done.then(() => { if (!document.querySelector('.gtv-root')) document.body.classList.remove('games-tv'); });

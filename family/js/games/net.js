@@ -138,7 +138,7 @@ async function getSignal(path, signal) {
   if (!res.ok) {
     if (res.status === 401) get('/api/me').catch(() => {});
     const err = (json && json.error) || {};
-    throw new ApiErr(res.status, err.key || 'family.errors.server', err.code);
+    throw new ApiErr(res.status, err.key || 'family.errors.server', err.code, err.vars);
   }
   return json;
 }
@@ -146,7 +146,7 @@ async function getSignal(path, signal) {
 export const games = {
   async rooms() { return (await apiMod()).get('/api/games/rooms'); },
   async people() { return (await apiMod()).get('/api/games/people'); },
-  async create(mode, settings) { return (await apiMod()).post('/api/games/rooms', { mode, game: 'dots', settings }); },
+  async create(mode, settings, game = 'dots') { return (await apiMod()).post('/api/games/rooms', { mode, game, settings }); },
   async join(code, as = 'player') { return (await apiMod()).post('/api/games/join', { code, as }); },
   async room(id, signal) { return signal ? getSignal(`/api/games/rooms/${id}`, signal) : (await apiMod()).get(`/api/games/rooms/${id}`); },
   wait(id, v, signal) { return getSignal(`/api/games/rooms/${id}/wait?v=${v}`, signal); },
@@ -154,7 +154,7 @@ export const games = {
   async seats(id, body) { return (await apiMod()).post(`/api/games/rooms/${id}/seats`, body); },
   async start(id) { return (await apiMod()).post(`/api/games/rooms/${id}/start`, {}); },
   async hint(id) { return (await apiMod()).get(`/api/games/rooms/${id}/hint`); },
-  async practice() { return (await apiMod()).post('/api/games/practice', {}); },
+  async practice(game) { return (await apiMod()).post('/api/games/practice', game && game !== 'dots' ? { game } : {}); },
   async options(id, body) { return (await apiMod()).post(`/api/games/rooms/${id}/options`, body); },
   // One action. A network failure is retried once with the same cid (the server makes a repeat harmless).
   async act(id, action) {

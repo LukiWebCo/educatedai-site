@@ -76,12 +76,13 @@ export function watchButton() {
     icon('play'), h('span', null, t('family.games.howto.watch')));
 }
 
-// Opens the rules sheet. Resolves when closed.
-export function openRules() {
+// Opens the rules sheet (Dots, or Conquián's own card). Resolves when closed.
+export function openRules(game) {
+  if (game === 'conquian') return import('./conquian/rules.js').then((m) => m.openCqRules());
   return new Promise((resolve) => {
     const dlg = h('dialog', { class: 'sheet grules-sheet', 'aria-labelledby': 'grules-title' });
     const done = () => { markSeen(); dlg.close(); dlg.remove(); resolve(); };
-    dlg.append(
+    dlg.append(...[   // (append would print a null — no how-to film yet — as the text "null")
       h('div', { class: 'grules-top' },
         h('div', null,
           h('p', { class: 'eyebrow', text: t('family.games.rules.eyebrow') }),
@@ -89,7 +90,7 @@ export function openRules() {
         h('button', { class: 'icon-btn grules-x', type: 'button', 'aria-label': t('family.games.common.close'), onclick: done }, '×')),
       rulesBody(),
       watchButton(),
-      h('button', { class: 'btn btn-primary btn-big grules-ok', type: 'button', onclick: done }, t('family.games.rules.got_it')));
+      h('button', { class: 'btn btn-primary btn-big grules-ok', type: 'button', onclick: done }, t('family.games.rules.got_it'))].filter(Boolean));
     dlg.addEventListener('cancel', (ev) => { ev.preventDefault(); done(); });
     dlg.addEventListener('click', (ev) => { if (ev.target === dlg) done(); });
     document.body.append(dlg);
@@ -99,7 +100,7 @@ export function openRules() {
 }
 
 // The round "?" button that opens the rules.
-export function rulesButton(cls = '') {
-  return h('button', { class: 'grules-btn ' + cls, type: 'button', onclick: () => openRules() },
+export function rulesButton(cls = '', game = 'dots') {
+  return h('button', { class: 'grules-btn ' + cls, type: 'button', onclick: () => openRules(game) },
     h('span', { class: 'grules-q', 'aria-hidden': 'true' }, '?'), h('span', { class: 'grules-l', text: t('family.games.rules.open') }));
 }

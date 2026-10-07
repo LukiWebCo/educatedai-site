@@ -25,11 +25,19 @@ function back(hash, label) {
 }
 
 // ---- room options, said plainly (room cards, the waiting room) ----------------------------------------
-export function optionTags(st) {
+export function optionTags(st, game = 'dots') {
   st = st || {};
   const tags = [];
   if (st.practice) tags.push(t('family.games.lobby.tag_practice'));
-  else {
+  else if (game === 'conquian') {
+    // no variant yet: it follows the number of players when the game starts
+    tags.push(st.variant === 'familia' ? t('family.games.cq.variant.familia') : st.variant === 'classic' ? t('family.games.cq.variant.classic') : t('family.games.cq.lobby.tag_auto'));
+    tags.push(st.match_to ? t('family.games.cq.lobby.tag_to', { n: st.match_to }) : t('family.games.cq.lobby.tag_one'));
+    if (st.forcing === false) tags.push(t('family.games.cq.lobby.tag_noforce'));
+    if (st.variant === 'familia' && st.cambio === false) tags.push(t('family.games.cq.lobby.tag_nocambio'));
+    tags.push(st.hints === false ? t('family.games.lobby.tag_nohints') : t('family.games.lobby.tag_hints'));
+    if (st.turn_seconds) tags.push(t('family.games.lobby.tag_timer', { s: st.turn_seconds }));
+  } else {
     tags.push(st.simple_table ? t('family.games.lobby.tag_simple') : t('family.games.lobby.tag_free'));
     tags.push(st.hints === false ? t('family.games.lobby.tag_nohints') : t('family.games.lobby.tag_hints'));
     if (st.turn_seconds) tags.push(t('family.games.lobby.tag_timer', { s: st.turn_seconds }));
@@ -40,10 +48,10 @@ export function optionTags(st) {
   return h('span', { class: 'gopt-tags' }, tags.map((x) => h('span', { class: 'gtag gtag-opt', text: x })));
 }
 
-async function startPractice(btn) {
+async function startPractice(btn, game) {
   btn.disabled = true;
   try {
-    const r = await games.practice();
+    const r = await games.practice(game);
     go('#/games/r/' + r.room_id);
   } catch (e) { toast(errText(e), 'error'); btn.disabled = false; }
 }
@@ -63,10 +71,11 @@ function roomRow(card, kind) {
     h('span', { class: 'groom-text' },
       h('span', { class: 'groom-title', text: names.length ? names.join(', ') : card.host_name }),
       h('span', { class: 'groom-sub' },
+        card.game === 'conquian' ? h('span', { class: 'gtag gtag-game', text: t('family.games.cq.name') }) : null,
         h('span', { class: 'gtag gtag-mode gtag-' + card.mode, text: modeLabel(card.mode) }),
         h('span', { class: 'groom-status' + (card.my_turn ? ' is-turn' : ''), text: status }),
         card.updated_at ? h('span', { class: 'groom-ago', text: ago(card.updated_at, currentLang()) }) : null),
-      optionTags(card.settings)),
+      optionTags(card.settings, card.game)),
   ];
   if (go2) return h('a', { class: 'groom' + (card.my_turn ? ' is-turn' : ''), href: go2 }, inner, icon('next', 'icon groom-go'));
   const joinBtn = h('button', { class: 'btn btn-primary groom-join', type: 'button' }, kind === 'invite' ? t('family.games.lobby.accept') : t('family.games.lobby.join_btn'));
@@ -91,10 +100,17 @@ function practiceCard(first) {
   const btn = h('button', { class: 'btn btn-big ' + (first ? 'btn-primary' : 'btn-quiet') + ' gpractice-btn', type: 'button' },
     h('span', { text: t('family.games.lobby.practice') }));
   btn.addEventListener('click', () => startPractice(btn));
+  // Conquián's own lesson (a first classic hand), and its rules card one tap away.
+  const cq = h('button', { class: 'btn btn-big btn-quiet gpractice-btn gpractice-cq', type: 'button' },
+    h('span', { text: t('family.games.cq.lobby.practice') }));
+  cq.addEventListener('click', () => startPractice(cq, 'conquian'));
+  const cqRules = h('button', { class: 'btn btn-quiet gpractice-rules', type: 'button', onclick: () => openRules('conquian') }, t('family.games.cq.lobby.how'));
   return h('section', { class: 'gpractice' + (first ? ' is-first' : '') },
     first ? h('p', { class: 'gpractice-k', text: t('family.games.lobby.practice_new') }) : null,
     btn,
-    h('p', { class: 'gpractice-sub', text: t('family.games.lobby.practice_sub') }));
+    h('p', { class: 'gpractice-sub', text: t('family.games.lobby.practice_sub') }),
+    h('div', { class: 'gpractice-row' }, cq, cqRules),
+    h('p', { class: 'gpractice-sub', text: t('family.games.cq.lobby.practice_sub') }));
 }
 
 export async function lobbyView() {
@@ -175,8 +191,26 @@ function seg(label, options, value, onChange) {
   return wrap;
 }
 
+// Which game: two big tiles above the mode choice (Dots & Lines stays the default).
+function gamePicker(game, onPick) {
+  const tile = (g, title, desc, art) => h('button', { type: 'button', class: 'ggame ggame-' + g + (game === g ? ' on' : ''), 'aria-pressed': String(game === g), onclick: () => onPick(g) },
+    h('span', { class: 'ggame-art', 'aria-hidden': 'true' }, art),
+    h('span', { class: 'ggame-title', text: title }),
+    h('span', { class: 'ggame-desc', text: desc }));
+  return h('div', { class: 'ggames', role: 'group', 'aria-label': t('family.games.cq.lobby.pick_game') },
+    h('p', { class: 'gopt-label ggames-k', text: t('family.games.cq.lobby.pick_game') }),
+    h('div', { class: 'ggames-row' },
+      tile('dots', t('family.games.common.game_name'), t('family.games.cq.lobby.dots_desc'), [dotArt({ c: 'r', n: 1 }, 's'), dotArt({ c: 'b', n: 2 }, 's')]),
+      tile('conquian', t('family.games.cq.name'), t('family.games.cq.lobby.cq_desc'), [h('span', { class: 'ggame-card ggame-card-1' }), h('span', { class: 'ggame-card ggame-card-2' })])));
+}
+
 export async function newGameView() {
-  const s = { step: 0, mode: null, invite: new Set(), claude: null, simple_table: null, hints: true, turn_seconds: 0, leisure_hours: 24, stack_adj: 0, match_to: 0 };
+  const s = { step: 0, game: 'dots', mode: null, invite: new Set(), claude: null, simple_table: null, hints: true, turn_seconds: 0, leisure_hours: 24, stack_adj: 0, match_to: 0,
+    variant: null, cq_match: 0, forcing: true, cambio: true };
+  if (/[?&]game=conquian\b/.test(location.hash)) s.game = 'conquian';
+  // Conquián: Classic is for two; with more people at the table, Familia (2–4).
+  const seatCount = () => 1 + s.invite.size + (s.claude ? 1 : 0);
+  const variant = () => s.variant || (seatCount() > 2 ? 'familia' : 'classic');
   let people = null;
   let meNew = true;
   games.rooms().then((d) => { meNew = !!(d && d.me_new); }).catch(() => {});
@@ -198,10 +232,12 @@ export async function newGameView() {
     btn.disabled = true;
     btn.classList.add('is-busy');
     try {
-      const settings = { simple_table: simple(), hints: s.hints, stack_adj: s.stack_adj, match_to: s.match_to };
+      const settings = s.game === 'conquian'
+        ? { variant: s.variant, match_to: s.cq_match, forcing: s.forcing, cambio: s.cambio, hints: s.hints }   // null: by players at the start
+        : { simple_table: simple(), hints: s.hints, stack_adj: s.stack_adj, match_to: s.match_to };
       if (s.mode === 'leisure') settings.leisure_hours = s.leisure_hours;
       else settings.turn_seconds = s.turn_seconds;
-      const card = await games.create(s.mode, settings);
+      const card = s.game === 'conquian' ? await games.create(s.mode, settings, 'conquian') : await games.create(s.mode, settings);
       if (s.invite.size) await games.invite(card.id, [...s.invite]).catch((e) => toast(errText(e), 'error'));
       if (s.claude) await games.seats(card.id, { op: 'add_bot', level: s.claude }).catch((e) => toast(errText(e), 'error'));
       go('#/games/r/' + card.id);
@@ -215,6 +251,7 @@ export async function newGameView() {
   function draw() {
     if (s.step === 0) {
       root.replaceChildren(...nav(t('family.games.lobby.new_mode')),
+        gamePicker(s.game, (g) => { s.game = g; draw(); }),
         h('div', { class: 'gchoices' },
           ['together', 'live', 'leisure'].map((m) => bigChoice({
             cls: 'gchoice-' + m, art: modeArt(m),
@@ -254,7 +291,20 @@ export async function newGameView() {
           bigChoice({ cls: 'gchoice-claude', art: claudeArt(), title: t('family.games.common.claude_sharp'), desc: t('family.games.lobby.claude_sharp_desc'), onclick: () => { s.claude = 'sharp'; s.step = 3; draw(); } }),
           bigChoice({ cls: 'gchoice-none', title: t('family.games.lobby.claude_none'), desc: t('family.games.lobby.claude_none_desc'), onclick: () => { s.claude = null; s.step = 3; draw(); } })));
     } else {
-      const opts = h('details', { class: 'gopts', open: s.optsOpen || null, ontoggle: (e) => { s.optsOpen = e.target.open; } },
+      const cq = s.game === 'conquian';
+      const timer = s.mode === 'leisure'
+        ? seg(t('family.games.lobby.opt_leisure'), [[4, t('family.games.lobby.hours_4')], [12, t('family.games.lobby.hours_12')], [24, t('family.games.lobby.hours_24')], [48, t('family.games.lobby.hours_48')]], s.leisure_hours, (v) => { s.leisure_hours = v; })
+        : seg(t('family.games.lobby.opt_timer'), [[0, t('family.games.lobby.timer_off')], [60, t('family.games.lobby.timer_60')], [90, t('family.games.lobby.timer_90')]], s.turn_seconds, (v) => { s.turn_seconds = v; });
+      const opts = cq ? h('details', { class: 'gopts', open: s.optsOpen || null, ontoggle: (e) => { s.optsOpen = e.target.open; } },
+        h('summary', { class: 'gopts-sum' }, h('span', { text: t('family.games.lobby.options') }), h('span', { class: 'gopts-hint', text: t('family.games.lobby.options_hint') })),
+        h('div', { class: 'gopts-body' },
+          seg(t('family.games.cq.lobby.opt_variant'), [['classic', t('family.games.cq.lobby.variant_classic')], ['familia', t('family.games.cq.lobby.variant_familia')]], variant(), (v) => { s.variant = v; draw(); }),
+          seatCount() > 2 && variant() === 'classic' ? h('p', { class: 'gwait-hint', text: t('family.games.cq.lobby.classic_two') }) : null,
+          seg(t('family.games.cq.lobby.opt_match'), [[0, t('family.games.cq.lobby.match_one')], [3, t('family.games.cq.lobby.match_3')], [5, t('family.games.cq.lobby.match_5')]], s.cq_match, (v) => { s.cq_match = v; }),
+          seg(t('family.games.cq.lobby.opt_force'), [[true, t('family.games.cq.lobby.on')], [false, t('family.games.cq.lobby.off')]], s.forcing, (v) => { s.forcing = v; }),
+          variant() === 'familia' ? seg(t('family.games.cq.lobby.opt_cambio'), [[true, t('family.games.cq.lobby.on')], [false, t('family.games.cq.lobby.off')]], s.cambio, (v) => { s.cambio = v; }) : null,
+          seg(t('family.games.lobby.opt_hints'), [[true, t('family.games.lobby.hints_on')], [false, t('family.games.lobby.hints_off')]], s.hints, (v) => { s.hints = v; draw(); }),
+          timer)) : h('details', { class: 'gopts', open: s.optsOpen || null, ontoggle: (e) => { s.optsOpen = e.target.open; } },
         h('summary', { class: 'gopts-sum' }, h('span', { text: t('family.games.lobby.options') }), h('span', { class: 'gopts-hint', text: t('family.games.lobby.options_hint') })),
         h('div', { class: 'gopts-body' },
           seg(t('family.games.lobby.opt_table'), [[true, t('family.games.lobby.opt_table_simple')], [false, t('family.games.lobby.opt_table_free')]], simple(), (v) => { s.simple_table = v; draw(); }),
@@ -269,12 +319,14 @@ export async function newGameView() {
       const n = s.invite.size;
       root.replaceChildren(...nav(t('family.games.lobby.new_ready')),
         h('ul', { class: 'gsummary' },
+          cq ? h('li', null, h('span', { class: 'gsummary-k', text: t('family.games.cq.lobby.sum_game') }), h('span', { text: t('family.games.cq.name') })) : null,
+          cq ? h('li', null, h('span', { class: 'gsummary-k', text: t('family.games.cq.lobby.opt_variant') }), h('span', { text: variant() === 'familia' ? t('family.games.cq.lobby.variant_familia') : t('family.games.cq.lobby.variant_classic') })) : null,
           h('li', null, h('span', { class: 'gsummary-k', text: t('family.games.lobby.sum_mode') }), h('span', { text: modeLabel(s.mode) })),
           h('li', null, h('span', { class: 'gsummary-k', text: t('family.games.lobby.sum_invited') }),
             h('span', { text: n ? (n === 1 ? t('family.games.lobby.sum_people.one') : t('family.games.lobby.sum_people.other', { n })) : t('family.games.lobby.sum_nobody') })),
           h('li', null, h('span', { class: 'gsummary-k', text: t('family.games.lobby.sum_claude') }),
             h('span', { text: s.claude === 'easy' ? t('family.games.common.claude_easy') : s.claude === 'sharp' ? t('family.games.common.claude_sharp') : t('family.games.lobby.claude_none') })),
-          h('li', null, h('span', { class: 'gsummary-k', text: t('family.games.lobby.opt_table') }),
+          cq ? null : h('li', null, h('span', { class: 'gsummary-k', text: t('family.games.lobby.opt_table') }),
             h('span', { text: simple() ? t('family.games.lobby.opt_table_simple') : t('family.games.lobby.opt_table_free') })),
           h('li', null, h('span', { class: 'gsummary-k', text: t('family.games.lobby.opt_hints') }),
             h('span', { text: s.hints ? t('family.games.lobby.hints_on') : t('family.games.lobby.hints_off') }))),
@@ -411,7 +463,15 @@ export function roomLobbyView(ctx) {
     const st0 = room.settings || {};
     const newbies = seats.filter((x) => !x.bot && x.first_game).map((x) => (x.seat === mine ? t('family.games.lobby.you') : x.name));
     const setOpt = (k, v) => op(() => games.options(room.id, { [k]: v }));
-    const options = h('section', { class: 'gwait-opts' },
+    const cqRoom = room.game === 'conquian';
+    const options = cqRoom ? h('section', { class: 'gwait-opts' },
+      h('h2', { class: 'gwait-h2' }, h('span', { text: t('family.games.lobby.options_on') })),
+      optionTags(st0, 'conquian'),
+      isHost ? h('div', { class: 'gwait-opts-edit' },
+        seg(t('family.games.cq.lobby.opt_variant'), [['classic', t('family.games.cq.lobby.variant_classic')], ['familia', t('family.games.cq.lobby.variant_familia')]], st0.variant || (seats.length > 2 ? 'familia' : 'classic'), (v) => setOpt('variant', v)),
+        seg(t('family.games.lobby.opt_hints'), [[true, t('family.games.lobby.hints_on')], [false, t('family.games.lobby.hints_off')]], st0.hints !== false, (v) => setOpt('hints', v))) : null,
+      st0.variant === 'classic' && seats.length > 2 ? h('p', { class: 'gwait-hint gwait-newbie', text: t('family.games.cq.lobby.classic_two') }) : null,
+      h('button', { class: 'btn btn-quiet gpractice-rules', type: 'button', onclick: () => openRules('conquian') }, t('family.games.cq.lobby.how'))) : h('section', { class: 'gwait-opts' },
       h('h2', { class: 'gwait-h2' }, h('span', { text: t('family.games.lobby.options_on') })),
       optionTags(st0),
       isHost ? h('div', { class: 'gwait-opts-edit' },
@@ -435,6 +495,7 @@ export function roomLobbyView(ctx) {
 
     el.replaceChildren(...[   // (replaceChildren would print a null as the text "null")
       h('div', { class: 'gwait-top' },
+        room.game === 'conquian' ? h('span', { class: 'gtag gtag-game', text: t('family.games.cq.name') }) : null,
         h('span', { class: 'gtag gtag-mode gtag-' + room.mode, text: modeLabel(room.mode) }),
         h('a', { class: 'gwait-tv', href: '#/games/tv/' + room.id }, t('family.games.lobby.show_tv'))),
       h('h1', { class: 'gwait-title', text: t('family.games.lobby.wait_title') }),
