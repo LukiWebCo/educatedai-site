@@ -326,6 +326,11 @@ img.avatar-claude { background: transparent; box-shadow: 0 0 18px color-mix(in o
 .send-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 .composer-tools { display: flex; align-items: center; gap: var(--eai-space-3); padding: 6px 4px 2px; flex-wrap: wrap; }
 .voice-hint { color: var(--eai-color-ink-muted); font-size: var(--eai-step--1); line-height: 1.3; flex: 1; min-width: 12em; }
+/* Not typing (no focus, nothing written): a slim one-line bar, so the chat gets the screen (family feedback, 2026-10-07). */
+.composer:not(:focus-within):not(.has-text) { padding: 6px var(--eai-space-2); }
+.composer:not(:focus-within):not(.has-text) .composer-tools { display: none; }
+.composer:not(:focus-within):not(.has-text) .composer-input { min-height: 44px; height: 44px; padding-top: 10px; padding-bottom: 10px; }
+.composer:not(:focus-within):not(.has-text) .send { width: 44px; height: 44px; min-width: 44px; }
 
 /* ---- book --------------------------------------------------------------------------------------- */
 .book-list { display: grid; gap: var(--eai-space-3); }

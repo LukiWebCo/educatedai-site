@@ -257,6 +257,7 @@ export async function newThreadView(shelfId) {
     h('label', { class: 'field', for: 'shelf' }, h('span', { class: 'field-label' }, t('family.new.shelf_label')), sel),
     msg,
     h('button', { class: 'btn btn-primary btn-big', type: 'submit' }, t('family.new.submit')));
+  form.addEventListener('focusin', grow);
   form.addEventListener('submit', async (ev) => {
     ev.preventDefault();
     if (!title.value.trim() || !body.value.trim()) { msg.textContent = t('family.errors.empty'); return; }
@@ -379,7 +380,12 @@ export async function threadView(id) {
   const thinkingSlot = h('div', { class: 'thinking-slot' }, th.claude_state === 'queued' ? thinking() : null);
 
   const ta = h('textarea', { id: 'composer', class: 'input composer-input', rows: 2, maxlength: 4000, 'data-i18n-attr': 'placeholder:family.composer.placeholder', placeholder: t('family.composer.placeholder'), 'aria-label': t('family.composer.label') });
-  const grow = () => { ta.style.setProperty('height', 'auto'); ta.style.setProperty('height', Math.min(ta.scrollHeight, 240) + 'px'); };
+  // A half-written message keeps the composer open; an empty one shrinks to a slim bar when not focused (see .composer CSS).
+  const grow = () => {
+    ta.closest('.composer')?.classList.toggle('has-text', !!ta.value.trim());
+    ta.style.setProperty('height', 'auto');
+    if (ta.value) ta.style.setProperty('height', Math.min(ta.scrollHeight, 240) + 'px');
+  };
   ta.addEventListener('input', grow);
   const send = h('button', { class: 'btn btn-primary send', type: 'submit', 'aria-label': t('family.composer.send') }, icon('send'), h('span', { class: 'send-label' }, t('family.composer.send')));
   const tag = h('button', {
