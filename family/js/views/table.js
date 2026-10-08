@@ -379,6 +379,35 @@ export async function threadView(id) {
   }
   for (const p of data.posts) list.append(postEl(p, byId));
   const thinkingSlot = h('div', { class: 'thinking-slot' }, th.claude_state === 'queued' ? thinking() : null);
+  // Live updates (owner, 2026-10-08): while this thread is open and the app is in front, ask every few seconds for
+  // new posts (Claude's replies, the family's) and for translations that arrived after a post was first shown.
+  const shown = () => Array.from(list.querySelectorAll('.msg[data-post]'));
+  const live = setInterval(async () => {
+    if (!list.isConnected) { clearInterval(live); return; }
+    if (document.hidden) return;
+    const ids = shown().map((n) => Number(n.dataset.post));
+    const recent = ids.slice(-10);
+    const after = recent.length ? recent[0] - 1 : 0;
+    let upd;
+    try { upd = await get(`/api/threads/${th.id}/posts?limit=50&after=${after}`); } catch (e) { return; }
+    if (!list.isConnected) return;
+    let added = false;
+    for (const p of upd.posts) {
+      const old = byId.get(p.id);
+      byId.set(p.id, p);
+      if (!old) { list.append(postEl(p, byId)); added = true; continue; }
+      // a translation arrived for a post shown in its original language: show the reader's language now
+      if (!old.alt && p.alt && p.alt.lang === lang && p.lang !== lang) {
+        const n = list.querySelector(`.msg[data-post="${p.id}"]`);
+        if (n) n.replaceWith(postEl(p, byId));
+      }
+    }
+    if (upd.thread) {
+      if (upd.thread.claude_state !== 'queued') clear(thinkingSlot);
+      else if (!thinkingSlot.firstChild) thinkingSlot.append(thinking());
+    }
+    if (added) thinkingSlot.scrollIntoView({ block: 'end', behavior: 'smooth' });
+  }, 4000);
 
   const ta = h('textarea', { id: 'composer', class: 'input composer-input', rows: 2, maxlength: 4000, 'data-i18n-attr': 'placeholder:family.composer.placeholder', placeholder: t('family.composer.placeholder'), 'aria-label': t('family.composer.label') });
   // A half-written message keeps the composer open; an empty one shrinks to a slim bar when not focused (see .composer CSS).
