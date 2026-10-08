@@ -300,7 +300,8 @@ function postEl(p, byId) {
   const el = h('article', { class: 'msg' + (p.mine ? ' mine' : '') + (p.claude ? ' claude' : '') + (p.mentions_me ? ' mentions-me' : ''), id: 'p' + p.id, 'data-post': p.id });
   const body = h('p', { class: 'msg-body' });
   const setBody = (text, l) => { clear(body); body.lang = l; body.append(...mentionize(linkify(text, p.claude), p.mentions)); };
-  // Claude writes its own posts in both languages: show the reader's language first, the original one tap away.
+  // Every post comes with its other-language version when there is one (Claude's twin, or Claude's translation of a
+  // family post): show the reader's language first, the original one tap away (owner, 2026-10-08).
   const twin = p.alt && p.alt.lang === lang && p.lang !== lang ? p.alt : null;
   if (twin) setBody(twin.body, twin.lang); else setBody(p.body, p.lang);
   const parent = p.reply_to && byId.get(p.reply_to);
@@ -387,9 +388,12 @@ export async function threadView(id) {
     if (ta.value) ta.style.setProperty('height', Math.min(ta.scrollHeight, 240) + 'px');
   };
   ta.addEventListener('input', grow);
-  const send = h('button', { class: 'btn btn-primary send', type: 'submit', 'aria-label': t('family.composer.send') }, icon('send'), h('span', { class: 'send-label' }, t('family.composer.send')));
+  const send = h('button', { class: 'btn btn-primary send', type: 'submit', 'aria-label': t('family.composer.send'), onmousedown: (ev) => keepFocus(ev) }, icon('send'), h('span', { class: 'send-label' }, t('family.composer.send')));
+  // Buttons in the composer keep the text field focused (mousedown preventDefault): on a phone, losing focus closes
+  // the keyboard and shrinks the composer mid-tap, so the tap missed (owner, 2026-10-08: "the @claude button").
+  const keepFocus = (ev) => { if (document.activeElement === ta) ev.preventDefault(); };
   const tag = h('button', {
-    class: 'chip', type: 'button', title: t('family.composer.tag_claude_hint'),
+    class: 'chip', type: 'button', title: t('family.composer.tag_claude_hint'), onmousedown: keepFocus,
     onclick: () => { if (!/@claude\b/i.test(ta.value)) ta.value = ('@claude ' + ta.value).trimEnd() + ' '; ta.focus(); grow(); },
   }, '@claude');
   const picker = mentionPicker(ta, grow);
