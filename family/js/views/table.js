@@ -295,9 +295,14 @@ function voteButtons(p, onChange) {
 
 function hitLabel() { return [t('family.thread.vote_hit_short'), t('family.thread.vote_miss_short')]; }
 
-function postEl(p, byId) {
+// The reader's language when there is one (the post's twin or translation), else the original.
+const readable = (p, lang) => (p.alt && p.alt.lang === lang && p.lang !== lang ? (p.alt.body || p.alt.excerpt || p.body) : p.body);
+const whoName = (p) => (p.claude ? 'Claude' : p.author.display_name);
+
+// nav (threadView): reply(p), jump(id), repliesTo(id) -> [ids]. Absent elsewhere: no reply/jump affordances.
+function postEl(p, byId, nav) {
   const lang = currentLang();
-  const el = h('article', { class: 'msg' + (p.mine ? ' mine' : '') + (p.claude ? ' claude' : '') + (p.mentions_me ? ' mentions-me' : ''), id: 'p' + p.id, 'data-post': p.id });
+  const el = h('article', { class: 'msg' + (p.mine ? ' mine' : '') + (p.claude ? ' claude' : '') + (p.mentions_me ? ' mentions-me' : ''), id: 'p' + p.id, 'data-post': p.id, 'data-author': p.author.id });
   const body = h('p', { class: 'msg-body' });
   const setBody = (text, l) => { clear(body); body.lang = l; body.append(...mentionize(linkify(text, p.claude), p.mentions)); };
   // Every post comes with its other-language version when there is one (Claude's twin, or Claude's translation of a
@@ -308,6 +313,8 @@ function postEl(p, byId) {
   const actions = h('div', { class: 'msg-actions' });
   const render = () => {
     clear(actions);
+    if (nav) actions.append(h('button', { class: 'act act-reply', type: 'button', 'data-test': 'reply', onclick: () => nav.reply(p) },
+      icon('reply', 'icon icon-inline'), h('span', null, t('family.thread.reply'))));
     add(actions, voteButtons(p, (v) => { p.votes = v; render(); }));
     actions.append(h('button', {
       class: 'act' + (p.booked ? ' on' : ''), type: 'button', 'data-test': 'book-this',
@@ -348,8 +355,33 @@ function postEl(p, byId) {
         h('span', { class: 'msg-author', text: p.claude ? 'Claude' : p.author.display_name }),
         p.mentions_me ? h('span', { class: 'pill pill-mention', 'data-test': 'mentioned-label' }, icon('at', 'icon icon-inline'), t('family.mention.you_were')) : null,
         h('time', { class: 'msg-time', datetime: p.created_at, text: ago(p.created_at, lang) }), flag),
-      parent ? h('blockquote', { class: 'msg-quote', text: (parent.claude ? 'Claude' : parent.author.display_name) + ': ' + parent.body.slice(0, 120) }) : null,
-      body, actions));
+      parent ? h('blockquote', { class: 'msg-quote' + (nav ? ' msg-quote-link' : ''), 'data-test': 'quote', role: nav ? 'button' : null, tabindex: nav ? 0 : null,
+        onclick: nav ? () => nav.jump(parent.id) : null, text: '↩ ' + whoName(parent) + ': ' + readable(parent, lang).slice(0, 120) })
+        : (p.reply_to && nav ? h('blockquote', { class: 'msg-quote msg-quote-link', role: 'button', tabindex: 0, 'data-test': 'quote',
+          onclick: () => nav.jump(p.reply_to), text: '↩ ' + t('family.thread.earlier_message') }) : null),
+      body, actions,
+      nav ? h('button', { class: 'act act-replies', type: 'button', hidden: true, 'data-test': 'replies', 'data-replies-for': p.id,
+        onclick: () => { const ids = nav.repliesTo(p.id); if (ids.length) nav.jump(ids[0]); } }) : null));
+  // swipe right on a message to reply (owner, 2026-10-08; the Reply button stays for anyone who doesn't swipe)
+  if (nav) {
+    let x0 = null, y0 = 0, dx = 0;
+    const bub = el.querySelector('.bubble');
+    el.addEventListener('touchstart', (e) => { const q = e.touches[0]; x0 = q.clientX; y0 = q.clientY; dx = 0; }, { passive: true });
+    el.addEventListener('touchmove', (e) => {
+      if (x0 == null) return;
+      const q = e.touches[0], ddx = q.clientX - x0, ddy = q.clientY - y0;
+      if (Math.abs(ddy) > Math.abs(ddx) || ddx < 0) { if (Math.abs(ddy) > 12) x0 = null; bub.style.transform = ''; return; }
+      dx = ddx;
+      bub.style.transform = `translateX(${Math.min(dx, 90)}px)`;
+      el.classList.toggle('swipe-ready', dx > 64);
+    }, { passive: true });
+    el.addEventListener('touchend', () => {
+      bub.style.transform = '';
+      el.classList.remove('swipe-ready');
+      if (x0 != null && dx > 64) nav.reply(p);
+      x0 = null; dx = 0;
+    });
+  }
   return el;
 }
 
@@ -363,22 +395,143 @@ export async function threadView(id) {
   const list = h('div', { class: 'msgs', 'aria-live': 'polite' });
   const byId = new Map(data.posts.map((p) => [p.id, p]));
   let oldest = data.posts.length ? data.posts[0].id : null;
-  if (data.has_more) {
-    const more = h('button', { class: 'btn btn-quiet btn-small more', type: 'button' }, t('family.thread.older'));
-    more.addEventListener('click', async () => {
-      busy(more, true);
-      try {
-        const older = await get(`/api/threads/${th.id}/posts?limit=50&before=${oldest}`);
-        older.posts.forEach((p) => byId.set(p.id, p));
-        more.after(...older.posts.map((p) => postEl(p, byId)));
-        oldest = older.posts.length ? older.posts[0].id : oldest;
-        if (!older.has_more) more.remove();
-      } catch (e) { toast(errText(e), 'error'); } finally { busy(more, false); }
-    });
+  let hasMore = data.has_more;
+  const meId = state.me && state.me.id;
+
+  // ---- navigation (owner, 2026-10-08: busy threads were hard to follow) ----------------------------------
+  const msgNode = (pid) => list.querySelector(`.msg[data-post="${pid}"]`);
+  const flash = (n) => { n.classList.remove('flash'); void n.offsetWidth; n.classList.add('flash'); };
+  const nav = {
+    reply: (p) => setReply(p),
+    repliesTo: (pid) => Array.from(byId.values()).filter((x) => x.reply_to === pid).map((x) => x.id).sort((a, b) => a - b),
+    async jump(pid) {
+      let n = msgNode(pid);
+      for (let i = 0; !n && hasMore && i < 6; i++) { await loadOlder(); n = msgNode(pid); }   // it may be further up
+      if (!n) { toast(t('family.thread.not_found')); return; }
+      if (n.hidden) showAll();
+      n.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      flash(n);
+    },
+  };
+  const refreshCounts = () => list.querySelectorAll('[data-replies-for]').forEach((b) => {
+    const n = nav.repliesTo(Number(b.dataset.repliesFor)).length;
+    b.hidden = !n;
+    clear(b).append(icon('down', 'icon icon-inline'), h('span', null, n === 1 ? t('family.thread.replies.one') : t('family.thread.replies.other', { n })));
+  });
+
+  let more = null;
+  async function loadOlder() {
+    if (!hasMore || !oldest) return;
+    if (more) busy(more, true);
+    try {
+      const older = await get(`/api/threads/${th.id}/posts?limit=50&before=${oldest}`);
+      older.posts.forEach((p) => byId.set(p.id, p));
+      const nodes = older.posts.map((p) => postEl(p, byId, nav));
+      if (more) more.after(...nodes); else list.prepend(...nodes);
+      oldest = older.posts.length ? older.posts[0].id : oldest;
+      hasMore = older.has_more;
+      if (!hasMore && more) { more.remove(); more = null; }
+      afterChange();
+    } catch (e) { toast(errText(e), 'error'); } finally { if (more) busy(more, false); }
+  }
+  if (hasMore) {
+    more = h('button', { class: 'btn btn-quiet btn-small more', type: 'button' }, t('family.thread.older'));
+    more.addEventListener('click', () => loadOlder());
     list.append(more);
   }
-  for (const p of data.posts) list.append(postEl(p, byId));
+  for (const p of data.posts) list.append(postEl(p, byId, nav));
   const thinkingSlot = h('div', { class: 'thinking-slot' }, th.claude_state === 'queued' ? thinking() : null);
+
+  // ---- the Table: who's spoken in this conversation, seated around a table -------------------------------
+  // Only people who have spoken. The latest speaker glows. Tap someone to step through their messages (newest
+  // first); hold to show just them and you. (owner, 2026-10-08)
+  const strip = h('div', { class: 'table-strip', 'data-test': 'table-strip', role: 'group', 'aria-label': t('family.table.label') });
+  const stepBar = h('div', { class: 'step-bar', hidden: true, 'data-test': 'step-bar' });
+  const onlyBar = h('div', { class: 'only-bar', hidden: true, 'data-test': 'only-bar' });
+  let step = null;      // { aid, ids (oldest->newest), i }
+  let only = null;      // author id shown with mine
+  const speakers = () => {
+    const m = new Map();
+    for (const p of Array.from(byId.values()).sort((a, b) => a.id - b.id)) {
+      const k = p.author.id;
+      if (!m.has(k)) m.set(k, { author: Object.assign({ claude: p.claude }, p.author), ids: [] });
+      m.get(k).ids.push(p.id);
+    }
+    return m;
+  };
+  const showStep = () => {
+    if (!step) { stepBar.hidden = true; return; }
+    const sp = speakers().get(step.aid);
+    if (!sp) { step = null; stepBar.hidden = true; return; }
+    step.ids = sp.ids;
+    step.i = Math.max(0, Math.min(step.i, step.ids.length - 1));
+    const name = sp.author.claude ? 'Claude' : sp.author.display_name;
+    clear(stepBar).append(
+      avatar(sp.author, 's'),
+      h('span', { class: 'step-label', 'aria-label': t('family.table.step', { name, i: step.ids.length - step.i, n: step.ids.length }) },
+        h('span', { class: 'step-name', text: name }), h('span', { class: 'step-count', text: t('family.table.step_count', { i: step.ids.length - step.i, n: step.ids.length }) })),
+      h('button', { class: 'btn btn-quiet btn-small', type: 'button', 'aria-label': t('family.table.older'), 'data-test': 'step-older',
+        disabled: step.i === 0 ? true : null, onclick: () => { step.i -= 1; showStep(); nav.jump(step.ids[step.i]); } }, icon('up')),
+      h('button', { class: 'btn btn-quiet btn-small', type: 'button', 'aria-label': t('family.table.newer'), 'data-test': 'step-newer',
+        disabled: step.i === step.ids.length - 1 ? true : null, onclick: () => { step.i += 1; showStep(); nav.jump(step.ids[step.i]); } }, icon('down')),
+      h('button', { class: 'btn btn-quiet btn-small', type: 'button', 'aria-label': t('family.table.close'), onclick: () => { step = null; showStep(); drawTable(); } }, icon('x')));
+    stepBar.hidden = false;
+  };
+  function applyOnly() {
+    list.querySelectorAll('.msg[data-post]').forEach((n) => { n.hidden = only != null && Number(n.dataset.author) !== only && Number(n.dataset.author) !== meId; });
+    onlyBar.hidden = only == null;
+    if (only != null) {
+      const sp = speakers().get(only);
+      const name = sp ? (sp.author.claude ? 'Claude' : sp.author.display_name) : '';
+      clear(onlyBar).append(h('span', { text: t('family.table.only', { name }) }),
+        h('button', { class: 'btn btn-quiet btn-small', type: 'button', 'data-test': 'show-all', onclick: showAll }, t('family.table.show_all')));
+    }
+  }
+  function showAll() { only = null; applyOnly(); drawTable(); }
+  function drawTable() {
+    const sp = Array.from(speakers().values());
+    clear(strip);
+    if (sp.length < 2) { strip.hidden = true; return; }
+    strip.hidden = false;
+    const lastAuthor = (() => { const ids = Array.from(byId.keys()).sort((a, b) => b - a); return ids.length ? byId.get(ids[0]).author.id : null; })();
+    const table = h('div', { class: 'table-top', 'aria-hidden': 'true' });
+    strip.append(table);
+    sp.forEach((s, k) => {
+      // up to six sit along the far side of the table; more go all the way round
+      const ang = sp.length > 6 ? (k / sp.length) * Math.PI * 2 - Math.PI / 2 : Math.PI + ((k + 0.5) / sp.length) * Math.PI;
+      const x = 50 + Math.cos(ang) * 42, y = sp.length > 6 ? 50 + Math.sin(ang) * 34 : 48 + Math.sin(ang) * 30;   // seats stay inside the strip
+      const name = s.author.claude ? 'Claude' : s.author.display_name;
+      let held = null, longDone = false;
+      const seat = h('button', {
+        class: 'seat' + (s.author.id === lastAuthor ? ' seat-latest' : '') + (step && step.aid === s.author.id ? ' seat-on' : '') + (only === s.author.id ? ' seat-only' : ''),
+        type: 'button', 'data-test': 'seat', 'data-author': s.author.id, 'aria-label': name + ' · ' + s.ids.length,
+        style: { left: x + '%', top: y + '%' },
+        onclick: () => {
+          if (longDone) { longDone = false; return; }
+          if (step && step.aid === s.author.id) step.i = Math.max(0, step.i - 1);    // tap again: the next older one
+          else step = { aid: s.author.id, ids: s.ids, i: s.ids.length - 1 };          // first tap: their newest
+          showStep(); drawTable(); nav.jump(step.ids[step.i]);
+        },
+      }, avatar(s.author, 's'), h('span', { class: 'seat-n', text: String(s.ids.length) }), h('span', { class: 'seat-name', text: name }));
+      const hold = () => { held = setTimeout(() => { longDone = true; only = only === s.author.id ? null : s.author.id; applyOnly(); drawTable(); }, 550); };
+      const unhold = () => clearTimeout(held);
+      seat.addEventListener('touchstart', hold, { passive: true }); seat.addEventListener('mousedown', hold);
+      ['touchend', 'touchmove', 'mouseup', 'mouseleave'].forEach((ev) => seat.addEventListener(ev, unhold, { passive: true }));
+      seat.addEventListener('contextmenu', (e) => e.preventDefault());
+      strip.append(seat);
+    });
+    strip.append(h('p', { class: 'table-hint', text: t('family.table.hint') }));
+  }
+
+  // ---- "↓ N new" when messages arrive while you're reading further up ------------------------------------
+  let unseen = [];
+  const newPill = h('button', { class: 'new-pill', type: 'button', hidden: true, 'data-test': 'new-pill',
+    onclick: () => { const first = unseen[0]; unseen = []; newPill.hidden = true; if (first) nav.jump(first); } });
+  const nearBottom = () => thinkingSlot.getBoundingClientRect().top < window.innerHeight + 60;
+  window.addEventListener('scroll', () => { if (unseen.length && nearBottom()) { unseen = []; newPill.hidden = true; } }, { passive: true });
+
+  function afterChange() { refreshCounts(); drawTable(); applyOnly(); showStep(); }
+
   // Live updates (owner, 2026-10-08): while this thread is open and the app is in front, ask every few seconds for
   // new posts (Claude's replies, the family's) and for translations that arrived after a post was first shown.
   const shown = () => Array.from(list.querySelectorAll('.msg[data-post]'));
@@ -391,28 +544,36 @@ export async function threadView(id) {
     let upd;
     try { upd = await get(`/api/threads/${th.id}/posts?limit=50&after=${after}`); } catch (e) { return; }
     if (!list.isConnected) return;
-    let added = false;
+    const fresh = [];
+    const wasNear = nearBottom();
     for (const p of upd.posts) {
       const old = byId.get(p.id);
       byId.set(p.id, p);
-      if (!old) { list.append(postEl(p, byId)); added = true; continue; }
+      if (!old) { const n = postEl(p, byId, nav); if (!wasNear && unseen.length === 0 && !p.mine) { n.classList.add('msg-new'); n.dataset.newLabel = ''; } list.append(n); fresh.push(p); continue; }
       // a translation arrived for a post shown in its original language: show the reader's language now
       if (!old.alt && p.alt && p.alt.lang === lang && p.lang !== lang) {
-        const n = list.querySelector(`.msg[data-post="${p.id}"]`);
-        if (n) n.replaceWith(postEl(p, byId));
+        const n = msgNode(p.id);
+        if (n) n.replaceWith(postEl(p, byId, nav));
       }
     }
     if (upd.thread) {
       if (upd.thread.claude_state !== 'queued') clear(thinkingSlot);
       else if (!thinkingSlot.firstChild) thinkingSlot.append(thinking());
     }
-    if (added) thinkingSlot.scrollIntoView({ block: 'end', behavior: 'smooth' });
+    if (fresh.length || upd.posts.length) afterChange();
+    if (!fresh.length) return;
+    if (wasNear) thinkingSlot.scrollIntoView({ block: 'end', behavior: 'smooth' });
+    else {
+      unseen.push(...fresh.filter((p) => !p.mine).map((p) => p.id));
+      if (unseen.length) { clear(newPill).append(icon('down', 'icon icon-inline'), h('span', null, t('family.thread.new_messages', { n: unseen.length }))); newPill.hidden = false; }
+    }
   }, 4000);
 
   const ta = h('textarea', { id: 'composer', class: 'input composer-input', rows: 2, maxlength: 4000, 'data-i18n-attr': 'placeholder:family.composer.placeholder', placeholder: t('family.composer.placeholder'), 'aria-label': t('family.composer.label') });
   // A half-written message keeps the composer open; an empty one shrinks to a slim bar when not focused (see .composer CSS).
+  let replyTo = null;
   const grow = () => {
-    ta.closest('.composer')?.classList.toggle('has-text', !!ta.value.trim());
+    ta.closest('.composer')?.classList.toggle('has-text', !!ta.value.trim() || !!replyTo);
     ta.style.setProperty('height', 'auto');
     if (ta.value) ta.style.setProperty('height', Math.min(ta.scrollHeight, 240) + 'px');
   };
@@ -440,8 +601,22 @@ export async function threadView(id) {
       picker.open();
     },
   }, icon('at', 'icon icon-inline'), h('span', null, t('family.mention.picker_label')));
+  const replyText = h('span', { class: 'reply-bar-text' });
+  const replyBar = h('div', { class: 'reply-bar', hidden: true, 'data-test': 'reply-bar' },
+    icon('reply', 'icon icon-inline'), replyText,
+    h('button', { class: 'reply-bar-x', type: 'button', 'aria-label': t('family.thread.cancel_reply'), onmousedown: (ev) => keepFocus(ev),
+      onclick: () => { setReply(null); ta.focus(); } }, icon('x')));
+  function setReply(p) {
+    replyTo = p;
+    replyBar.hidden = !p;
+    if (p) {
+      replyText.textContent = t('family.thread.replying_to', { name: whoName(p) }) + ': ' + readable(p, lang).slice(0, 70) + (readable(p, lang).length > 70 ? '…' : '');
+      ta.focus();
+    }
+    grow();
+  }
   const form = h('form', { class: 'composer', novalidate: true },
-    picker.box,
+    picker.box, replyBar,
     h('div', { class: 'composer-row' }, ta, send),
     h('div', { class: 'composer-tools' }, tag, at,
       h('span', { class: 'voice-hint' }, icon('mic', 'icon icon-inline'), t('family.composer.voice_hint'))));
@@ -451,11 +626,12 @@ export async function threadView(id) {
     if (!text) { ta.focus(); return; }
     busy(send, true);
     try {
-      const p = await post(`/api/threads/${th.id}/posts`, { body: text, lang });
+      const p = await post(`/api/threads/${th.id}/posts`, replyTo ? { body: text, lang, reply_to: replyTo.id } : { body: text, lang });
       byId.set(p.id, p);
-      list.append(postEl(p, byId));
+      list.append(postEl(p, byId, nav));
       ta.value = '';
-      grow();
+      setReply(null);
+      afterChange();
       if (/(^|[^\w@])@claude\b/i.test(text)) { clear(thinkingSlot).append(thinking()); toast(t('family.thread.claude_called')); }
       thinkingSlot.scrollIntoView({ block: 'end', behavior: 'smooth' });
     } catch (e) { toast(errText(e), 'error'); } finally { busy(send, false); }
@@ -465,7 +641,8 @@ export async function threadView(id) {
     backLink(shelf ? '#/shelf/' + shelf.id : '#/', shelf ? shelfTitle(shelf) : t('family.nav.table')),
     h('h1', { class: 'thread-h1', text: titleOf(th) }),
     h('p', { class: 'muted small legend' }, t('family.thread.legend', { hit: hitShort, miss: missShort })),
-    list, thinkingSlot, form);
+    strip, stepBar, onlyBar, list, thinkingSlot, newPill, form);
+  afterChange();
   requestAnimationFrame(() => { const last = list.lastElementChild; if (last && data.posts.length > 3) last.scrollIntoView({ block: 'end' }); });
   return root;
 }

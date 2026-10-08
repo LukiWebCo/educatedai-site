@@ -517,3 +517,47 @@ body[data-authed=no] .view { padding-bottom: var(--eai-space-7); }
 .ok-line { color: var(--eai-color-hit); font-weight: 700; margin: 0; }
 .ios-hint h3 { margin-bottom: var(--eai-space-2); }
 .ios-hint .steps { margin: 0; padding-left: 0; list-style: none; display: grid; gap: 6px; line-height: 1.45; }
+
+/* ---- following a busy thread (owner, 2026-10-08): reply, jump, the Table, new messages ---------------------- */
+.reply-bar { display: flex; align-items: center; gap: var(--eai-space-2); padding: 6px 8px 8px; margin-bottom: 6px;
+  border-bottom: 1px solid color-mix(in oklab, var(--eai-color-ink) 12%, transparent); color: var(--eai-color-ink-muted); font-size: var(--eai-step--1); }
+.reply-bar[hidden] { display: none; }
+.reply-bar-text { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.reply-bar-x { background: none; border: 0; color: inherit; padding: 6px; border-radius: 50%; cursor: pointer; }
+.composer.has-text .reply-bar, .composer:focus-within .reply-bar { color: var(--eai-color-ink); }
+.msg-quote-link { cursor: pointer; }
+.msg-quote-link:hover, .msg-quote-link:focus-visible { border-color: var(--eai-color-accent); }
+.msg.flash .bubble { animation: msgflash 1.6s ease-out; }
+@keyframes msgflash { 0%, 30% { box-shadow: 0 0 0 4px color-mix(in oklab, var(--eai-color-accent) 70%, transparent); } 100% { box-shadow: 0 0 0 0 transparent; } }
+.msg .bubble { transition: transform .12s ease-out; }
+.msg.swipe-ready .bubble { box-shadow: -6px 0 0 color-mix(in oklab, var(--eai-color-accent) 60%, transparent); }
+.act-replies { margin-top: 2px; }
+.msg-new { position: relative; padding-top: calc(var(--eai-space-3) + 4px); border-top: 2px solid var(--eai-color-accent); }
+
+.table-strip { position: relative; height: 150px; margin: var(--eai-space-2) 0 var(--eai-space-4); overflow: visible; }
+.table-strip[hidden] { display: none; }
+.table-top { position: absolute; left: 16%; right: 16%; top: 42%; height: 38%; border-radius: 50%;
+  background: radial-gradient(ellipse at 50% 35%, #c9925a, #8c5a33); border: 3px solid #4a2f1c; box-shadow: 0 6px 0 #4a2f1c; }
+.seat { position: absolute; transform: translate(-50%, -50%); display: grid; justify-items: center; gap: 2px; background: none; border: 0;
+  padding: 2px; cursor: pointer; color: var(--eai-color-ink); -webkit-touch-callout: none; user-select: none; }
+.seat .avatar { box-shadow: 0 0 0 3px var(--eai-color-surface); transition: box-shadow .2s; }
+.seat-latest .avatar { box-shadow: 0 0 0 3px var(--eai-color-accent), 0 0 14px 2px color-mix(in oklab, var(--eai-color-accent) 70%, transparent); }
+.seat-on .avatar, .seat-only .avatar { box-shadow: 0 0 0 4px var(--eai-color-accent-2); }
+.seat-n { position: absolute; right: -4px; top: -4px; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 10px; font-size: 12px; font-weight: 800;
+  line-height: 20px; background: var(--eai-color-ink); color: var(--eai-color-bg); }
+.seat-name { font-size: 11px; font-weight: 700; max-width: 72px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.table-hint { position: absolute; left: 0; right: 0; bottom: -14px; text-align: center; font-size: 11px; color: var(--eai-color-ink-muted); }
+.step-bar, .only-bar { position: sticky; top: 8px; z-index: 11; display: flex; align-items: center; gap: var(--eai-space-2); margin-bottom: var(--eai-space-3);
+  padding: 6px 10px; border-radius: 999px; background: var(--eai-color-surface); border: 1px solid color-mix(in oklab, var(--eai-color-accent-2) 50%, transparent);
+  box-shadow: 0 6px 20px -8px rgba(0, 0, 0, .6); font-weight: 700; }
+.step-bar[hidden], .only-bar[hidden] { display: none; }
+.step-label { flex: 1; min-width: 0; display: flex; align-items: baseline; gap: 8px; }
+.step-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.step-count { flex: none; color: var(--eai-color-accent); white-space: nowrap; }
+.only-bar { border-radius: var(--eai-radius-l); }
+.only-bar > span { flex: 1; min-width: 0; line-height: 1.25; }
+.step-bar .btn-small { min-width: 40px; padding: 6px; }
+.new-pill { position: sticky; bottom: calc(150px + env(safe-area-inset-bottom)); z-index: 12; display: flex; align-items: center; gap: 6px; margin: 0 auto;
+  padding: 8px 16px; border-radius: 999px; border: 0; background: var(--eai-color-accent); color: var(--eai-color-bg); font-weight: 800; cursor: pointer;
+  box-shadow: 0 8px 24px -8px rgba(0, 0, 0, .7); }
+.new-pill[hidden] { display: none; }

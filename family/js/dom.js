@@ -28,6 +28,9 @@ export function clear(el) { while (el.firstChild) el.firstChild.remove(); return
 const SVGNS = 'http://www.w3.org/2000/svg';
 // Stroke icons, 24x24. Path data is constant; never built from user text.
 const ICONS = {
+  reply: 'M9 14l-5-5 5-5M4 9h10a6 6 0 0 1 6 6v4',
+  up: 'M12 19V5M6 11l6-6 6 6',
+  down: 'M12 5v14M6 13l6 6 6-6',
   table: 'M3 9h18M5 9v10M19 9v10M8 9l1-4h6l1 4M12 3v2',
   book: 'M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2V5zM4 19a2 2 0 0 1 2-2h13',
   film: 'M4 4h16v16H4zM4 9h16M4 15h16M9 4v16M15 4v16',
