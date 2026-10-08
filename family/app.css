@@ -561,3 +561,6 @@ body[data-authed=no] .view { padding-bottom: var(--eai-space-7); }
   padding: 8px 16px; border-radius: 999px; border: 0; background: var(--eai-color-accent); color: var(--eai-color-bg); font-weight: 800; cursor: pointer;
   box-shadow: 0 8px 24px -8px rgba(0, 0, 0, .7); }
 .new-pill[hidden] { display: none; }
+
+/* a question of the day can open with a little context before the question itself (owner, 2026-10-08) */
+.qotd-lead { margin: 0 0 var(--eai-space-3); line-height: 1.45; color: var(--eai-color-ink); }

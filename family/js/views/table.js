@@ -146,6 +146,7 @@ export async function tableView() {
       h('div', { class: 'qotd-head' },
         h('img', { class: 'avatar avatar-m avatar-claude', src: 'claude-avatar.svg', alt: '' }),
         h('p', { class: 'eyebrow', text: t('family.table.qotd_label') })),
+      q.lead && (q.lead[lang] || q.lead.en) ? h('p', { class: 'qotd-lead', text: q.lead[lang] || q.lead.en }) : null,
       h('p', { id: 'qotd-q', class: 'qotd-text', text: q.text[lang] || q.text.en }),
       q.why && (q.why[lang] || q.why.en) ? h('p', { class: 'qotd-why' },
         h('strong', { text: t('family.table.qotd_why') }), ' ', h('span', { text: q.why[lang] || q.why.en })) : null,
