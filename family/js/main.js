@@ -6,10 +6,7 @@ import { currentLang, guessLang, setLang, t } from './i18n.js';
 import { state, loading, errorBox, go } from './ui.js';
 import { joinView, loginView, rememberJoinToken } from './views/auth.js';
 import { adminView } from './views/admin.js';
-import { bookView, chapterView } from './views/book.js';
-import { filmsView } from './views/films.js';
 import { meView } from './views/me.js';
-import { scoreView } from './views/score.js';
 import { allView, newThreadView, shelfView, tableView, threadView } from './views/table.js';
 
 const SCALES = { 1: 1, 2: 1.15, 3: 1.32, 4: 1.55 };
@@ -150,11 +147,8 @@ async function route() {
       case 't': node = await threadView(b); break;
       case 'shelf': node = await shelfView(b); break;
       case 'all': node = await allView(); break;
-      case 'new': node = await newThreadView(b); break;
-      case 'book': node = b ? await chapterView(b) : await bookView(); break;
-      case 'films': node = await filmsView(); break;
+      case 'new': node = state.me.role === 'admin' ? await newThreadView(b) : errorBox({ key: 'family.errors.forbidden' }); break;
       case 'games': node = await (await import('./games/index.js')).gamesView(parts.slice(1)); break;
-      case 'score': node = await scoreView(b); break;
       case 'admin': node = state.me.role === 'admin' ? await adminView() : errorBox({ key: 'family.errors.forbidden' }); break;
       case 'me': node = await meView(actions); break;
       default: node = errorBox({ key: 'family.errors.not_found' });

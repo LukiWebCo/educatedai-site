@@ -6,7 +6,7 @@ import { t } from './i18n.js';
 import { busy, errText, toast } from './ui.js';
 
 const KINDS = ['mention', 'claude_reply', 'film', 'digest'];
-const label = (k) => ({ mention: t('family.notify.kind_mention'), claude_reply: t('family.notify.kind_claude_reply'), film: t('family.notify.kind_film'), digest: t('family.notify.kind_digest') })[k];
+const label = (k) => ({ mention: t('family.notify.kind_mention'), claude_reply: t('family.notify.kind_claude_reply'), film: t('family.notify.kind_table'), digest: t('family.notify.kind_digest') })[k];
 
 function supported() {
   return 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;

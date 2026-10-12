@@ -3,7 +3,6 @@ import { del, get, post } from '../api.js';
 import { ago, avatar, h, icon } from '../dom.js';
 import { currentLang, t } from '../i18n.js';
 import { normalizePhone } from './auth.js';
-import { statusLabel } from './films.js';
 import { busy, confirmBox, errText, errorBox, go, state, toast } from '../ui.js';
 
 function inviteBox(member, url, expires) {
@@ -38,9 +37,9 @@ function memberStatus(m) {
 }
 
 export async function adminView() {
-  let members, films, takedowns;
+  let members, takedowns;
   try {
-    [members, films, takedowns] = await Promise.all([get('/api/admin/members'), get('/api/films'), get('/api/admin/takedowns')]);
+    [members, takedowns] = await Promise.all([get('/api/admin/members'), get('/api/admin/takedowns')]);
   } catch (e) { return errorBox(e, () => go('#/admin')); }
   const root = h('section', { class: 'page admin' },
     h('p', { class: 'eyebrow', text: t('family.admin.eyebrow') }),
@@ -114,24 +113,30 @@ export async function adminView() {
   const kill = h('div', { class: 'card kill' },
     h('h2', { text: t('family.admin.kill_title') }),
     h('p', { class: 'muted', text: t('family.admin.kill_lede') }));
-  const live = films.filter((f) => f.status === 'published');
-  if (!live.length) kill.append(h('p', { class: 'muted', text: t('family.admin.kill_empty') }));
-  const pick = (o) => (o && (o[currentLang()] || o.en)) || '';
-  for (const f of live) {
-    const asked = pending.has('film:' + f.id) || f.takedown === 'pending';
-    const btn = h('button', {
-      class: 'btn btn-danger', type: 'button', disabled: asked, 'data-test': 'takedown-film',
-      onclick: async () => {
-        if (!(await confirmBox(t('family.admin.takedown_film_confirm', { title: pick(f.title) || f.id }), t('family.admin.takedown_yes'), true))) return;
-        busy(btn, true);
-        try { await post('/api/admin/takedowns', { kind: 'film', ref: f.id }); btn.textContent = t('family.admin.takedown_requested'); toast(t('family.admin.takedown_done')); } catch (e) { toast(errText(e), 'error'); busy(btn, false); return; }
-        btn.disabled = true;
-      },
-    }, asked ? t('family.admin.takedown_requested') : t('family.admin.takedown'));
-    kill.append(h('div', { class: 'row gap kill-row' }, h('div', { class: 'grow' },
-      h('p', { class: 'member-name', text: pick(f.title) || f.id }),
-      h('p', { class: 'muted small', text: (f.date || '') + ' · ' + statusLabel(f.status) })), btn));
-  }
+  const filmId = h('input', { class: 'input', maxlength: 80, autocomplete: 'off', required: true });
+  const filmMsg = h('p', { class: 'form-msg', role: 'alert' });
+  const filmBtn = h('button', { class: 'btn btn-danger', type: 'submit', disabled: true, 'data-test': 'takedown-film' },
+    t('family.admin.takedown'));
+  filmId.addEventListener('input', () => { filmBtn.disabled = !filmId.value.trim() || pending.has('film:' + filmId.value.trim()); });
+  const filmForm = h('form', { class: 'stack' },
+    h('label', { class: 'field' }, h('span', { class: 'field-label', text: t('family.admin.film_id_label') }), filmId),
+    h('p', { class: 'muted small', text: t('family.admin.film_id_hint') }), filmMsg, filmBtn);
+  filmForm.addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+    const id = filmId.value.trim();
+    if (!id) { filmMsg.textContent = t('family.errors.empty'); return; }
+    if (pending.has('film:' + id)) { filmMsg.textContent = t('family.admin.takedown_requested'); return; }
+    if (!(await confirmBox(t('family.admin.takedown_film_confirm', { title: id }), t('family.admin.takedown_yes'), true))) return;
+    busy(filmBtn, true);
+    try {
+      await post('/api/admin/takedowns', { kind: 'film', ref: id });
+      pending.add('film:' + id);
+      filmBtn.disabled = true;
+      filmMsg.textContent = t('family.admin.takedown_requested');
+      toast(t('family.admin.takedown_done'));
+    } catch (e) { filmMsg.textContent = errText(e); } finally { busy(filmBtn, false); }
+  });
+  kill.append(filmForm);
   kill.append(h('p', { class: 'muted small', text: t('family.admin.kill_posts_hint') }));
   if (takedowns.length) {
     kill.append(h('h3', { text: t('family.admin.recent_takedowns') }),

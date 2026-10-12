@@ -1,6 +1,6 @@
 // The Table: home feed, shelves, threads as group chats, and the composer.
 import { get, post } from '../api.js';
-import { add, ago, avatar, clear, dateLong, h, icon } from '../dom.js';
+import { ago, avatar, clear, h, icon } from '../dom.js';
 import { currentLang, t } from '../i18n.js';
 import { backLink, busy, confirmBox, errText, errorBox, go, loading, shelfTitle, state, thinking, titleOf, toast } from '../ui.js';
 
@@ -100,7 +100,6 @@ function mentionPicker(ta, grow) {
 const MARKS = {
   mentioned: ['at', () => t('family.table.mark_mentioned')],
   replied: ['sms', () => t('family.table.mark_replied')],
-  new_today: ['lamp', () => t('family.table.mark_new')],
 };
 
 function threadCard(th, queued) {
@@ -124,10 +123,7 @@ function threadCard(th, queued) {
 const threadsCount = (n) => (n === 1 ? t('family.table.threads_count.one', { n }) : t('family.table.threads_count.other', { n }));
 const topicsCount = (n) => (n === 1 ? t('family.all.topics_count.one', { n }) : t('family.all.topics_count.other', { n }));
 
-// The calm home (owner, 2026-10-06: "so many topics at once"): at most three blocks. Claude's question of the day,
-// today's film (only on a film day), and "What's going on": at most three conversations, the ones that mention or
-// answer me first. A quiet week gets one gentle line and the day's new starter topic. Everything else is one quiet
-// link away, on All conversations.
+// The home stays quiet: recent conversation activity and a link to the full list.
 export async function tableView() {
   const root = h('section', { class: 'page table-page' });
   let feed;
@@ -136,50 +132,22 @@ export async function tableView() {
   } catch (e) {
     return errorBox(e, () => go('#/'));
   }
-  const lang = currentLang();
-  const q = feed.qotd;
   root.append(
     h('header', { class: 'page-head' },
-      h('p', { class: 'eyebrow', text: dateLong(q.date, lang) }),
-      h('h1', { class: 'hello', text: t('family.table.hello', { name: state.me.display_name.split(' ')[0] }) })),
-    h('article', { class: 'card qotd', 'aria-labelledby': 'qotd-q' },
-      h('div', { class: 'qotd-head' },
-        h('img', { class: 'avatar avatar-m avatar-claude', src: 'claude-avatar.svg', alt: '' }),
-        h('p', { class: 'eyebrow', text: t('family.table.qotd_label') })),
-      q.lead && (q.lead[lang] || q.lead.en) ? h('p', { class: 'qotd-lead', text: q.lead[lang] || q.lead.en }) : null,
-      h('p', { id: 'qotd-q', class: 'qotd-text', text: q.text[lang] || q.text.en }),
-      q.why && (q.why[lang] || q.why.en) ? h('p', { class: 'qotd-why' },
-        h('strong', { text: t('family.table.qotd_why') }), ' ', h('span', { text: q.why[lang] || q.why.en })) : null,
-      h('a', { class: 'btn btn-primary btn-big', href: '#/t/' + q.thread_id }, t('family.table.qotd_answer'))));
-
-  const film = feed.film_today;
-  if (film) {
-    const live = film.status === 'live' && film.watch;
-    root.append(h('article', { class: 'card film-today', 'aria-labelledby': 'film-today-title', 'data-test': 'film-today' },
-      h('p', { class: 'eyebrow' }, icon('film', 'icon icon-inline'), h('span', null, t('family.table.film_label'))),
-      h('h2', { id: 'film-today-title', class: 'film-title', text: film.title[lang] || film.title.en }),
-      film.hook[lang] || film.hook.en ? h('p', { class: 'film-hook', text: film.hook[lang] || film.hook.en }) : null,
-      h('p', { class: 'film-when' + (live ? ' live' : '') }, h('span', { class: 'dot', 'aria-hidden': 'true' }),
-        h('span', null, live ? t('family.table.film_live') : t('family.table.film_soon'))),
-      h('div', { class: 'film-actions' },
-        live ? h('a', { class: 'btn btn-primary btn-big', href: film.watch[lang] || film.watch.en, target: '_blank', rel: 'noopener' },
-          icon('play'), h('span', null, t('family.table.film_watch'))) : null,
-        film.thread_id ? h('a', { class: 'btn btn-quiet btn-big', href: '#/t/' + film.thread_id },
-          icon('sms'), h('span', null, t('family.table.film_thread'))) : null)));
-  }
+      h('h1', { class: 'hello', text: t('family.table.hello', { name: state.me.display_name.split(' ')[0] }) })));
 
   const queued = new Set(feed.claude_thinking);
   const convs = feed.conversations || [];
   const going = h('section', { class: 'going-on', 'aria-labelledby': 'going-on-h', 'data-test': 'going-on' },
     h('h2', { id: 'going-on-h', class: 'section-title', text: t('family.table.active') }));
   const list = h('div', { class: 'stack' });
-  if (!convs.length) list.append(h('p', { class: 'quiet-line', 'data-test': 'quiet', text: feed.new_today ? t('family.table.quiet') : t('family.table.quiet_none') }));
+  if (!convs.length) list.append(h('div', { class: 'quiet-line', 'data-test': 'quiet' },
+    h('h3', { text: t('family.table.quiet_title') }), h('p', { text: t('family.table.quiet_body') })));
   for (const th of convs) list.append(threadCard(th, queued.has(th.id)));
-  if (feed.new_today) list.append(threadCard(feed.new_today, queued.has(feed.new_today.id)));
   going.append(list);
   root.append(going,
     h('a', { class: 'all-link', href: '#/all', 'data-test': 'all-link' }, h('span', null, t('family.table.all_link')), icon('next', 'icon icon-inline')));
-  root.append(h('a', { class: 'fab', href: '#/new', 'data-i18n-attr': 'aria-label:family.table.new_thread', 'aria-label': t('family.table.new_thread') }, icon('plus')));
+  if (state.me.role === 'admin') root.append(h('a', { class: 'fab', href: '#/new', 'data-i18n-attr': 'aria-label:family.table.new_thread', 'aria-label': t('family.table.new_thread') }, icon('plus')));
   return root;
 }
 
@@ -217,7 +185,8 @@ export async function allView() {
     list.append(group(t('family.all.coming_up'), data.coming_up,
       { count: topicsCount(data.coming_up.length), test: 'coming-up', lede: t('family.all.coming_up_lede'), cls: 'group-coming' }));
   }
-  root.append(list, h('a', { class: 'btn btn-primary btn-big', href: '#/new' }, icon('plus'), h('span', null, t('family.table.new_thread'))));
+  root.append(list);
+  if (state.me.role === 'admin') root.append(h('a', { class: 'btn btn-primary btn-big', href: '#/new' }, icon('plus'), h('span', null, t('family.table.new_thread'))));
   return root;
 }
 
@@ -239,15 +208,16 @@ export async function shelfView(id) {
     list.append(group(t('family.all.coming_up'), later,
       { count: topicsCount(later.length), test: 'coming-up', lede: t('family.all.coming_up_lede'), cls: 'group-coming' }));
   }
-  root.append(list, h('a', { class: 'btn btn-primary btn-big', href: '#/new/' + id }, icon('plus'), h('span', null, t('family.table.new_thread'))));
+  root.append(list);
+  if (state.me.role === 'admin') root.append(h('a', { class: 'btn btn-primary btn-big', href: '#/new/' + id }, icon('plus'), h('span', null, t('family.table.new_thread'))));
   return root;
 }
 
 export async function newThreadView(shelfId) {
   const shelves = await loadShelves().catch(() => []);
+  const defaultShelf = shelfId || (shelves.find((s) => s.slug === 'table') || {}).id;
   const sel = h('select', { id: 'shelf', class: 'input' },
-    h('option', { value: '' }, t('family.new.no_shelf')),
-    shelves.filter((s) => s.source !== 'qotd').map((s) => h('option', { value: s.id, selected: String(s.id) === String(shelfId) }, shelfTitle(s))));
+    shelves.map((s) => h('option', { value: s.id, selected: String(s.id) === String(defaultShelf) }, shelfTitle(s))));
   const title = h('input', { id: 'title', class: 'input', maxlength: 140, required: true, autocomplete: 'off' });
   const body = h('textarea', { id: 'body', class: 'input', rows: 5, maxlength: 4000, required: true });
   const msg = h('p', { class: 'form-msg', role: 'alert' });
@@ -276,26 +246,6 @@ export async function newThreadView(shelfId) {
 
 // ---- a thread ---------------------------------------------------------------------------
 
-function voteButtons(p, onChange) {
-  const mine = p.votes.mine;
-  const own = p.mine;
-  const mk = (kind, glyph, label) => {
-    const pressed = mine === kind;
-    return h('button', {
-      class: 'vote vote-' + kind + (pressed ? ' on' : ''), type: 'button', disabled: own, 'aria-pressed': String(pressed),
-      title: own ? t('family.thread.vote_own') : label, 'aria-label': label,
-      onclick: async (ev) => {
-        const b = ev.currentTarget;
-        busy(b, true);
-        try { onChange(await post(`/api/posts/${p.id}/vote`, { vote: pressed ? null : kind })); } catch (e) { toast(errText(e), 'error'); } finally { busy(b, false); }
-      },
-    }, icon(glyph, 'icon vote-icon'), h('span', { class: 'vote-count', text: String(p.votes[kind]) }));
-  };
-  return [mk('hit', 'target', t('family.thread.vote_hit')), mk('miss', 'puff', t('family.thread.vote_miss'))];
-}
-
-function hitLabel() { return [t('family.thread.vote_hit_short'), t('family.thread.vote_miss_short')]; }
-
 // The reader's language when there is one (the post's twin or translation), else the original.
 const readable = (p, lang) => (p.alt && p.alt.lang === lang && p.lang !== lang ? (p.alt.body || p.alt.excerpt || p.body) : p.body);
 const whoName = (p) => (p.claude ? 'Claude' : p.author.display_name);
@@ -316,14 +266,6 @@ function postEl(p, byId, nav) {
     clear(actions);
     if (nav) actions.append(h('button', { class: 'act act-reply', type: 'button', 'data-test': 'reply', onclick: () => nav.reply(p) },
       icon('reply', 'icon icon-inline'), h('span', null, t('family.thread.reply'))));
-    add(actions, voteButtons(p, (v) => { p.votes = v; render(); }));
-    actions.append(h('button', {
-      class: 'act' + (p.booked ? ' on' : ''), type: 'button', 'data-test': 'book-this',
-      onclick: async (ev) => {
-        busy(ev.currentTarget, true);
-        try { await post(`/api/posts/${p.id}/book`); p.booked = true; render(); toast(t('family.thread.booked_toast')); } catch (e) { toast(errText(e), 'error'); busy(ev.currentTarget, false); }
-      },
-    }, icon('book', 'icon icon-inline'), h('span', null, p.booked ? t('family.thread.booked') : t('family.thread.book_this'))));
     if (p.lang !== lang) {
       const showing = body.lang !== p.lang;
       actions.append(h('button', {
@@ -637,11 +579,9 @@ export async function threadView(id) {
       thinkingSlot.scrollIntoView({ block: 'end', behavior: 'smooth' });
     } catch (e) { toast(errText(e), 'error'); } finally { busy(send, false); }
   });
-  const [hitShort, missShort] = hitLabel();
   const root = h('section', { class: 'page thread-page' },
     backLink(shelf ? '#/shelf/' + shelf.id : '#/', shelf ? shelfTitle(shelf) : t('family.nav.table')),
     h('h1', { class: 'thread-h1', text: titleOf(th) }),
-    h('p', { class: 'muted small legend' }, t('family.thread.legend', { hit: hitShort, miss: missShort })),
     strip, stepBar, onlyBar, list, thinkingSlot, newPill, form);
   afterChange();
   requestAnimationFrame(() => { const last = list.lastElementChild; if (last && data.posts.length > 3) last.scrollIntoView({ block: 'end' }); });

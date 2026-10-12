@@ -88,8 +88,7 @@ export function openHowto({ autoplay = false, onClose } = {}) {
         h('ul', { class: 'howto-tips' },
           h('li', { text: t('family.howto.tip_post') }),
           h('li', { text: t('family.howto.tip_claude') }),
-          h('li', { text: t('family.howto.tip_vote') }),
-          h('li', { text: t('family.howto.tip_book') }),
+          h('li', { text: t('family.howto.tip_table') }),
           h('li', { text: t('family.howto.tip_lang') }))),
       h('button', { class: 'btn btn-primary btn-big', type: 'button', onclick: close }, t('family.howto.got_it')));
   }

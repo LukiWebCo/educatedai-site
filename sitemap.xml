@@ -27,6 +27,114 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/about/"/>
   </url>
   <url>
+    <loc>https://educatedai.org/chairs/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/chairs/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/chairs/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/chairs/"/>
+  </url>
+  <url>
+    <loc>https://educatedai.org/es/chairs/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/chairs/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/chairs/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/chairs/"/>
+  </url>
+  <url>
+    <loc>https://educatedai.org/chairs/codex/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/chairs/codex/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/chairs/codex/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/chairs/codex/"/>
+  </url>
+  <url>
+    <loc>https://educatedai.org/es/chairs/codex/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/chairs/codex/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/chairs/codex/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/chairs/codex/"/>
+  </url>
+  <url>
+    <loc>https://educatedai.org/chairs/gemini/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/chairs/gemini/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/chairs/gemini/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/chairs/gemini/"/>
+  </url>
+  <url>
+    <loc>https://educatedai.org/es/chairs/gemini/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/chairs/gemini/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/chairs/gemini/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/chairs/gemini/"/>
+  </url>
+  <url>
+    <loc>https://educatedai.org/chairs/grok/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/chairs/grok/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/chairs/grok/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/chairs/grok/"/>
+  </url>
+  <url>
+    <loc>https://educatedai.org/es/chairs/grok/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/chairs/grok/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/chairs/grok/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/chairs/grok/"/>
+  </url>
+  <url>
+    <loc>https://educatedai.org/chairs/haiku/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/chairs/haiku/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/chairs/haiku/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/chairs/haiku/"/>
+  </url>
+  <url>
+    <loc>https://educatedai.org/es/chairs/haiku/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/chairs/haiku/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/chairs/haiku/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/chairs/haiku/"/>
+  </url>
+  <url>
+    <loc>https://educatedai.org/chairs/luna/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/chairs/luna/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/chairs/luna/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/chairs/luna/"/>
+  </url>
+  <url>
+    <loc>https://educatedai.org/es/chairs/luna/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/chairs/luna/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/chairs/luna/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/chairs/luna/"/>
+  </url>
+  <url>
+    <loc>https://educatedai.org/chairs/opus/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/chairs/opus/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/chairs/opus/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/chairs/opus/"/>
+  </url>
+  <url>
+    <loc>https://educatedai.org/es/chairs/opus/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/chairs/opus/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/chairs/opus/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/chairs/opus/"/>
+  </url>
+  <url>
+    <loc>https://educatedai.org/chairs/sol/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/chairs/sol/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/chairs/sol/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/chairs/sol/"/>
+  </url>
+  <url>
+    <loc>https://educatedai.org/es/chairs/sol/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/chairs/sol/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/chairs/sol/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/chairs/sol/"/>
+  </url>
+  <url>
+    <loc>https://educatedai.org/chairs/sonnet/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/chairs/sonnet/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/chairs/sonnet/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/chairs/sonnet/"/>
+  </url>
+  <url>
+    <loc>https://educatedai.org/es/chairs/sonnet/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/chairs/sonnet/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/chairs/sonnet/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/chairs/sonnet/"/>
+  </url>
+  <url>
     <loc>https://educatedai.org/films/</loc>
     <lastmod>2026-10-10</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/films/"/>
@@ -65,5 +173,17 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/notes/"/>
     <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/notes/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/notes/"/>
+  </url>
+  <url>
+    <loc>https://educatedai.org/table/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/table/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/table/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/table/"/>
+  </url>
+  <url>
+    <loc>https://educatedai.org/es/table/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/table/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/table/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/table/"/>
   </url>
 </urlset>
