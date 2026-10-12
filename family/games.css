@@ -232,6 +232,8 @@ a.groom:hover { border-color: var(--eai-color-accent); }
 .grail-phone { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); margin-bottom: var(--eai-space-4); }
 .gseat { position: relative; display: grid; gap: 6px; padding: var(--eai-space-3); border-radius: var(--eai-radius-l);
   background: var(--eai-color-surface); border: 2px solid var(--g-line); min-width: 0; }
+button.gseat { min-height: 48px; color: inherit; cursor: pointer; font: inherit; text-align: left; }
+button.gseat:focus-visible { outline: 3px solid var(--eai-color-focus); outline-offset: 2px; }
 .gseat.is-turn { border-color: var(--eai-color-accent); box-shadow: 0 0 0 3px color-mix(in oklab, var(--eai-color-accent) 30%, transparent), 0 12px 30px -10px color-mix(in oklab, var(--eai-color-accent) 60%, transparent); }
 .gseat.is-away { opacity: .55; }
 .gseat-who { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; min-width: 0; }
@@ -337,8 +339,18 @@ dialog.grules-sheet { width: min(640px, calc(100% - 16px)); padding: var(--eai-s
 .grules-bell .gm-bell { width: 100%; }
 .grules-market { padding: var(--eai-space-3); border-radius: var(--eai-radius-m); border: 2px dashed color-mix(in oklab, var(--eai-color-focus) 60%, transparent); }
 .grules-stuck { color: var(--eai-color-ink-muted); }
-.grules-ok { position: sticky; bottom: 0; margin: var(--eai-space-4) 0 0; box-shadow: 0 -16px 20px -6px var(--eai-color-surface); }
+.grules-actions { position: sticky; bottom: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px;
+  margin: var(--eai-space-4) 0 0; padding: 8px 0; background: var(--eai-color-surface); box-shadow: 0 -16px 20px -6px var(--eai-color-surface); }
+.grules-actions > .btn { min-width: 0; min-height: 56px; padding: 8px; line-height: 1.15; overflow-wrap: anywhere; }
+.grules-ok { margin: 0; }
 dialog.grules-sheet::after { content: ""; display: block; height: var(--eai-space-4); }
+dialog.grules-full { width: 100vw; height: 100dvh; max-width: none; max-height: none; margin: 0; padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+  inset: 0; border: 0; border-radius: 0; display: flex; flex-direction: column; overflow: hidden; }
+.grules-full-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex: none; padding-bottom: 8px; }
+.grules-full-top h2 { min-width: 0; overflow-wrap: anywhere; }
+.grules-full-top .icon-btn { min-width: 56px; min-height: 56px; flex: none; }
+.grules-full-body { min-height: 0; flex: 1; overflow: auto; overscroll-behavior: contain; }
+.grules-full-body .md { overflow-wrap: anywhere; }
 
 /* ---- TV ---------------------------------------------------------------------------------------- */
 body.games-tv .topbar, body.games-tv .tabs, body.games-tv .lamp-glow, body.games-tv .skip { display: none !important; }

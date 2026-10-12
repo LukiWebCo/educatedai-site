@@ -24,6 +24,7 @@ import * as Lines from './lines.js';
 import { Staging } from './staging.js';
 import { applyArt, dotName, dotNode, stackLabel, stackText } from './dots.js';
 import { Coach } from './coach.js';
+import { openLastTurn } from './last_turn.js';
 
 const check = Lines.check || Lines.checkLine || Lines.default;
 const reduced = () => typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -123,6 +124,8 @@ class PlayScreen {
     this.unsub = null;
     this.alive = true;
     this.queue = Promise.resolve();
+    this.handCollapsed = false;
+    try { this.handCollapsed = localStorage.getItem('eai.games.hand_collapsed') === '1'; } catch { /* private mode */ }
   }
 
   sfx(name) { try { this.ctx.sfx && this.ctx.sfx.play(name); } catch { /* sound is optional */ } }
@@ -144,6 +147,7 @@ class PlayScreen {
     const un = this.ctx.onView && this.ctx.onView((nv) => { this.queue = this.queue.then(() => this.receive(nv)); });
     this.unsub = typeof un === 'function' ? un : null;
     this.ro = typeof ResizeObserver === 'function' ? new ResizeObserver(() => this.measureTray()) : null;
+    this.measureTray();
     this.tick = setInterval(() => this.updateClock(), 1000);
   }
 
@@ -558,7 +562,14 @@ class PlayScreen {
     const aria = s.stack_top
       ? t('family.games.play.seat_aria', { name, dot: dotName(s.stack_top), n: stackText(s) })
       : t('family.games.play.seat_aria_empty', { name });
-    return h('li', { class: 'gp-seat' + (me ? ' gp-seat-me' : '') + (playing ? ' gp-seat-on' : '') + (s.away ? ' gp-seat-away' : ''), 'aria-label': aria },
+    return h('li', {
+      class: 'gp-seat' + (me ? ' gp-seat-me' : '') + (playing ? ' gp-seat-on' : '') + (s.away ? ' gp-seat-away' : ''),
+      role: 'button', tabindex: '0', 'aria-label': `${aria}. ${t('family.games.last_turn.tap')}`,
+      onclick: () => openLastTurn(v, s.seat, this.root),
+      onkeydown: (ev) => {
+        if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); openLastTurn(v, s.seat, this.root); }
+      },
+    },
       s.stack_top ? dotNode(s.stack_top, { cls: 'gp-dot-mini', label: '' }) : h('span', { class: 'gp-dot gp-dot-mini gp-dot-none', 'aria-hidden': 'true' }),
       h('span', { class: 'gp-seat-name', 'aria-hidden': 'true' }, name, s.bot || s.covering_bot ? h('span', { class: 'gp-bot' }, ' ✦') : null),
       h('span', { class: 'gp-seat-n', 'aria-hidden': 'true' }, stackText(s)));
@@ -660,6 +671,21 @@ class PlayScreen {
     const me = v.me;
     const canAct = this.st.myTurn && !this.busy && !this.clearing;
     const fx = this.fx;
+    const trayClass = 'gp-tray gm-tray' + (this.st.myTurn ? ' gp-tray-mine' : '') + (this.mode === 'swap' ? ' gp-tray-swap' : '');
+    if (this.handCollapsed) {
+      const state = isMyTurn(v) ? t('family.games.play.collapse.your_turn') : this.turnText(v);
+      const top = me.stack_top ? dotNode(me.stack_top, { cls: 'gp-collapse-dot' })
+        : h('span', { class: 'gp-collapse-empty', 'aria-hidden': 'true' });
+      return h('footer', { class: trayClass + ' gp-tray-collapsed' },
+        h('div', { class: 'gp-tray-in' },
+          h('button', {
+            class: 'gp-collapse-bar' + (isMyTurn(v) ? ' is-your-turn' : ''), type: 'button', 'aria-expanded': 'false',
+              'aria-label': `${t('family.games.play.collapse.show')}. ${state}`, 'data-fk': 'hand-toggle',
+            onclick: () => this.setHandCollapsed(false),
+          }, top,
+          h('span', { class: 'gp-collapse-label', text: t('family.games.play.collapse.show') }),
+          h('span', { class: 'gp-collapse-state', text: state }))));
+    }
     const parts = [];
 
     // In the air: the dots you're holding, lifted.
@@ -730,7 +756,18 @@ class PlayScreen {
       }
       parts.push(acts);
     }
-    return h('footer', { class: 'gp-tray gm-tray' + (this.st.myTurn ? ' gp-tray-mine' : '') + (this.mode === 'swap' ? ' gp-tray-swap' : '') }, h('div', { class: 'gp-tray-in' }, parts));
+    // Hide my cards: a tab on the tray's top edge, so it takes no room inside the tray (small phones, big text).
+    const hideBtn = h('button', {
+      class: 'gp-collapse-btn', type: 'button', 'aria-expanded': 'true', 'data-fk': 'hand-toggle',
+      'aria-label': t('family.games.play.collapse.hide'), onclick: () => this.setHandCollapsed(true),
+    }, icon('down', 'icon'), h('span', { 'aria-hidden': 'true' }, t('family.games.play.collapse.hide_short')));
+    return h('footer', { class: trayClass }, hideBtn, h('div', { class: 'gp-tray-in' }, parts));
+  }
+
+  setHandCollapsed(collapsed) {
+    this.handCollapsed = collapsed;
+    try { localStorage.setItem('eai.games.hand_collapsed', collapsed ? '1' : '0'); } catch { /* private mode */ }
+    this.render();
   }
 
   renderGuide() {

@@ -139,6 +139,7 @@ button.gm-dot { padding: 0; border: 0; background: none; color: inherit; cursor:
   background: var(--gm-bad); color: var(--gm-plate); font: 700 var(--eai-step--1)/1.5 var(--eai-font-body);
 }
 .gm-line.is-hint { border: 2px dashed var(--gm-hint); }
+.gm-line.is-last { border: 2px solid var(--gm-new); box-shadow: 0 0 18px color-mix(in oklab, var(--gm-new) 45%, transparent); }  /* last-turn sheet */
 .gm-target { /* "Put here" / "+ New line" drop targets */
   display: grid; place-items: center; min-height: calc(var(--gm-dot) + 12px); padding: 6px 14px;
   border: 2px dashed color-mix(in srgb, var(--gm-chalk) 55%, transparent); border-radius: calc(var(--gm-dot) / 2 + 10px);

@@ -341,6 +341,16 @@
    "how": "music loop composed and synthesized in pure Python by tools/games_assets.py, MP3 via ffmpeg/LAME",
    "license": "CC0-1.0"
   },
+  "rules/puntos-y-rayas.en.md": {
+   "author": "Claude, for educatedai.org",
+   "how": "English rulebook text, written from the Spanish printed rulebook",
+   "license": "CC0-1.0"
+  },
+  "rules/puntos-y-rayas.es.md": {
+   "author": "Claude, for educatedai.org",
+   "how": "Spanish rulebook text written for the printed game and app",
+   "license": "CC0-1.0"
+  },
   "sfx/bell.mp3": {
    "author": "Claude, for educatedai.org",
    "how": "sound effect synthesized in pure Python by tools/games_assets.py (marimba/chime/bell/noise models), MP3 via ffmpeg/LAME",

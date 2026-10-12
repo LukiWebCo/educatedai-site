@@ -5,6 +5,7 @@ import { h } from '../dom.js';
 import { t } from '../i18n.js';
 import { countWord, dotArt, marketBanner, ring, seatAvatar, seatName, serverClock, ticker } from './market.js';
 import { stackLabel, stackText } from './dots.js';
+import { openLastTurn } from './last_turn.js';
 
 // W5's wordmark: real text in three parts so it translates ("Dots & Lines" / "Puntos y Rayas").
 export function wordmark(cls = '') {
@@ -41,7 +42,7 @@ export function tableBoard(view, cls = '', seen = null) {
   if (!lines.length) el.append(h('p', { class: 'gtable-empty', text: t('family.games.tv.table_empty') }));
   for (const line of lines) {
     const fresh = seen && !seen.has(line.id);
-    el.append(h('div', { class: 'gm-line gline' + (line.kind === 'group' ? ' gm-line--group' : '') + (line.full ? ' is-full' : '') + (fresh ? ' is-drawn' : ''), role: 'listitem' },
+    el.append(h('div', { class: 'gm-line gline' + (line.kind === 'group' ? ' gm-line--group' : '') + (line.full ? ' is-full' : '') + (fresh ? ' is-drawn' : ''), role: 'listitem', 'data-key': line.id },
       h('div', { class: 'gm-line-dots' }, line.dots.map((d) => dotArt(d, 'm', fresh ? 'is-enter' : '')))));
   }
   if (seen) { seen.clear(); for (const line of lines) seen.add(line.id); }
@@ -49,11 +50,16 @@ export function tableBoard(view, cls = '', seen = null) {
 }
 
 // One card per seat: avatar, name, the giant Stack-top chip and how many are left.
-export function seatCard(view, st) {
+export function seatCard(view, st, tableRoot = document) {
   const turn = view.turn || {};
   const playing = turn.seat === st.seat && turn.phase !== 'over' && !view.result;
   const isMe = view.me && view.me.seat === st.seat;
-  return h('div', { class: 'gseat' + (playing ? ' is-turn' : '') + (st.away ? ' is-away' : '') + (isMe ? ' is-me' : '') },
+  const name = isMe ? t('family.games.common.you') : st.name;
+  return h('button', {
+    class: 'gseat' + (playing ? ' is-turn' : '') + (st.away ? ' is-away' : '') + (isMe ? ' is-me' : ''),
+    type: 'button', 'aria-label': `${name}. ${t('family.games.last_turn.tap')}`,
+    onclick: () => openLastTurn(view, st.seat, tableRoot),
+  },
     h('div', { class: 'gseat-who' },
       seatAvatar(st, 'm'),
       h('span', { class: 'gseat-name', text: isMe ? t('family.games.common.you') : st.name }),
@@ -67,11 +73,11 @@ export function seatCard(view, st) {
     playing ? h('span', { class: 'gseat-now', text: t('family.games.tv.now_playing') }) : null);
 }
 
-export function seatRail(view, cls = '') {
+export function seatRail(view, cls = '', tableRoot = document) {
   const seats = view.seats || [];
   const two = seats.length > 4; // more than 4 seats: two columns, so every Stack top stays big
   const rows = Math.max(1, two ? Math.ceil(seats.length / 2) : seats.length);
-  return h('div', { class: 'grail ' + cls + (two ? ' is-two' : ''), style: { '--n': String(rows) } }, seats.map((st) => seatCard(view, st)));
+  return h('div', { class: 'grail ' + cls + (two ? ' is-two' : ''), style: { '--n': String(rows) } }, seats.map((st) => seatCard(view, st, tableRoot)));
 }
 
 function codeTiles(code, cls = '') {
@@ -214,7 +220,7 @@ export function tvScreen(root, ctx) {
     body.classList.toggle('is-many', (view.seats || []).length > 4);
     body.replaceChildren(
       h('section', { class: 'gtv-table' }, tableBoard(view, 'gtable-tv', linesSeen)),
-      h('aside', { class: 'gtv-seats' }, seatRail(view, 'grail-tv')));
+      h('aside', { class: 'gtv-seats' }, seatRail(view, 'grail-tv', screen)));
     requestAnimationFrame(() => fitTable(screen, lines));
     const ev = (view.events || []).slice(-1)[0];
     foot.replaceChildren(

@@ -2,7 +2,7 @@
 import { h, icon } from '../dom.js';
 import { howtoPlayer, howtoSource } from '../howto.js';
 import { currentLang, t } from '../i18n.js';
-import { inline } from '../md.js';
+import { inline, render } from '../md.js';
 import { bellIcon, dotArt } from './market.js';
 
 const SEEN = 'eai.games.rules_seen';
@@ -78,6 +78,39 @@ export function watchButton() {
     icon('play'), h('span', null, t('family.games.howto.watch')));
 }
 
+async function openFullRules() {
+  const lang = currentLang();
+  const dialog = h('dialog', { class: 'sheet grules-full', 'aria-labelledby': 'grules-full-title' });
+  const body = h('div', { class: 'grules-full-body', 'aria-live': 'polite' },
+    h('p', { class: 'muted', text: t('family.games.rules.full_loading') }));
+  const close = () => dialog.close();
+  dialog.append(
+    h('div', { class: 'grules-full-top' },
+      h('h2', { id: 'grules-full-title', text: t('family.games.rules.full_title') }),
+      h('button', { class: 'icon-btn', type: 'button', 'aria-label': t('family.games.common.close'), onclick: close }, icon('x'))),
+    body);
+  dialog.addEventListener('close', () => dialog.remove());
+  dialog.addEventListener('cancel', (ev) => { ev.preventDefault(); close(); });
+  document.body.append(dialog);
+  dialog.showModal();
+  try {
+    let response = await fetch(new URL(`../../games-assets/rules/puntos-y-rayas.${lang}.md`, import.meta.url));
+    let note = false;
+    if (lang === 'en' && response.status === 404) {
+      response = await fetch(new URL('../../games-assets/rules/puntos-y-rayas.es.md', import.meta.url));
+      note = true;
+    }
+    if (!response.ok) throw new Error(`Rules request failed (${response.status})`);
+    const markdown = await response.text();
+    if (!dialog.isConnected) return dialog;
+    body.replaceChildren(...(note ? [h('p', { class: 'card note', text: t('family.games.rules.full_note') })] : []), render(markdown));
+  } catch {
+    if (!dialog.isConnected) return dialog;
+    body.replaceChildren(h('p', { role: 'alert', text: t('family.games.rules.full_error') }));
+  }
+  return dialog;
+}
+
 // Opens the rules sheet (Dots, or Conquián's own card). Resolves when closed.
 export function openRules(game) {
   if (game === 'conquian') return import('./conquian/rules.js').then((m) => m.openCqRules());
@@ -92,7 +125,9 @@ export function openRules(game) {
         h('button', { class: 'icon-btn grules-x', type: 'button', 'aria-label': t('family.games.common.close'), onclick: done }, '×')),
       rulesBody(),
       watchButton(),
-      h('button', { class: 'btn btn-primary btn-big grules-ok', type: 'button', onclick: done }, t('family.games.rules.got_it'))].filter(Boolean));
+      h('div', { class: 'grules-actions' },
+        h('button', { class: 'btn btn-quiet btn-big', type: 'button', 'data-test': 'full-rules', onclick: () => openFullRules() }, t('family.games.rules.full')),
+        h('button', { class: 'btn btn-primary btn-big grules-ok', type: 'button', onclick: done }, t('family.games.rules.got_it')))].filter(Boolean));
     dlg.addEventListener('cancel', (ev) => { ev.preventDefault(); done(); });
     dlg.addEventListener('click', (ev) => { if (ev.target === dlg) done(); });
     document.body.append(dlg);
