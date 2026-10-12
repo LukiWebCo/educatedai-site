@@ -22,7 +22,7 @@ import { h, icon, clear } from '../dom.js';
 import { currentLang, t } from '../i18n.js';
 import * as Lines from './lines.js';
 import { Staging } from './staging.js';
-import { applyArt, dotName, dotNode } from './dots.js';
+import { applyArt, dotName, dotNode, stackLabel, stackText } from './dots.js';
 import { Coach } from './coach.js';
 
 const check = Lines.check || Lines.checkLine || Lines.default;
@@ -556,13 +556,12 @@ class PlayScreen {
     const playing = v.turn && v.turn.seat === s.seat && !v.result && v.turn.phase === 'play';
     const name = me ? t('family.games.play.you') : s.name;
     const aria = s.stack_top
-      ? t('family.games.play.seat_aria', { name, dot: dotName(s.stack_top), n: s.stack_left })
+      ? t('family.games.play.seat_aria', { name, dot: dotName(s.stack_top), n: stackText(s) })
       : t('family.games.play.seat_aria_empty', { name });
     return h('li', { class: 'gp-seat' + (me ? ' gp-seat-me' : '') + (playing ? ' gp-seat-on' : '') + (s.away ? ' gp-seat-away' : ''), 'aria-label': aria },
       s.stack_top ? dotNode(s.stack_top, { cls: 'gp-dot-mini', label: '' }) : h('span', { class: 'gp-dot gp-dot-mini gp-dot-none', 'aria-hidden': 'true' }),
       h('span', { class: 'gp-seat-name', 'aria-hidden': 'true' }, name, s.bot || s.covering_bot ? h('span', { class: 'gp-bot' }, ' ✦') : null),
-      h('span', { class: 'gp-seat-n', 'aria-hidden': 'true' }, String(s.stack_left)),
-      s.catchup ? h('span', { class: 'gp-plus1', 'aria-hidden': 'true' }, '+1') : null);
+      h('span', { class: 'gp-seat-n', 'aria-hidden': 'true' }, stackText(s)));
   }
 
   renderTicker(v) {
@@ -680,7 +679,8 @@ class PlayScreen {
     // Stack (outlined in the accent) · status · Hint lamp; then the hand, full width.
     const top = me.stack_top;
     const stackOut = top && !this.st.stack;
-    const leftNow = me.stack_left - (stackOut ? 1 : 0);
+    const leftNow = me.stack_left == null ? null : me.stack_left - (stackOut ? 1 : 0);
+    const stackView = { stack_left: leftNow, stack_many: me.stack_many };
     let stackNode;
     if (top && this.st.stack) {
       const scls = 'is-stack gp-stack-dot' + (fx.flip ? ' is-flip' : '') + (this.mode === 'swap' ? ' is-hint' : '');
@@ -692,9 +692,9 @@ class PlayScreen {
     } else {
       stackNode = h('span', { class: 'gm-dot gp-dot gp-stack-dot gp-dot-none', 'aria-label': t('family.games.play.stack_empty') });
     }
-    const stack = h('div', { class: 'gp-stack' + (leftNow <= 1 ? ' gp-stack-last' : '') },
+    const stack = h('div', { class: 'gp-stack' + (leftNow != null && leftNow <= 1 ? ' gp-stack-last' : '') },
       h('div', { class: 'gm-stack gp-stack-slot' }, stackNode,
-        h('span', { class: 'gm-stack-count', 'aria-label': t('family.games.play.stack_left', { n: leftNow }) }, String(leftNow))),
+        h('span', { class: 'gm-stack-count' + (stackView.stack_many || leftNow == null ? ' is-many' : ''), role: 'img', 'aria-label': stackLabel(stackView) }, stackText(stackView))),
       h('span', { class: 'gp-rack-label', 'aria-hidden': 'true' }, t('family.games.play.stack')));
     const hintsOn = v.room.settings.hints !== false && !!this.ctx.hint;
     const ready = !this.guide && !st.dirty && this.st.stack && this.st.hintKeys().length;
@@ -788,7 +788,6 @@ class PlayScreen {
     if (st.canPlace && st.stackUsed) return t('family.games.play.msg.flip_next');
     if (st.canPlace) return t('family.games.play.msg.ready');
     if (v.turn && v.turn.swapped) return t('family.games.play.msg.swapped');
-    if (this.view.me.refill_bonus) return t('family.games.play.msg.bonus');
     const hintsOn = v.room.settings.hints !== false && !!this.ctx.hint;
     if (this.st.stack && this.st.hintKeys().length) return hintsOn ? t('family.games.play.msg.top_fits') : t('family.games.play.msg.top_fits_nohint');
     return hintsOn ? t('family.games.play.msg.start_hint') : t('family.games.play.msg.start');

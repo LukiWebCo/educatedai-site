@@ -9,6 +9,7 @@ import { openRules, rulesButton } from './rules_card.js';
 import { modeLabel } from './tv.js';
 
 const CODE_CHARS = 'BCDFGHJKLMNPQRSTVWXZ23456789';
+const DOTS_MAX_PLAYERS = 8;
 
 function head(title, lede, withRules = true) {
   return h('header', { class: 'ghead' },
@@ -102,7 +103,7 @@ function gamePicker(game, onPick) {
   return h('div', { class: 'ggames', role: 'group', 'aria-label': t('family.games.cq.lobby.pick_game') },
     h('p', { class: 'gopt-label ggames-k', text: t('family.games.cq.lobby.pick_game') }),
     h('div', { class: 'ggames-row' },
-      tile('dots', t('family.games.common.game_name'), t('family.games.cq.lobby.dots_desc'), [dotArt({ c: 'r', n: 1 }, 's'), dotArt({ c: 'b', n: 2 }, 's')]),
+      tile('dots', t('family.games.common.game_name'), game === 'conquian' ? t('family.games.cq.lobby.dots_desc') : t('family.games.lobby.dots_desc'), [dotArt({ c: 'r', n: 1 }, 's'), dotArt({ c: 'b', n: 2 }, 's')]),
       tile('conquian', t('family.games.cq.name'), t('family.games.cq.lobby.cq_desc'), [h('span', { class: 'ggame-card ggame-card-1' }), h('span', { class: 'ggame-card ggame-card-2' })])));
 }
 
@@ -173,6 +174,7 @@ export async function newGameView() {
         list.replaceChildren(...folks.map((p) => {
           const on = s.invite.has(p.id);
           return h('button', { type: 'button', class: 'gperson' + (on ? ' on' : ''), 'aria-pressed': String(on),
+            disabled: s.game === 'dots' && !on && seatCount() >= DOTS_MAX_PLAYERS,
             onclick: () => { if (s.invite.has(p.id)) s.invite.delete(p.id); else s.invite.add(p.id); draw(); } },
           avatar(p, 'm'), h('span', { class: 'grow gperson-name', text: p.display_name }),
           h('span', { class: 'gcheck', 'aria-hidden': 'true' }, on ? '✓' : ''));
@@ -191,8 +193,9 @@ export async function newGameView() {
       const claudeArt = () => h('img', { class: 'avatar avatar-m avatar-claude', src: 'claude-avatar.svg', alt: '' });
       root.replaceChildren(...nav(t('family.games.lobby.new_claude')),
         h('div', { class: 'gchoices' },
-          bigChoice({ cls: 'gchoice-claude gchoice-best', art: claudeArt(), title: t('family.games.common.claude_easy'), badge: t('family.games.lobby.recommended'), desc: t('family.games.lobby.claude_easy_desc'), onclick: () => { s.claude = 'easy'; s.step = 3; draw(); } }),
-          bigChoice({ cls: 'gchoice-claude', art: claudeArt(), title: t('family.games.common.claude_sharp'), desc: t('family.games.lobby.claude_sharp_desc'), onclick: () => { s.claude = 'sharp'; s.step = 3; draw(); } }),
+          ...(s.game === 'dots' && 1 + s.invite.size >= DOTS_MAX_PLAYERS ? [] : [
+            bigChoice({ cls: 'gchoice-claude gchoice-best', art: claudeArt(), title: t('family.games.common.claude_easy'), badge: t('family.games.lobby.recommended'), desc: t('family.games.lobby.claude_easy_desc'), onclick: () => { s.claude = 'easy'; s.step = 3; draw(); } }),
+            bigChoice({ cls: 'gchoice-claude', art: claudeArt(), title: t('family.games.common.claude_sharp'), desc: t('family.games.lobby.claude_sharp_desc'), onclick: () => { s.claude = 'sharp'; s.step = 3; draw(); } })]),
           bigChoice({ cls: 'gchoice-none', title: t('family.games.lobby.claude_none'), desc: t('family.games.lobby.claude_none_desc'), onclick: () => { s.claude = null; s.step = 3; draw(); } })));
     } else {
       const cq = s.game === 'conquian';
@@ -340,6 +343,7 @@ export function roomLobbyView(ctx) {
     const hostSeat = seats.find((s) => s.seat === room.host_seat);
     const humans = seats.filter((s) => !s.bot).length;
     const canStart = seats.length >= 2;
+    const full = room.game !== 'conquian' && seats.length >= DOTS_MAX_PLAYERS;
     if (seats.length > seatsSeen) { try { ctx.sfx && ctx.sfx.play('join'); } catch { /* no sound */ } }
     seatsSeen = seats.length;
 
@@ -355,7 +359,7 @@ export function roomLobbyView(ctx) {
 
     // Add Claude: an extra "seat" row under the players (host only).
     let adder = null;
-    if (isHost) {
+    if (isHost && !full) {
       adder = picking
         ? h('div', { class: 'gwait-pick' },
           h('p', { class: 'gwait-pick-q', text: t('family.games.lobby.which_claude') }),
@@ -368,7 +372,7 @@ export function roomLobbyView(ctx) {
 
     // Invite family (host): tap a name and the invite goes out (it shows up in their Games).
     let inviter = null;
-    if (isHost) {
+    if (isHost && !full) {
       if (!inviting) {
         inviter = h('button', { class: 'gwait-invite', type: 'button', disabled: busy, onclick: () => {
           inviting = true; draw();
@@ -418,7 +422,8 @@ export function roomLobbyView(ctx) {
         onclick: () => op(() => games.start(room.id)) }, t('family.games.lobby.start')));
       if (!canStart) foot.push(h('p', { class: 'gwait-hint', text: t('family.games.lobby.need_two') }));
     } else if (mine == null) {
-      foot.push(h('button', { class: 'btn btn-primary btn-big', type: 'button', disabled: busy, onclick: () => op(() => games.seats(room.id, { op: 'sit' })) }, t('family.games.lobby.sit')));
+      foot.push(h('button', { class: 'btn btn-primary btn-big', type: 'button', disabled: busy || full, onclick: () => op(() => games.seats(room.id, { op: 'sit' })) }, t('family.games.lobby.sit')));
+      if (full) foot.push(h('p', { class: 'gwait-hint', text: t('family.games.api.room_full') }));
       foot.push(h('p', { class: 'gwait-hint', text: t('family.games.lobby.watching') }));
     } else {
       foot.push(h('p', { class: 'gwait-waiting' }, h('span', { text: t('family.games.lobby.waiting_host', { name: hostSeat ? hostSeat.name : '' }) }),

@@ -16,10 +16,6 @@
 .gm-dot.gmk-l { --gm-dot: min(calc(60px * var(--eai-text-scale)), calc((100vw - 96px) / 4)); }
 .gm-dot.gmk-xl { --gm-dot: 88px; }
 .gmk-empty .gmk-hole { fill: none; stroke: var(--gm-chalk-soft); stroke-width: 4; stroke-dasharray: 8 8; }
-.gm-dot--r .gmk-fallback { fill: var(--gm-suit-r); stroke: var(--gm-suit-r); } .gm-dot--b .gmk-fallback { fill: var(--gm-suit-b); stroke: var(--gm-suit-b); }
-.gm-dot--g .gmk-fallback { fill: var(--gm-suit-g); stroke: var(--gm-suit-g); } .gm-dot--p .gmk-fallback { fill: var(--gm-suit-p); stroke: var(--gm-suit-p); }
-.gm-dot--s .gmk-fallback { fill: var(--gm-suit-s); }
-.gmk-num { font-family: var(--eai-font-display); }
 
 /* ---- shared bits ------------------------------------------------------------------------------- */
 .gtag { display: inline-flex; align-items: center; min-height: 26px; padding: 2px 10px; border-radius: 999px; white-space: nowrap;
@@ -27,7 +23,6 @@
   border: 1px solid var(--g-line); }
 .gtag-bot { background: color-mix(in oklab, var(--eai-color-accent-2) 18%, var(--eai-color-surface)); }
 .gtag-host { background: color-mix(in oklab, var(--eai-color-accent) 22%, var(--eai-color-surface)); }
-.gtag-plus { background: var(--eai-color-hit); color: var(--eai-color-bg); border-color: transparent; }
 .gtag-mode { text-transform: uppercase; letter-spacing: .06em; font-family: var(--eai-font-mono); }
 .gtag-together { border-color: color-mix(in oklab, var(--eai-color-accent) 60%, transparent); }
 .gtag-live { border-color: color-mix(in oklab, var(--eai-color-hit) 60%, transparent); }
@@ -279,8 +274,8 @@ body.games-sheet-open .toast { bottom: calc(150px * var(--eai-text-scale) + env(
 .gmk-head .gm-market-title { font-size: min(calc(3.2rem * var(--eai-text-scale)), 10.5vw); }
 .gmk-head .gm-bell { width: min(calc(56px * var(--eai-text-scale)), 12vw); }
 .gmk-sub { font-weight: 700; max-width: 30ch; line-height: 1.35; }
-.gmk-ring { width: min(calc(76px * var(--eai-text-scale)), 19vw); }
-.gmk-ring .gm-ring-num { font-size: min(calc(2.3rem * var(--eai-text-scale)), 9vw); }
+.gmk-ring { width: min(calc(48px * var(--eai-text-scale)), 12vw); flex: none; }
+.gmk-ring .gm-ring-num { font-size: min(calc(1.4rem * var(--eai-text-scale)), 5vw); }
 .gmk-until { margin: 0; text-align: center; font-weight: 800; font-size: var(--eai-step-1); color: var(--gm-ball); }
 .gmk-sec { display: grid; gap: var(--eai-space-2); }
 .gmk-h3 { margin: 0; font: 700 var(--eai-step--1)/1.2 var(--eai-font-mono); text-transform: uppercase; letter-spacing: .1em; color: var(--eai-color-ink-muted); }
@@ -379,9 +374,9 @@ body.games-tv .toast { bottom: 3vh; }
 .grail-tv .gseat-who .avatar { width: 4vh; height: 4vh; font-size: 1.8vh; }
 .grail-tv .gtag { font-size: 1.5vh; min-height: 2.4vh; }
 .grail-tv .gseat-stack { grid-column: 1 / -1; justify-content: space-between; min-height: 0; }
-.grail-tv .gseat-top { --gm-dot: min(13vh, calc((100vh - 26vh) / var(--n) - 7vh)); }
+.grail-tv .gseat-top { --gm-dot: min(13vh, calc(((100vh - 26vh) / var(--n) - 7vh) / 1.4)); }
 .grail-tv .gseat-left { align-items: flex-end; }
-.grail-tv .gseat-left-n { font-size: min(8vh, calc((100vh - 26vh) / var(--n) - 7vh)); }
+.grail-tv .gseat-left-n { font-size: min(5vh, calc((100vh - 26vh) / var(--n) - 7vh)); }
 .grail-tv .gseat-left-l { font-size: 1.7vh; }
 .grail-tv .gseat-now { top: -1.2vh; font-size: 1.4vh; }
 .gtv-foot { display: flex; align-items: center; gap: 2vw; padding: 1.2vh 2.4vw 2vh; min-height: 6vh; }
@@ -409,8 +404,8 @@ body.games-tv .toast { bottom: 3vh; }
 .gtv-market-head .gm-market-title { font-size: 12vh; }
 .gtv-market-head .gm-bell { width: 11vh; }
 .gtv-market-head .gm-market-banner { padding: 1.4vh 2.4vw 1.4vh 1.4vw; box-shadow: 1vh 1vh 0 0 var(--gm-chalk); }
-.gtv-ring.gm-ring--big { width: 40vh; }
-.gtv-ring .gm-ring-num { font-size: 16vh; }
+.gtv-ring { width: 14vh; }
+.gtv-ring .gm-ring-num { font-size: 6vh; }
 .gtv-market-left { display: flex; flex-direction: column; align-items: center; gap: 3vh; }
 .gtv-market-how { margin: 0; font-size: 3vh; text-align: center; font-weight: 700; }
 .gtv-market-board { margin: 0 0 2vh; font: 700 2.2vh/1 var(--eai-font-mono); text-transform: uppercase; letter-spacing: .14em; color: var(--eai-color-ink-muted); }

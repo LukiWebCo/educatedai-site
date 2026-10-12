@@ -55,7 +55,6 @@ body.games-play .toast { bottom: calc(240px + env(safe-area-inset-bottom)); }
 .gp-seat-n { display: inline-grid; place-items: center; min-width: 1.9em; height: 1.9em; padding: 0 5px; border-radius: 999px;
   background: var(--eai-color-surface-2); font: 700 var(--eai-step--1)/1 var(--eai-font-mono); }
 .gp-seat-on .gp-seat-n { background: var(--eai-color-accent); color: var(--eai-color-bg); }
-.gp-plus1 { font: 700 12px/1 var(--eai-font-mono); padding: 3px 5px; border-radius: 6px; background: var(--eai-color-hit); color: var(--eai-color-bg); }
 .gp-bag { display: inline-flex; align-items: center; gap: 4px; min-height: 42px; padding: 0 12px; border-radius: 999px; flex: none;
   background: var(--eai-color-surface-2); color: var(--eai-color-ink-muted); font: 700 var(--eai-step--1)/1 var(--eai-font-mono); }
 .gp-bag b { color: var(--eai-color-ink); }
@@ -114,7 +113,7 @@ body.games-play .toast { bottom: calc(240px + env(safe-area-inset-bottom)); }
 .gp-put-arrow { font-size: 1.2em; }
 
 button.gm-dot:focus-visible { outline: 3px solid var(--eai-color-focus); outline-offset: 3px; }
-.gp-dot-none { border-radius: 50%; box-shadow: inset 0 0 0 2px color-mix(in oklab, var(--eai-color-ink) 22%, transparent); }
+.gp-dot-none { border-radius: 9%; box-shadow: inset 0 0 0 2px color-mix(in oklab, var(--eai-color-ink) 22%, transparent); }
 
 /* ---- the tray ------------------------------------------------------------------------------------------------ */
 .gp-tray {
@@ -200,7 +199,7 @@ button.gm-dot:focus-visible { outline: 3px solid var(--eai-color-focus); outline
   color: var(--eai-color-ink); font: 400 32px/1 var(--eai-font-body); }
 .gp-guide-x:hover, .gp-guide-x:focus-visible { background: color-mix(in oklab, var(--eai-color-ink) 10%, transparent); }
 .gp-target { position: relative; outline: 4px solid var(--gm-hint); outline-offset: 4px; z-index: 4; }
-.gm-dot.gp-target { border-radius: 50%; }
+.gm-dot.gp-target { border-radius: 9%; }
 .gp-btn.gp-target, .gp-put.gp-target, .gp-newline.gp-target { border-color: var(--gm-hint); }
 .gp-target-n { position: absolute; top: -14px; left: -14px; z-index: 5; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%;
   background: var(--gm-hint); color: var(--gm-plate, #10201a); font: 800 16px/1 var(--eai-font-mono); box-shadow: 0 2px 8px rgba(0, 0, 0, .5); pointer-events: none; }

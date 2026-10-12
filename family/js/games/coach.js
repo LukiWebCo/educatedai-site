@@ -5,11 +5,12 @@
 //
 //   1 stack  your Stack (Got it)          2 line   red 2 3 4 + New line + Place
 //   3 top    blue 6 onto the blue Line (the Smart Hint shows the taps)
-//   4 move   green 6 needs a dot moved: tap Hint and follow it
-//   5 market purple 6 clears the 6s; Done opens the Market; trade or Done trading
+//   4 move   green 6 needs a card moved: tap Hint and follow it
+//   5 market purple 6 clears the 6s; Done opens the Market; trade or Done!
 //   6 win    how you win (Let's play!)
 import { h } from '../dom.js';
 import { t } from '../i18n.js';
+import { stackText } from './dots.js';
 
 const STEPS = ['stack', 'line', 'top', 'move', 'market', 'win'];
 
@@ -36,7 +37,7 @@ export class Coach {
       if (saved === 'done') this.done = true;
       else if (saved && /^[0-5]$/.test(saved)) this.i = Number(saved);
     } catch { /* private mode: start at the top */ }
-    this.base = null;     // what the current step started from: {hand:Set, left}
+    this.base = null;     // what the current step started from: {hand:Set, top}
   }
 
   get step() { return this.done ? null : STEPS[this.i]; }
@@ -47,7 +48,7 @@ export class Coach {
 
   snapshot(v) {
     const me = v.me || {};
-    this.base = { hand: new Set((me.hand || []).map((d) => d.id)), left: me.stack_left };
+    this.base = { hand: new Set((me.hand || []).map((d) => d.id)), top: me.stack_top && me.stack_top.id };
   }
 
   next() {
@@ -84,7 +85,7 @@ export class Coach {
     const s = this.step;
     let did = false;
     if (s === 'line') did = (v.table || []).some((L) => L.dots.length >= 3 && L.dots.every((d) => this.base.hand.has(d.id)));
-    else if (s === 'top' || s === 'move') did = me.stack_left < this.base.left;
+    else if (s === 'top' || s === 'move') did = this.base.top != null && (!me.stack_top || me.stack_top.id !== this.base.top);
     else if (s === 'market') {
       if (v.market && v.market.open) this.marketSeen = true;
       did = this.marketSeen && !(v.market && v.market.open);
@@ -92,7 +93,7 @@ export class Coach {
     if (did) setTimeout(() => { if (this.step === s) this.next(); }, 0);
   }
 
-  // The red Line in step 2: the hand dots that make a 3-dot Line together.
+  // The red Line in step 2: the hand cards that make a 3-card Line together.
   lineIds() {
     const sc = this.screen;
     if (this.lineFor && this.lineFor.v === sc.view.v) return this.lineFor.ids;
@@ -125,7 +126,7 @@ export class Coach {
       default: {
         const me = v.me || {};
         const claude = (v.seats || []).find((x) => x.bot);
-        return t('family.games.coach.win.body', { n: me.stack_left || 0, m: claude ? claude.stack_left : 0 });
+        return t('family.games.coach.win.body', { n: stackText(me), m: stackText(claude || {}) });
       }
     }
   }

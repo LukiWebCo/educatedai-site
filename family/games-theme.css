@@ -62,18 +62,17 @@
 }
 
 /* ---- dots ------------------------------------------------------------------------------------------------
-   <span class="gm-dot gm-dot--r [is-…]"><svg viewBox="0 0 100 100">…token…</svg></span>
-   Tokens come from dots.js using games-assets/dots.json (or <use href="games-assets/dots.svg#gm-token-r">). */
+   Portrait cards from dots.js, with suit geometry from games-assets/dots.json. */
 .gm-dot {
   position: relative; display: inline-grid; place-items: center; flex: none;
-  width: var(--gm-dot); height: var(--gm-dot);
-  border-radius: 50%; -webkit-tap-highlight-color: transparent;
+  width: var(--gm-dot); height: calc(var(--gm-dot) * 1.4);
+  border-radius: 9%; -webkit-tap-highlight-color: transparent;
 }
 .gm-dot > svg { width: 100%; height: 100%; display: block; overflow: visible; }
 .gm-dot > svg text { font-family: var(--eai-font-display); }
 button.gm-dot { padding: 0; border: 0; background: none; color: inherit; cursor: pointer; }
-.gm-dot::after { /* state ring, drawn around the token face */
-  content: ""; position: absolute; inset: -4%; bottom: 4%; border-radius: 50%; pointer-events: none;
+.gm-dot::after { /* state ring around the card */
+  content: ""; position: absolute; inset: -2%; border-radius: 9%; pointer-events: none;
   border: 3px solid transparent;
 }
 .gm-dot.is-picked { transform: translateY(-16%) scale(1.06); z-index: 2; }
@@ -94,14 +93,14 @@ button.gm-dot { padding: 0; border: 0; background: none; color: inherit; cursor:
   font: 700 calc(var(--gm-dot) * .2)/1.3 var(--eai-font-mono); text-transform: uppercase; letter-spacing: .04em;
 }
 /* a Spark that stands for a dot: a small token of that suit and number tucked at its lower right */
-.gm-as { position: absolute; right: -10%; bottom: -4%; width: 50%; height: 50%; z-index: 1;
+.gm-as { position: absolute; right: 0; bottom: 0; width: 50%; height: 50%; z-index: 1;
   filter: drop-shadow(0 0 0 var(--gm-felt)) drop-shadow(2px 2px 0 var(--gm-felt)); }
 .gm-as > svg { width: 100%; height: 100%; display: block; }
 
 /* the Stack: the top dot on a pile, with its count */
 .gm-stack { position: relative; display: inline-grid; padding: 0 6px 6px 0; }
 .gm-stack::before, .gm-stack::after {
-  content: ""; position: absolute; width: var(--gm-dot); height: var(--gm-dot); border-radius: 50%;
+  content: ""; position: absolute; width: var(--gm-dot); height: calc(var(--gm-dot) * 1.4); border-radius: 9%;
   background: var(--gm-felt-2); box-shadow: inset 0 0 0 2px var(--gm-chalk-soft);
 }
 .gm-stack::before { left: 6px; top: 6px; }
@@ -112,6 +111,7 @@ button.gm-dot { padding: 0; border: 0; background: none; color: inherit; cursor:
   border-radius: 999px; background: var(--gm-ball); color: var(--gm-plate);
   font: 700 var(--eai-step--1)/1.6 var(--eai-font-mono);
 }
+.gm-stack-count.is-many { left: 0; right: auto; font-size: clamp(12px, var(--eai-step--1), 16px); }
 
 /* ---- lines (Rayas): dots strung on a chalk line. Runs: a solid line. Groups: a dotted line. --------------- */
 .gm-line {
@@ -121,7 +121,7 @@ button.gm-dot { padding: 0; border: 0; background: none; color: inherit; cursor:
 .gm-line-dots { position: relative; display: flex; gap: var(--gm-gap); }
 .gm-line-dots::before { /* the chalk line, from the first dot's centre to the last */
   content: ""; position: absolute; left: calc(var(--gm-dot) / 2); right: calc(var(--gm-dot) / 2);
-  top: calc(var(--gm-dot) * .46 - 2px); height: 4px; border-radius: 2px; transform-origin: left center;
+  top: calc(var(--gm-dot) * .7 - 2px); height: 4px; border-radius: 2px; transform-origin: left center;
   background: linear-gradient(90deg, var(--gm-chalk) 0 70%, color-mix(in srgb, var(--gm-chalk) 70%, transparent) 70% 74%,
     var(--gm-chalk) 74%) 0 0 / 23px 100%;
   opacity: .85;

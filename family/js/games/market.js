@@ -1,9 +1,9 @@
 // The MARKET: the full-screen sheet every seat sees at once (live), the leisure card, the bell moment.
-// Also the shared art the W3a screens draw with: W5's pieces (games-assets/dots.svg + dots.json, contracts/
-// games-art.md), the countdown ring, number words. Classes gm-* are W5's (games-theme.css); gmk-* are ours.
+// Shared card faces come from dots.js; the sprite still supplies the bell.
 import { avatar, h } from '../dom.js';
 import { t } from '../i18n.js';
 import { errText, toast } from '../ui.js';
+import { applyArt, faceSvg } from './dots.js';
 
 const SVGNS = 'http://www.w3.org/2000/svg';
 function s(tag, attrs, ...kids) {
@@ -14,11 +14,9 @@ function s(tag, attrs, ...kids) {
 }
 
 // ---- W5's art, loaded once ------------------------------------------------------------------------------
-// The sprite is parsed (DOMParser, never innerHTML) and each piece is a clone of its <symbol>'s children, so no
-// external <use> reference is needed. Until it loads (or if it fails) pieces fall back to a plain suit shape.
+// Parse the sprite for the bell (never innerHTML); card faces use dots.js's built-in geometry until JSON loads.
 let ART = null;
 let artLoading = null;
-const FALLBACK_NUM = { r: { x: 50, y: 62, size: 50, size_two_digits: 44 }, b: { x: 50, y: 63, size: 52, size_two_digits: 46 }, g: { x: 50, y: 77, size: 46, size_two_digits: 38 }, p: { x: 50, y: 63, size: 48, size_two_digits: 40 } };
 export function loadArt() {
   if (ART) return Promise.resolve(ART);
   if (!artLoading) {
@@ -30,9 +28,8 @@ export function loadArt() {
       const doc = new DOMParser().parseFromString(svg.replace(/\sstyle="[^"]*"/g, ''), 'image/svg+xml');
       const sym = {};
       doc.querySelectorAll('symbol[id]').forEach((el) => { sym[el.id] = el; });
-      const num = {};
-      for (const su of json.suits || []) num[su.key] = su.number;
-      ART = { sym, num };
+      applyArt(json);
+      ART = { sym };
       return ART;
     }).catch(() => { artLoading = null; return null; });
   }
@@ -44,30 +41,6 @@ function symbolInto(svg, id) {
   if (!src) return false;
   for (const k of src.childNodes) svg.append(document.importNode(k, true));
   return true;
-}
-
-const FALLBACK_SHAPE = {
-  r: () => s('circle', { cx: 50, cy: 47, r: 43 }),
-  b: () => s('rect', { x: 9, y: 6, width: 82, height: 82, rx: 16 }),
-  g: () => s('path', { d: 'M50 12L89 82H11Z', 'stroke-width': 13, 'stroke-linejoin': 'round' }),
-  p: () => s('path', { d: 'M50 9L89 47L50 85L11 47Z', 'stroke-width': 12, 'stroke-linejoin': 'round' }),
-  s: () => s('circle', { cx: 50, cy: 47, r: 43 }),
-};
-
-function tokenSvg(c, n) {
-  const svg = s('svg', { viewBox: '0 0 100 100', 'aria-hidden': 'true', focusable: 'false' });
-  if (!symbolInto(svg, 'gm-token-' + c)) {
-    const sh = FALLBACK_SHAPE[c] ? FALLBACK_SHAPE[c]() : FALLBACK_SHAPE.r();
-    sh.setAttribute('class', 'gmk-fallback');
-    svg.append(sh);
-  }
-  if (n != null) {
-    const g = (ART && ART.num[c]) || FALLBACK_NUM[c] || FALLBACK_NUM.r;
-    const two = String(n).length > 1;
-    svg.append(s('text', { x: g.x, y: g.y, 'font-size': two ? g.size_two_digits : g.size, 'text-anchor': 'middle', 'font-weight': 800,
-      'font-stretch': '75%', 'letter-spacing': two ? -1.5 : 0, fill: '#10201a', class: 'gmk-num' }, String(n)));
-  }
-  return svg;
 }
 
 export function suitName(c) {
@@ -85,11 +58,11 @@ export function dotArt(d, size = 'm', extra = '') {
   const cls = 'gm-dot gmk-' + size + (extra ? ' ' + extra : '');
   if (!d) {
     return h('span', { class: cls + ' gmk-empty', role: 'img', 'aria-label': t('family.games.common.empty_stack') },
-      s('svg', { viewBox: '0 0 100 100', 'aria-hidden': 'true', focusable: 'false' }, s('circle', { cx: 50, cy: 47, r: 40, class: 'gmk-hole' })));
+      s('svg', { viewBox: '0 0 100 140', 'aria-hidden': 'true', focusable: 'false' }, s('rect', { x: 4, y: 4, width: 92, height: 132, rx: 9, class: 'gmk-hole' })));
   }
   const c = d.s ? 's' : d.c;
-  const el = h('span', { class: cls + ' gm-dot--' + c + (d.s && d.as ? ' gm-dot--as' : ''), role: 'img', 'aria-label': dotLabel(d) }, tokenSvg(c, d.s ? null : d.n));
-  if (d.s && d.as) el.append(h('span', { class: 'gm-as', 'aria-hidden': 'true' }, tokenSvg(d.as.c, d.as.n)));
+  const el = h('span', { class: cls + ' gm-dot--' + c + (d.s && d.as ? ' gm-dot--as' : ''), role: 'img', 'aria-label': dotLabel(d) }, faceSvg(d));
+  if (d.s && d.as) el.append(h('span', { class: 'gm-as', 'aria-hidden': 'true' }, faceSvg(d.as)));
   return el;
 }
 

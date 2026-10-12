@@ -6,6 +6,8 @@ import { inline } from '../md.js';
 import { bellIcon, dotArt } from './market.js';
 
 const SEEN = 'eai.games.rules_seen';
+// howto-dots-v1 teaches the retired rules. Enable only after a table-edition film replaces it.
+const TABLE_EDITION_FILM_READY = false;
 
 export function rulesSeen() {
   try { return localStorage.getItem(SEEN) === '1'; } catch { return true; }
@@ -48,7 +50,7 @@ export function rulesBody() {
 // The how-to film (window.EAI.gameHowto from /family/config.js), played like the sign-up tour: inline, muted
 // autoplay with a big "tap for sound", <source type="video/mp4">, and an "Open the video" fallback.
 export function gameHowtoSource() {
-  return howtoSource(currentLang(), 'gameHowto');
+  return TABLE_EDITION_FILM_READY ? howtoSource(currentLang(), 'gameHowto') : null;
 }
 
 export function openGameHowto() {

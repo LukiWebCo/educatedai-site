@@ -4,6 +4,7 @@
 import { h } from '../dom.js';
 import { t } from '../i18n.js';
 import { countWord, dotArt, marketBanner, ring, seatAvatar, seatName, serverClock, ticker } from './market.js';
+import { stackLabel, stackText } from './dots.js';
 
 // W5's wordmark: real text in three parts so it translates ("Dots & Lines" / "Puntos y Rayas").
 export function wordmark(cls = '') {
@@ -57,13 +58,12 @@ export function seatCard(view, st) {
       seatAvatar(st, 'm'),
       h('span', { class: 'gseat-name', text: isMe ? t('family.games.common.you') : st.name }),
       st.bot ? h('span', { class: 'gtag gtag-bot', text: st.bot_level === 'easy' ? t('family.games.common.claude_easy') : t('family.games.common.claude_sharp') }) : null,
-      st.covering_bot ? h('span', { class: 'gtag', text: t('family.games.common.covering') }) : null,
-      st.catchup ? h('span', { class: 'gtag gtag-plus', title: t('family.games.common.catchup'), text: '+1' }) : null),
+      st.covering_bot ? h('span', { class: 'gtag', text: t('family.games.common.covering') }) : null),
     h('div', { class: 'gseat-stack' },
       dotArt(st.stack_top, 'xl', 'gseat-top'),
-      h('div', { class: 'gseat-left' },
-        h('span', { class: 'gseat-left-n', text: String(st.stack_left) }),
-        h('span', { class: 'gseat-left-l', text: t('family.games.common.stack_left') }))),
+      h('div', { class: 'gseat-left', role: 'img', 'aria-label': stackLabel(st) },
+        h('span', { class: 'gseat-left-n', 'aria-hidden': 'true', text: stackText(st) }),
+        h('span', { class: 'gseat-left-l', 'aria-hidden': 'true', text: t('family.games.common.stack_left') }))),
     playing ? h('span', { class: 'gseat-now', text: t('family.games.tv.now_playing') }) : null);
 }
 
@@ -94,7 +94,7 @@ function marketTakeover(first, sfx) {
   let view = first;
   let clock = serverClock(view);
   let seen = new Set();
-  const timer = ring('gtv-ring', sfx);
+  const timer = ring('gtv-ring', sfx, false);
   const offersEl = h('ul', { class: 'gtv-offers' });
   const doneEl = h('p', { class: 'gtv-done' });
   const el = h('div', { class: 'gtv-market', role: 'region', 'aria-label': t('family.games.market.title') },
@@ -153,7 +153,7 @@ function fitTable(screen, n) {
   const vw = window.innerWidth / 100;
   for (let d = 11 * vh; d >= 3 * vh; d -= 0.25 * vh) {
     const lw = 6.4 * d + 1.6 * vw + 8;
-    const lh = d + 16 + 1.2 * vh;
+    const lh = 1.4 * d + 16 + 1.2 * vh;
     const cols = Math.max(1, Math.floor((W + vw) / (lw + vw)));
     if (Math.ceil(n / cols) * lh <= H) {
       screen.style.setProperty('--tvdot', d.toFixed(1) + 'px');

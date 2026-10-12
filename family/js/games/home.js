@@ -45,6 +45,10 @@ function roomRow(card, kind, withGame) {
   const cls = 'groom groom-' + game;
   if (go2) return h('a', { class: cls + (card.my_turn ? ' is-turn' : ''), href: go2, 'data-game': game }, inner, icon('next', 'icon groom-go'));
   const joinBtn = h('button', { class: 'btn btn-primary groom-join', type: 'button' }, kind === 'invite' ? t('family.games.lobby.accept') : t('family.games.lobby.join_btn'));
+  if (game === 'dots' && card.seats.length >= 8) {
+    joinBtn.disabled = true;
+    joinBtn.textContent = t('family.games.api.room_full');
+  }
   joinBtn.addEventListener('click', async () => {
     joinBtn.disabled = true;
     try {
@@ -120,7 +124,7 @@ function tile(game, d, art, title) {
   return h('a', { class: 'ghub-tile ghub-tile-' + game, href: '#/games/' + game, 'data-game': game },
     h('span', { class: 'ghub-tile-text' },
       title,
-      h('span', { class: 'ghub-tile-desc', text: game === 'conquian' ? t('family.games.cq.lobby.cq_desc') : t('family.games.cq.lobby.dots_desc') }),
+      h('span', { class: 'ghub-tile-desc', text: game === 'conquian' ? t('family.games.cq.lobby.cq_desc') : t('family.games.lobby.dots_desc') }),
       h('span', { class: 'ghub-tile-foot' },
         n ? h('span', { class: 'ghub-badge' }, h('i', { class: 'ghub-badge-dot', 'aria-hidden': 'true' }),
           h('span', { text: n === 1 ? t('family.games.hub.turn_in.one') : t('family.games.hub.turn_in.other', { n }) })) : h('span'),
