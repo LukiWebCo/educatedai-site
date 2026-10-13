@@ -383,6 +383,25 @@ export async function threadView(id) {
     list.append(more);
   }
   for (const p of data.posts) list.append(postEl(p, byId, nav));
+  const purchaseTitle = lang === 'es' ? (th.title_es || th.title) : th.title;
+  if (state.me.role === 'admin' && th.source === 'table' && th.purchase_id &&
+      data.posts.length && purchaseTitle.startsWith(t('family.table.purchase_title', { item: '' }))) {
+    const controls = h('div', { class: 'msg-actions purchase-actions', 'data-test': 'purchase-actions' });
+    for (const [action, label] of [['bought', t('family.table.purchase_bought')],
+      ['declined', t('family.table.purchase_declined')]]) {
+      controls.append(h('button', { class: 'act', type: 'button', onclick: async (ev) => {
+        const button = ev.currentTarget;
+        busy(button, true);
+        try {
+          await post(`/api/admin/ledger/${encodeURIComponent(th.purchase_id)}/${action}`);
+          toast(t('family.table.purchase_action_done'));
+          controls.querySelectorAll('button').forEach((b) => { b.disabled = true; });
+        } catch (e) { toast(errText(e), 'error'); } finally { busy(button, false); }
+      } }, label));
+    }
+    const opening = msgNode(data.posts[0].id);
+    if (opening) opening.append(controls);
+  }
   const thinkingSlot = h('div', { class: 'thinking-slot' }, th.claude_state === 'queued' ? thinking() : null);
 
   // ---- the Table: who's spoken in this conversation, seated around a table -------------------------------
