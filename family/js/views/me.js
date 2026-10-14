@@ -20,21 +20,43 @@ export async function meView(actions) {
     [1, 2, 3, 4].map((n) => h('button', { class: 'seg-btn size-' + n + (me.text_size === n ? ' on' : ''), type: 'button', 'aria-pressed': String(me.text_size === n), 'aria-label': t('family.me.size_n', { n }), onclick: () => actions.setSize(n) }, 'A')));
 
   const pkMsg = h('p', { class: 'form-msg', role: 'alert' });
+  const current = h('input', { class: 'input input-pin', type: 'password', inputmode: 'numeric', maxlength: 6, autocomplete: 'current-password', 'aria-label': t('family.me.current_pin') });
   let regOpts = null;
+  let stepOpts = passkey.supported() ? await post('/api/me/stepup/options').catch(() => null) : null;
+  const stepBtn = h('button', { class: 'btn btn-quiet', type: 'button', onclick: async () => {
+    try {
+      if (!stepOpts) throw new Error();
+      const credential = await passkey.get(stepOpts.options);
+      await post('/api/me/stepup/verify', { challenge_id: stepOpts.challenge_id, credential });
+      regOpts = await post('/api/me/webauthn/register/options');
+      toast(t('family.me.stepup_done'));
+    } catch (e) { pkMsg.textContent = e instanceof ApiErr ? errText(e) : t('family.join.passkey_cancelled'); }
+    finally { stepOpts = await post('/api/me/stepup/options').catch(() => null); }
+  } }, t('family.me.stepup'));
+  current.addEventListener('input', async () => {
+    regOpts = null;
+    if (!/^\d{6}$/.test(current.value)) return;
+    const value = current.value;
+    try {
+      const options = await post('/api/me/webauthn/register/options', { current_pin: value });
+      if (current.value === value) regOpts = options;
+    } catch (e) { pkMsg.textContent = errText(e); }
+  });
   const pkBtn = h('button', { class: 'btn btn-quiet btn-big', type: 'button' }, icon('finger'), h('span', null, t('family.me.add_passkey')));
   pkBtn.addEventListener('click', async () => {
     pkMsg.textContent = '';
-    if (!passkey.supported() || !regOpts) { pkMsg.textContent = t('family.join.passkey_unavailable'); return; }
+    if (!passkey.supported()) { pkMsg.textContent = t('family.join.passkey_unavailable'); return; }
     busy(pkBtn, true);
     try {
+      if (!regOpts) regOpts = await post('/api/me/webauthn/register/options', { current_pin: current.value });
       const cred = await passkey.create(regOpts);
-      const res = await post('/api/webauthn/register/verify', { credential: cred });
-      actions.swapToken(res.token);
+      await post('/api/me/webauthn/register/verify', { credential: cred, current_pin: current.value });
+      current.value = '';
       toast(t('family.me.passkey_added'));
     } catch (e) { pkMsg.textContent = e instanceof ApiErr ? errText(e) : t('family.join.passkey_cancelled'); }
-    finally { busy(pkBtn, false); regOpts = await post('/api/webauthn/register/options').catch(() => null); }
+    finally { busy(pkBtn, false); regOpts = null; }
   });
-  if (passkey.supported()) regOpts = await post('/api/webauthn/register/options').catch(() => null);
+
 
   const p1 = h('input', { id: 'np1', class: 'input input-pin', type: 'password', inputmode: 'numeric', maxlength: 6, autocomplete: 'new-password' });
   const p2 = h('input', { id: 'np2', class: 'input input-pin', type: 'password', inputmode: 'numeric', maxlength: 6, autocomplete: 'new-password' });
@@ -49,7 +71,7 @@ export async function meView(actions) {
     ev.preventDefault();
     if (!/^\d{6}$/.test(p1.value)) { pinMsg.textContent = t('family.errors.bad_pin'); return; }
     if (p1.value !== p2.value) { pinMsg.textContent = t('family.join.pin_mismatch'); return; }
-    try { const res = await post('/api/pin/set', { pin: p1.value }); actions.swapToken(res.token); pinForm.reset(); toast(t('family.me.pin_saved')); } catch (e) { pinMsg.textContent = errText(e); }
+    try { await post('/api/me/pin', { pin: p1.value, current_pin: current.value }); current.value = ''; pinForm.reset(); toast(t('family.me.pin_saved')); } catch (e) { pinMsg.textContent = errText(e); }
   });
 
   root.append(
@@ -60,7 +82,8 @@ export async function meView(actions) {
       h('button', { class: 'btn btn-quiet btn-big', type: 'button', onclick: () => openHowto({ autoplay: true }) }, icon('play'), h('span', null, t('family.me.watch_howto')))),
     h('div', { class: 'card stack' }, h('h2', { text: t('family.me.security_title') }),
       h('p', { class: 'muted small', text: me.has_passkey ? t('family.me.has_passkey') : t('family.me.no_passkey') }),
-      pkBtn, pkMsg, pinForm),
+      h('label', { class: 'field' }, t('family.me.current_pin'), current), stepBtn, pkBtn, pkMsg, pinForm),
+    h('button', { class: 'btn btn-danger-quiet btn-big', type: 'button', onclick: async () => { await post('/api/me/logout-all'); actions.logout(); } }, t('family.me.logout_all')),
     h('button', { class: 'btn btn-danger-quiet btn-big', type: 'button', 'data-test': 'logout', onclick: () => actions.logout() }, icon('out'), h('span', null, t('family.me.logout'))));
   return root;
 }

@@ -2,7 +2,7 @@
  "schema": "eai.sitting/1",
  "date": "2026-10-14",
  "season": "2026-S1",
- "status": "rounds",
+ "status": "failed",
  "lead": "opus",
  "chairs": [
   "opus",
@@ -27,7 +27,7 @@
  },
  "hook": {
   "title": "AI can act exactly like a human, but we still don't think it's conscious",
-  "url": "http://www.sciencedaily.com/releases/2026/10/261012185017.htm",
+  "url": "https://www.sciencedaily.com/releases/2026/10/261012185017.htm",
   "summary": {
    "en": "LMU Munich researchers (Louis Longin, Bahador Bahrami, Ophelia Deroy and others; Cognition, vol. 278, 106733) had nearly 1,100 participants rate agents at different levels of responsiveness, some described as human, some as AI. Even when the AI behaved identically, it was rated significantly less conscious; the most responsive AI scored below the least responsive human. When asked about 'awareness' instead, human and AI ratings came out much closer. Longin: people are willing to say an AI notices things, 'but they clearly draw a line when it comes to the term conscious'."
   }
@@ -46,7 +46,6 @@
    "stance": "disagree",
    "cites": [],
    "status": "ok",
-   "task": "ai-philosophy-table-20261014T121044-8fc9",
    "at": "2026-10-14T12:20:02Z"
   },
   {
@@ -64,7 +63,6 @@
     }
    ],
    "status": "ok",
-   "task": "ai-philosophy-table-20261014T122005-6aa8",
    "at": "2026-10-14T12:30:03Z"
   }
  ],
@@ -72,8 +70,6 @@
  "ask_family": null,
  "purchase_request": null,
  "film_id": null,
- "tasks": {
-  "open": "ai-philosophy-table-20261014T120003-5647"
- },
- "updated_at": "2026-10-14T12:30:04Z"
+ "updated_at": "2026-10-14T16:10:03Z",
+ "stopped_reason": "A chair's seat did not answer for two hours, so the sitting stopped after the first round."
 }

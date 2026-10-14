@@ -137,11 +137,57 @@ export async function adminView() {
     } catch (e) { filmMsg.textContent = errText(e); } finally { busy(filmBtn, false); }
   });
   kill.append(filmForm);
+  const tableTakedownForm = (kind) => {
+    const isTurn = kind === 'table_msg';
+    const dateLabel = isTurn ? t('family.admin.turn_date_label') : t('family.admin.sitting_date_label');
+    const submitLabel = isTurn ? t('family.admin.takedown_turn') : t('family.admin.takedown_sitting');
+    const date = h('input', { class: 'input', type: 'date', required: true });
+    const number = isTurn ? h('input', { class: 'input', type: 'number', min: 1, max: 999, step: 1, required: true }) : null;
+    const message = h('p', { class: 'form-msg', role: 'alert' });
+    const button = h('button', { class: 'btn btn-danger-quiet', type: 'submit' }, submitLabel);
+    const form = h('form', { class: 'stack' },
+      h('label', { class: 'field' },
+        h('span', { class: 'field-label', text: dateLabel }),
+        date),
+      isTurn ? h('label', { class: 'field' },
+        h('span', { class: 'field-label', text: t('family.admin.turn_number_label') }), number) : null,
+      message, button);
+    form.addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      const ref = date.value + (isTurn ? '/' + number.value : '');
+      const key = kind + ':' + ref;
+      if (!date.value || (isTurn && (!number.value || Number(number.value) < 1 || Number(number.value) > 999))) {
+        message.textContent = t('family.errors.empty');
+        return;
+      }
+      if (pending.has(key)) { message.textContent = t('family.admin.takedown_requested'); return; }
+      const confirmation = isTurn
+        ? t('family.admin.takedown_turn_confirm', { ref })
+        : t('family.admin.takedown_sitting_confirm', { ref });
+      if (!(await confirmBox(confirmation, t('family.admin.takedown_yes'), true))) return;
+      busy(button, true);
+      try {
+        await post('/api/admin/takedowns', { kind, ref });
+        pending.add(key);
+        button.disabled = true;
+        message.textContent = t('family.admin.takedown_requested');
+        toast(t('family.admin.takedown_done'));
+      } catch (e) { message.textContent = errText(e); } finally { busy(button, false); }
+    });
+    return form;
+  };
+  kill.append(tableTakedownForm('table_msg'), tableTakedownForm('table_sitting'));
   kill.append(h('p', { class: 'muted small', text: t('family.admin.kill_posts_hint') }));
   if (takedowns.length) {
+    const kindLabels = {
+      film: t('family.admin.kind_film'),
+      post: t('family.admin.kind_post'),
+      table_msg: t('family.admin.kind_table_msg'),
+      table_sitting: t('family.admin.kind_table_sitting'),
+    };
     kill.append(h('h3', { text: t('family.admin.recent_takedowns') }),
       h('ul', { class: 'plain' }, takedowns.slice(0, 10).map((x) => h('li', { class: 'small' },
-        (x.kind === 'film' ? t('family.admin.kind_film') : t('family.admin.kind_post')) + ' ' + x.ref + ' · ' +
+        (kindLabels[x.kind] || kindLabels.post) + ' ' + x.ref + ' · ' +
         (x.status === 'done' ? t('family.admin.td_done') : x.status === 'failed' ? t('family.admin.td_failed') : t('family.admin.td_pending')) + ' · ' + ago(x.requested_at, currentLang())))));
   }
   root.append(kill);

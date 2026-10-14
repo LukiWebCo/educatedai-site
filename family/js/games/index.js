@@ -68,7 +68,7 @@ export async function gamesView(parts = []) {
 }
 
 // ---- the live room controller (shared by the phone room and the TV) ------------------------------------
-function liveRoom(root, id, first, onStop) {
+function liveRoom(root, id, first, onStop, spectator = false) {
   let view = first;
   const listeners = new Set();
   const waiters = [];
@@ -86,8 +86,8 @@ function liveRoom(root, id, first, onStop) {
   }
 
   const poller = createPoller({
-    wait: (v, signal, seq) => games.wait(id, v, signal, seq >= 0 ? seq : view.draft_seq),
-    view: (signal) => games.room(id, signal),
+    wait: (v, signal, seq) => games.wait(id, v, signal, seq >= 0 ? seq : view.draft_seq, spectator),
+    view: (signal) => games.room(id, signal, spectator),
     onView: apply,
     alive,
     onStop: (out) => { cleanup(); onStop && onStop(out); },
@@ -296,12 +296,12 @@ function placeholderPlay(main, ctx) {
 
 // ---- #/games/tv/:id ---------------------------------------------------------------------------------
 async function tvView(id) {
-  const first = await games.room(id);
+  const first = await games.room(id, null, true);
   document.body.classList.add('games-tv');
   const root = h('section', { class: 'gtv-root' });
   const live = liveRoom(root, id, first, () => {
     root.append(h('p', { class: 'gtv-lost', role: 'status', text: t('family.games.common.lost') }));
-  });
+  }, true);
   const screen = first.room.game === 'conquian'
     ? await (await import('./conquian/tv.js')).cqTvScreen(root, { getView: live.getView, sfx: sfxTv })
     : tvScreen(root, { getView: live.getView, sfx: sfxTv, bell: (el) => bellMoment(sfxTv, el) });

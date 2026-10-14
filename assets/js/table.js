@@ -1,93 +1,46 @@
-/* Refresh only the growing transcript; server-rendered content remains the complete fallback. */
+/* Refresh the server-rendered card so live and static transcripts share one markup. */
 (() => {
   const page = document.querySelector("[data-table-live]");
-  if (!page || (!page.hasAttribute("data-table-home") && page.dataset.status === "published")) return;
-  const lang = document.documentElement.lang === "es" ? "es" : "en";
-  const labels = { withheld: page.dataset.withheldLabel, turn: page.dataset.turnLabel };
-  let roster = [];
-  try {
-    roster = JSON.parse(document.querySelector("#table-roster")?.textContent || "[]");
-  } catch (error) {
-    console.warn("table transcript metadata could not be read", error);
-    return;
-  }
-  const chairs = Object.fromEntries(roster.map((chair) => [chair.id, chair]));
-  const feed = page.hasAttribute("data-table-home")
-    ? "/table/latest.json"
-    : `/table/${encodeURIComponent(page.dataset.date)}.json`;
-  const makeRows = (turns) => {
-    const list = document.createElement("ol");
-    list.className = "turnlist";
-    list.dataset.tableTurns = "";
-    for (const turn of turns || []) {
-      const chair = chairs[turn.chair] || { id: turn.chair, name: {}, avatar: {} };
-      const item = document.createElement("li");
-      item.className = "turnrow";
-      item.dataset.turn = String(turn.n);
-      const avatar = document.createElement("span");
-      avatar.className = "avatar";
-      avatar.setAttribute("aria-hidden", "true");
-      avatar.style.setProperty("--avatar", chair.avatar?.color || "#777");
-      avatar.textContent = chair.avatar?.glyph || "?";
-      const body = document.createElement("div");
-      body.className = "turn__body";
-      const meta = document.createElement("div");
-      meta.className = "turn__meta";
-      const number = document.createElement("span");
-      number.textContent = labels.turn.replace("{n}", turn.n);
-      const name = document.createElement("strong");
-      name.textContent = chair.name?.[lang] || chair.name?.en || chair.id;
-      const time = document.createElement("time");
-      time.textContent = (turn.at || "").slice(11, 16);
-      const stance = document.createElement("span");
-      stance.className = "turn__stance";
-      stance.textContent = turn.stance || "";
-      meta.append(number, name, time, stance);
-      const text = document.createElement("p");
-      if (turn.status === "withheld") {
-        text.textContent = labels.withheld;
-      } else if (lang === "es" && !turn.text?.es && turn.text?.en) {
-        text.textContent = turn.text.en;
-        const note = document.createElement("small");
-        note.className = "table__spanish";
-        note.textContent = page.dataset.spanishLabel;
-        text.append(note);
-      } else {
-        text.textContent = turn.text?.[lang] || turn.text?.en || "";
-      }
-      body.append(meta, text);
-      const cites = document.createElement("span");
-      cites.className = "turn__cites";
-      for (const cite of turn.cites || []) {
-        const link = cite.url && /^https:\/\//.test(cite.url) ? document.createElement("a") : document.createElement("span");
-        link.textContent = [cite.title, cite.ref].filter(Boolean).join(" ");
-        if (link.tagName === "A") {
-          link.href = cite.url;
-          link.rel = "noopener";
-        }
-        if (cites.childNodes.length) cites.append(", ");
-        cites.append(link);
-      }
-      if (cites.childNodes.length) body.append(cites);
-      item.append(avatar, body);
-      list.append(item);
-    }
-    return list;
+  if (!page || (!page.hasAttribute("data-table-home") && ["published", "failed"].includes(page.dataset.status))) return;
+  const desktop = window.matchMedia("(min-width: 900px)");
+  const expandDesktop = () => {
+    if (desktop.matches) page.querySelector(".opening-full")?.setAttribute("open", "");
   };
+  expandDesktop();
+  desktop.addEventListener("change", expandDesktop);
+  let previous = null;
   const update = async () => {
     try {
+      const feed = page.hasAttribute("data-table-home")
+        ? "/table/latest.json"
+        : `/table/${encodeURIComponent(page.dataset.date)}.json`;
       const response = await fetch(feed, { cache: "no-store" });
       if (!response.ok) return;
       const sitting = await response.json();
-      const turns = makeRows(sitting.turns);
-      page.querySelector("[data-table-turns]")?.replaceWith(turns);
-      const details = page.querySelector(".table__rest");
-      if (details) {
-        const all = sitting.turns || [];
-        details.hidden = all.length <= 4;
-        details.querySelector("ol")?.replaceWith(makeRows(all.slice(4)));
+      const signature = JSON.stringify(sitting);
+      if (signature === previous) return;
+      const rendered = await fetch(window.location.pathname, { cache: "no-store" });
+      if (!rendered.ok) return;
+      const documentCopy = new DOMParser().parseFromString(await rendered.text(), "text/html");
+      const card = documentCopy.querySelector("[data-table-live]");
+      if (!card) return;
+      const expanded = page.querySelector(".opening-full")?.open;
+      if (expanded) card.querySelector(".opening-full")?.setAttribute("open", "");
+      // Keep an existing film player and its playback/listeners intact.
+      for (const selector of ["[data-table-turns]", ".table-seating", ".table__question", ".kicker"]) {
+        const replacement = card.querySelector(selector);
+        if (replacement) page.querySelector(selector)?.replaceWith(replacement);
       }
-      page.dataset.status = sitting.status === "published" ? "published" : "in_progress";
+      page.querySelector(".table-stopped")?.remove();
+      const stopped = card.querySelector(".table-stopped");
+      if (stopped) page.insertBefore(stopped, page.querySelector("[data-table-turns]"));
+      page.dataset.status = card.dataset.status;
+      page.dataset.date = card.dataset.date;
+      const readLink = page.querySelector(".btn--ghost");
+      const nextLink = card.querySelector(".btn--ghost");
+      if (readLink && nextLink) readLink.href = nextLink.href;
+      expandDesktop();
+      previous = signature;
     } catch (error) {
       console.warn("table transcript refresh failed", error);
     }
