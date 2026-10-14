@@ -275,3 +275,10 @@ button.gm-dot { padding: 0; border: 0; background: none; color: inherit; cursor:
 @keyframes gm-flash { 0% { opacity: 0; } 15% { opacity: 1; } 100% { opacity: 0; } }
 @keyframes gm-burst { 0% { transform: translate(-50%, -50%) scale(.2) rotate(-20deg); opacity: 0; } 25% { opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1) rotate(0); opacity: .5; } }
 @keyframes gm-wipe { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+
+.glive-banner { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; max-width: 100%; overflow-wrap: anywhere; }
+.glive-banner button { min-height: 48px; min-width: 48px; max-width: 100%; white-space: normal; font: inherit; padding: .5rem; border-radius: .5rem; }
+.gm-dot.is-last, .gp-tdot.is-last, .is-last[data-id] { outline: 3px solid var(--gm-new); outline-offset: 2px; }
+.gm-dot.is-added, .gp-tdot.is-added, .is-added[data-id] { box-shadow: 0 0 0 3px #368548; }
+
+.gtable > .glive-banner { grid-column: 1 / -1; }

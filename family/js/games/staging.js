@@ -273,7 +273,7 @@ export class Staging {
   snapshot() {
     return {
       v: this.view.v, seq: this.seq,
-      lines: this.lines.map((l) => ({ key: l.key, orig: l.orig, ids: l.dots.map((d) => d.id) })),
+      lines: this.lines.map((l) => ({ key: l.key, orig: l.orig, ids: l.dots.map((d) => d.id), spark_as: this.evaluate(l).sparkAs })),
       air: this.air.map((a) => a.dot.id),
       stack: !!this.stack,
     };

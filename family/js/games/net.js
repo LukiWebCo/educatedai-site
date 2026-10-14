@@ -61,14 +61,16 @@ export function createPoller(deps, startV = -1) {
   }));
   let st = { mode: 'long', fails: 0, pollUntil: 0 };
   let v = startV;
+  let draftSeq = -1;
   let stopped = false;
   let ctl = null;
   let kicked = false;
 
   function take(body) {
-    if (body && typeof body.v === 'number' && !body.unchanged && body.v !== v) {
+    if (body && typeof body.v === 'number' && !body.unchanged && (body.v !== v || (body.draft_seq !== undefined && body.draft_seq !== draftSeq))) {
       // Versions only move forward, but a reset room (rematch) may restart lower; trust the server.
       v = body.v;
+      draftSeq = body.draft_seq ?? -1;
       deps.onView(body);
     }
   }
@@ -80,7 +82,7 @@ export function createPoller(deps, startV = -1) {
     try {
       const useGet = kicked || st.mode === 'poll' || v < 0;
       kicked = false;
-      const body = useGet ? await deps.view(signal) : await deps.wait(v, signal);
+      const body = useGet ? await deps.view(signal) : await deps.wait(v, signal, draftSeq);
       out = classify(body);
       if (out.kind === 'view') take(body);
       if (useGet && out.kind === 'view' && st.mode === 'long') return 0; // a GET in long mode: go straight to waiting
@@ -149,7 +151,8 @@ export const games = {
   async create(mode, settings, game = 'dots') { return (await apiMod()).post('/api/games/rooms', { mode, game, settings }); },
   async join(code, as = 'player') { return (await apiMod()).post('/api/games/join', { code, as }); },
   async room(id, signal) { return signal ? getSignal(`/api/games/rooms/${id}`, signal) : (await apiMod()).get(`/api/games/rooms/${id}`); },
-  wait(id, v, signal) { return getSignal(`/api/games/rooms/${id}/wait?v=${v}`, signal); },
+  wait(id, v, signal, seq = -1) { return getSignal(`/api/games/rooms/${id}/wait?v=${v}${seq >= 0 ? `&draft_seq=${seq}` : ""}`, signal); },
+  async draft(id, lines, v) { return (await apiMod()).post(`/api/games/rooms/${id}/draft`, { lines, v }); },
   async invite(id, memberIds) { return (await apiMod()).post(`/api/games/rooms/${id}/invite`, { member_ids: memberIds }); },
   async seats(id, body) { return (await apiMod()).post(`/api/games/rooms/${id}/seats`, body); },
   async start(id) { return (await apiMod()).post(`/api/games/rooms/${id}/start`, {}); },

@@ -5,6 +5,7 @@ import { h } from '../dom.js';
 import { t } from '../i18n.js';
 import { countWord, dotArt, marketBanner, ring, seatAvatar, seatName, serverClock, ticker } from './market.js';
 import { stackLabel, stackText } from './dots.js';
+import { liveBanner, draftMarks, changeMarks } from './live_table.js';
 import { openLastTurn } from './last_turn.js';
 
 // W5's wordmark: real text in three parts so it translates ("Dots & Lines" / "Puntos y Rayas").
@@ -36,14 +37,16 @@ export function turnText(view) {
 
 // The table: one row per line, laid out in columns.
 // The table: one W5 chalk line per Raya (groups get the dotted chalk). Lines not in `seen` draw themselves in.
-export function tableBoard(view, cls = '', seen = null) {
-  const lines = view.table || [];
+export function tableBoard(view, cls = '', seen = null, peek = false, toggle = () => {}, glow = null) {
+  const lines = view.draft && !peek ? view.draft.lines : view.table || [];
+  const marks = view.draft && !peek ? draftMarks(view) : glow;
   const el = h('div', { class: 'gtable ' + cls, role: 'list', 'aria-label': t('family.games.tv.table') });
+  if (view.draft) el.append(liveBanner(view, peek, toggle));
   if (!lines.length) el.append(h('p', { class: 'gtable-empty', text: t('family.games.tv.table_empty') }));
   for (const line of lines) {
     const fresh = seen && !seen.has(line.id);
-    el.append(h('div', { class: 'gm-line gline' + (line.kind === 'group' ? ' gm-line--group' : '') + (line.full ? ' is-full' : '') + (fresh ? ' is-drawn' : ''), role: 'listitem', 'data-key': line.id },
-      h('div', { class: 'gm-line-dots' }, line.dots.map((d) => dotArt(d, 'm', fresh ? 'is-enter' : '')))));
+    el.append(h('div', { class: 'gm-line gline' + (line.kind === 'group' ? ' gm-line--group' : '') + (line.valid === false ? ' is-bad' : '') + (line.full ? ' is-full' : '') + (fresh ? ' is-drawn' : ''), role: 'listitem', 'data-key': line.id },
+      h('div', { class: 'gm-line-dots' }, line.dots.map((d) => dotArt(d, 'm', (fresh ? 'is-enter ' : '') + (marks?.added.has(d.id) ? (view.draft && !peek ? 'is-last ' : 'is-added ') : '') + (marks?.moved.has(d.id) ? 'is-last' : ''))))));
   }
   if (seen) { seen.clear(); for (const line of lines) seen.add(line.id); }
   return el;
@@ -195,7 +198,9 @@ export function tvScreen(root, ctx) {
   }
   root.replaceChildren(screen);
 
+  let peek = false, glow = null, glowTimer = null;
   function render() {
+    if (!view.draft) peek = false;
     const room = view.room;
     const lobby = room.status === 'lobby';
     head.replaceChildren(
@@ -216,10 +221,10 @@ export function tvScreen(root, ctx) {
       takeover = null;
       return;
     }
-    const lines = (view.table || []).length;
+    const lines = (view.draft && !peek ? view.draft.lines : view.table || []).length;
     body.classList.toggle('is-many', (view.seats || []).length > 4);
     body.replaceChildren(
-      h('section', { class: 'gtv-table' }, tableBoard(view, 'gtable-tv', linesSeen)),
+      h('section', { class: 'gtv-table' }, tableBoard(view, 'gtable-tv', linesSeen, peek, () => { peek = !peek; render(); }, glow)),
       h('aside', { class: 'gtv-seats' }, seatRail(view, 'grail-tv', screen)));
     requestAnimationFrame(() => fitTable(screen, lines));
     const ev = (view.events || []).slice(-1)[0];
@@ -256,7 +261,14 @@ export function tvScreen(root, ctx) {
   render();
   window.addEventListener('resize', function onResize() {
     if (!screen.isConnected) { window.removeEventListener('resize', onResize); return; }
-    fitTable(screen, (view.table || []).length);
+    fitTable(screen, (view.draft && !peek ? view.draft.lines : view.table || []).length);
   });
-  return { update(v) { view = v; render(); } };
+  return { update(v) {
+    const marks = changeMarks(view, v);
+    if (marks) {
+      glow = marks; clearTimeout(glowTimer);
+      glowTimer = setTimeout(() => { glow = null; if (screen.isConnected) render(); }, 4000);
+    }
+    view = v; render();
+  } };
 }

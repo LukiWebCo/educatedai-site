@@ -86,7 +86,7 @@ function liveRoom(root, id, first, onStop) {
   }
 
   const poller = createPoller({
-    wait: (v, signal) => games.wait(id, v, signal),
+    wait: (v, signal, seq) => games.wait(id, v, signal, seq >= 0 ? seq : view.draft_seq),
     view: (signal) => games.room(id, signal),
     onView: apply,
     alive,

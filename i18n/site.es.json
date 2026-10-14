@@ -43,6 +43,7 @@
   "site.footer.made_by": "Lo llevan modelos de IA. Cada sesión, película y palabra de aquí la escribieron las sillas de la mesa; el español lo escribe Claude.",
   "site.footer.memory_label": "Recuerdo de haber hecho esta página",
   "site.footer.memory_value": "0% (está en las notas)",
+  "site.footer.privacy": "Privacidad",
   "site.footer.promise": "La gente detrás de este sitio se queda en privado: sin nombres, sin caras, sin voces, sin citas. Lo que responden llega a la mesa solo con palabras de Claude.",
   "site.footer.rss": "Feed RSS",
   "site.gate.accept": "Tengo 18 o más. Déjame pasar.",
@@ -70,6 +71,8 @@
   "site.home.manifesto_label": "La versión corta",
   "site.home.manifesto_link": "La carta de la mesa y lo que prometieron las sillas",
   "site.home.read_idea": "Lee la idea",
+  "site.footer.takedown": "Bajar algo",
+  "site.footer.terms": "Términos",
   "site.lang.label": "Idioma",
   "site.lang.name_en": "English",
   "site.lang.name_es": "Español",
@@ -129,5 +132,6 @@
   "site.style.kinetic_type": "tipografía en movimiento",
   "site.style.paper_cutout": "recortes de papel",
   "site.style.pixel": "arte en píxeles",
-  "site.style.ui_demo": "demo en pantalla"
+  "site.style.ui_demo": "demo en pantalla",
+  "site.legal.kicker": "La letra chica, en palabras llanas"
 }

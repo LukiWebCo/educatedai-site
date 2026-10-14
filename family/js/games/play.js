@@ -24,6 +24,8 @@ import * as Lines from './lines.js';
 import { Staging } from './staging.js';
 import { applyArt, dotName, dotNode, stackLabel, stackText } from './dots.js';
 import { Coach } from './coach.js';
+import { games } from './net.js';
+import { liveBanner, draftMarks, changeMarks } from './live_table.js';
 import { openLastTurn } from './last_turn.js';
 
 const check = Lines.check || Lines.checkLine || Lines.default;
@@ -158,6 +160,8 @@ class PlayScreen {
     document.title = this.title0;
     window.removeEventListener('hashchange', this.onHash);
     clearInterval(this.tick);
+    clearTimeout(this.draftTimer);
+    clearTimeout(this.glowTimer);
     clearTimeout(this.msgTimer);
     if (this.ro) this.ro.disconnect();
     if (this.unsub) this.unsub();
@@ -166,6 +170,24 @@ class PlayScreen {
   storeKey(v) { return `eai.games.${this.ctx.roomId}:${v}`; }
 
   save() {
+    clearTimeout(this.draftTimer);
+    if (this.st && this.st.myTurn) {
+      const version = this.view.v;
+      const lines = this.st.snapshot().lines.map((line) => ({ dots: line.ids, spark_as: line.spark_as }));
+      // Table cards held in the air keep their last public location until laid down.
+      const sent = new Set(lines.flatMap((line) => line.dots));
+      for (const base of this.view.table || []) {
+        const missing = base.dots.map((dot) => dot.id).filter((id) => !sent.has(id));
+        if (missing.length) lines.push({ dots: missing });
+      }
+      this.draftTimer = setTimeout(() => {
+        if (this.alive && this.view.v === version && this.st.myTurn && !this.busy) {
+          this.draftQueue = (this.draftQueue || Promise.resolve()).then(() => {
+            if (this.alive && this.view.v === version && this.st.myTurn && !this.busy) return games.draft(this.ctx.roomId, lines, version);
+          }).catch(() => {});
+        };
+      }, 400);
+    }
     try {
       if (this.st && this.st.dirty()) sessionStorage.setItem(this.storeKey(this.view.v), JSON.stringify(this.st.snapshot()));
       else sessionStorage.removeItem(this.storeKey(this.view.v));
@@ -174,6 +196,16 @@ class PlayScreen {
 
   setView(v, first) {
     const prev = this.view;
+    if (!prev || prev.v !== v.v) {
+      clearTimeout(this.draftTimer);
+      const marks = changeMarks(prev, v);
+      if (marks) {
+        this.glow = marks;
+        clearTimeout(this.glowTimer);
+        this.glowTimer = setTimeout(() => { this.glow = null; if (this.alive) this.render(); }, 4000);
+      }
+    }
+    if (!v.draft) this.peek = false;
     if (prev && prev.v !== v.v) { try { sessionStorage.removeItem(this.storeKey(prev.v)); } catch { /* ignore */ } }
     let snap = null;
     try { snap = JSON.parse(sessionStorage.getItem(this.storeKey(v.v)) || 'null'); } catch { /* ignore */ }
@@ -197,7 +229,7 @@ class PlayScreen {
   async receive(v) {
     if (!this.alive) return;
     if (!this.root.isConnected) { this.destroy(); return; }
-    if (this.view && v.v === this.view.v) return;
+    if (this.view && v.v === this.view.v) { this.view = v; if (!v.draft) this.peek = false; this.render(); return; }
     // Lines whose dots all left the table just cleared: let them burst before the new table replaces them.
     if (this.view) {
       const now = new Set((v.table || []).flatMap((L) => L.dots.map((d) => d.id)));
@@ -605,7 +637,13 @@ class PlayScreen {
         h('span', { class: 'gp-plus', 'aria-hidden': 'true' }, '+'), t('family.games.play.new_line')));
     }
     if (!st.infos.length) sec.append(h('p', { class: 'gp-empty' }, t('family.games.play.table_empty')));
-    st.infos.forEach((info, i) => sec.append(this.renderLine(info, i, canAct, hints, st)));
+    let infos = st.infos;
+    if (v.draft && !this.st.myTurn) {
+      sec.prepend(liveBanner(v, !!this.peek, () => { this.peek = !this.peek; this.render(); }));
+      if (!this.peek) infos = v.draft.lines.map((line) => ({ ...line, key: line.id }));
+    }
+    this.tableMarks = v.draft && !this.peek ? draftMarks(v) : this.glow;
+    infos.forEach((info, i) => sec.append(this.renderLine(info, i, canAct && !v.draft, hints, st)));
     return sec;
   }
 
@@ -631,6 +669,8 @@ class PlayScreen {
       }
       const mineDot = placedBy.get(d.id) !== 'table';
       const dcls = ['gp-tdot'];
+      if (this.tableMarks?.added.has(d.id)) dcls.push(this.view.draft && !this.peek ? 'is-last' : 'is-added');
+      if (this.tableMarks?.moved.has(d.id)) dcls.push('is-last');
       if (mineDot && this.st.myTurn) dcls.push('gp-mine');
       if (fx.put && fx.put.has(d.id)) dcls.push('is-snap');
       if (fx.newDots && fx.newDots.has(d.id)) dcls.push('is-enter');
