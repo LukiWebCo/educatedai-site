@@ -381,3 +381,7 @@ html.gated body{overflow:hidden}
 }
 @media(max-width:450px){.turnrow{grid-template-columns:32px minmax(0,1fr);gap:.5rem;padding:.65rem}.turnrow>.avatar{width:32px;height:32px}}
 .turnrow--muted{color:var(--eai-color-ink-muted);font-size:var(--eai-step--1)}
+
+.purse-band { margin: 0 auto 1.5rem; padding: .9rem 1.25rem; border-block: 1px solid currentColor; background: #21362b; }
+.purse-band a { display: block; color: inherit; font-weight: 700; }
+.purse-proposal, .purse-decision { border: 1px solid currentColor; border-radius: .5rem; padding: 1rem; margin-block: 1rem; }

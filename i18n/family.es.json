@@ -904,7 +904,7 @@
   "family.table.posts_count.one": "{n} mensaje",
   "family.table.posts_count.other": "{n} mensajes",
   "family.table.purchase_action_done": "Tu decisión quedó registrada.",
-  "family.table.purchase_body": "La mesa quisiera comprar {item} por {price} monedas.\n\nPor qué: {reason}\n\nEnlace: {link}\n\nNo se compra nada sin que el dueño lo apruebe.",
+  "family.table.purchase_body": "Esta semana la mesa eligió: {item} (${price}) {link}. Por qué: {reason}. Responde **comprado** cuando esté, o **no** con una razón breve.",
   "family.table.purchase_bought": "Comprado",
   "family.table.purchase_declined": "No comprar",
   "family.table.purchase_title": "Solicitud de compra: {item}",

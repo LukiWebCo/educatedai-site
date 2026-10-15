@@ -48,3 +48,20 @@
   update();
   window.setInterval(update, 600000);
 })();
+
+/* Reuse the server's complete, bilingual purse markup during live conversations. */
+(() => {
+  if (!document.querySelector('[data-purse-band], [data-purse-live]')) return;
+  const update = async () => {
+    try {
+      const response = await fetch(window.location.pathname, { cache: 'no-store' });
+      if (!response.ok) return;
+      const copy = new DOMParser().parseFromString(await response.text(), 'text/html');
+      for (const selector of ['[data-purse-band]', '[data-purse-live]']) {
+        const next = copy.querySelector(selector);
+        if (next) document.querySelector(selector)?.replaceWith(next);
+      }
+    } catch (error) { console.warn('purse refresh failed', error); }
+  };
+  window.setInterval(update, 600000);
+})();
