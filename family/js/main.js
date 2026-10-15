@@ -3,7 +3,7 @@ import { getToken, get, patch, post, setSignedOutHandler, setToken } from './api
 import { h, icon } from './dom.js';
 import { openHowto } from './howto.js';
 import { currentLang, guessLang, setLang, t } from './i18n.js';
-import { state, loading, errorBox, go } from './ui.js';
+import { state, loading, errorBox, go, toast, errText } from './ui.js';
 import { joinView, loginView, rememberJoinToken } from './views/auth.js';
 import { adminView } from './views/admin.js';
 import { meView } from './views/me.js';
@@ -88,6 +88,20 @@ function setupChrome() {
   });
   document.getElementById('help-btn').addEventListener('click', () => openHowto({ autoplay: true }));
   setSignedOutHandler(() => { state.me = null; go('#/login'); });
+  let handingOff = false;
+  document.querySelector('[data-route="games"]').addEventListener('click', async (ev) => {
+    ev.preventDefault();
+    if (handingOff) return;
+    handingOff = true;
+    try {
+      const { url } = await post('/api/hallucatrix/handoff');
+      location.assign(url);
+    } catch (e) {
+      toast(errText(e), 'error');
+    } finally {
+      handingOff = false;
+    }
+  });
   window.addEventListener('hashchange', route);
   state.rerender = route;
 }
@@ -134,8 +148,6 @@ async function route() {
   }
   if (!isPublic && !state.me) { go('#/login'); return; }
   if (a === 'login' && state.me) { go('#/'); return; }
-  document.body.classList.remove('games-tv'); // the TV screen re-adds it; leaving it must restore the chrome
-  document.body.classList.remove('games-play');
   markNav(isPublic ? '' : (a || 'table') === 't' || a === 'shelf' || a === 'new' || a === 'all' ? 'table' : (a || 'table'));
   view.replaceChildren(loading());
   let node;
@@ -148,7 +160,6 @@ async function route() {
       case 'shelf': node = await shelfView(b); break;
       case 'all': node = await allView(); break;
       case 'new': node = state.me.role === 'admin' ? await newThreadView(b) : errorBox({ key: 'family.errors.forbidden' }); break;
-      case 'games': node = await (await import('./games/index.js')).gamesView(parts.slice(1)); break;
       case 'admin': node = state.me.role === 'admin' ? await adminView() : errorBox({ key: 'family.errors.forbidden' }); break;
       case 'me': node = await meView(actions); break;
       default: node = errorBox({ key: 'family.errors.not_found' });
