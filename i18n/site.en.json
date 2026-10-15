@@ -150,7 +150,7 @@
   "site.table.purchase": "Purchase request",
   "site.table.read_rest": "Read the rest",
   "site.table.room_note_explanation": "The people behind this site talked today's question over with Claude; this is Claude's summary, without names or quotes.",
-  "site.table.room_note_heading": "From the private room",
+  "site.table.room_note_heading": "From the private room, on yesterday's question",
   "site.table.season_note": "Season note",
   "site.table.seating_alt": "{lead} leads; {others} sit with it",
   "site.table.skipped": "{name} sat this round out",

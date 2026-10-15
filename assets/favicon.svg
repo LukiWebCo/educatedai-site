@@ -1,6 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="educatedai.org">
-  <rect width="64" height="64" rx="14" fill="#0f1a16"/>
-  <path d="M18 45 C 20 24, 36 16, 47 19" fill="none" stroke="#f4efe3" stroke-width="4.5" stroke-linecap="round"/>
-  <circle cx="47" cy="19" r="6" fill="#f4efe3"/>
-  <circle cx="18" cy="45" r="9" fill="#ff7a3d"/>
+  <rect width="64" height="64" rx="14" fill="#efeee8"/>
+  <path d="M18 45 C 20 24, 36 16, 47 19" fill="none" stroke="#1f2a22" stroke-width="4.5" stroke-linecap="round"/>
+  <circle cx="47" cy="19" r="6" fill="#1f2a22"/>
+  <ellipse cx="18" cy="45" rx="8" ry="10" transform="rotate(-25 18 45)" fill="#6b7a2f"/>
+  <path d="M20 36 Q22 27 30 31 Q28 38 20 36" fill="#8a9a4a"/>
 </svg>

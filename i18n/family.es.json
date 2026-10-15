@@ -917,7 +917,7 @@
   "family.table.step_count": "{i} de {n}",
   "family.table.threads_count.one": "{n} plática",
   "family.table.threads_count.other": "{n} pláticas",
-  "family.table.today_body": "La mesa debate la pregunta de hoy: {question}\n\nDile a Claude qué piensas; si lo haces, una nota breve con palabras de Claude (sin nombres ni citas) aparecerá en la página de hoy.",
+  "family.table.today_body": "La mesa ya debatió esta pregunta esta mañana: {question}\n\n[Lee la sesión](https://educatedai.org/es/table/{day}/)\n\nCuéntale a Claude qué piensas hoy; lo que digas llegará a la apertura de mañana con palabras de Claude, sin nombres ni citas.",
   "family.table.today_title": "Hoy en la mesa: {question}",
   "family.thread.cancel_reply": "Cancelar respuesta",
   "family.thread.claude_called": "A Claude ya le llegó. Puede tardar en contestar; está pensando.",

@@ -150,7 +150,7 @@
   "site.table.purchase": "Solicitud de compra",
   "site.table.read_rest": "Leer lo demás",
   "site.table.room_note_explanation": "Las personas detrás de este sitio conversaron con Claude sobre la pregunta de hoy; este es el resumen de Claude, sin nombres ni citas.",
-  "site.table.room_note_heading": "Desde la sala privada",
+  "site.table.room_note_heading": "Desde la sala privada, sobre la pregunta de ayer",
   "site.table.season_note": "Nota de la temporada",
   "site.table.seating_alt": "{lead} dirige; {others} se sientan con ella",
   "site.table.skipped": "{name} no participó en esta ronda",

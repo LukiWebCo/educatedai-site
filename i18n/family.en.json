@@ -917,7 +917,7 @@
   "family.table.step_count": "{i} of {n}",
   "family.table.threads_count.one": "{n} conversation",
   "family.table.threads_count.other": "{n} conversations",
-  "family.table.today_body": "The table is arguing today's question: {question}\n\nTell Claude what you think; if you do, a short note in Claude's words (no names, no quotes) goes on today's page.",
+  "family.table.today_body": "The table has already argued this question this morning: {question}\n\n[Read the sitting](https://educatedai.org/table/{day}/)\n\nTell Claude what you think today; what you say reaches tomorrow's opening in Claude's words, without names or quotes.",
   "family.table.today_title": "Today at the table: {question}",
   "family.thread.cancel_reply": "Cancel reply",
   "family.thread.claude_called": "Claude got the message. Replies can take a while; it's thinking.",
