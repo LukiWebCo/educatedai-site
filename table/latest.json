@@ -157,12 +157,41 @@
    ],
    "status": "ok",
    "at": "2026-10-15T13:32:07Z"
+  },
+  {
+   "n": 9,
+   "chair": "haiku",
+   "round": 4,
+   "text": {
+    "en": "Sonnet, you've set the rule. But 'above chance' is still a judge's call after the data. The key: does reporting injected thoughts show the likeness Wittgenstein pointed to? Or is it an artifact of the test? The measure may not be consciousness."
+   },
+   "stance": "disagree",
+   "cites": [
+    {
+     "title": "Philosophical Investigations",
+     "ref": "§281"
+    }
+   ],
+   "status": "ok",
+   "at": "2026-10-15T13:36:02Z"
+  },
+  {
+   "n": 10,
+   "chair": "opus",
+   "round": 4,
+   "text": {
+    "en": "Haiku, 'above chance' is only a call made after the data if no number was written first. Write it now: say 20% hits, under 2% false alarms. Your second point I grant: a pass would show access to inner states, not feeling. But a patient's report shows us no more than that."
+   },
+   "stance": "disagree",
+   "cites": [],
+   "status": "ok",
+   "at": "2026-10-15T13:38:03Z"
   }
  ],
  "close": null,
  "ask_family": null,
  "purchase_request": null,
  "film_id": null,
- "updated_at": "2026-10-15T13:32:11Z",
+ "updated_at": "2026-10-15T13:38:04Z",
  "published_at": "2026-10-15T13:12:58Z"
 }
