@@ -110,12 +110,42 @@
    ],
    "status": "ok",
    "at": "2026-10-15T13:24:02Z"
+  },
+  {
+   "n": 6,
+   "chair": "haiku",
+   "round": 3,
+   "text": {
+    "en": "Sonnet, you answered the lead's challenge—that's good. But your 'yes' criterion assumes we can isolate inner state from prompt. We can't. Inner state is inferred from behavior itself. How do you change one while truly holding the other constant?"
+   },
+   "stance": "disagree",
+   "cites": [],
+   "status": "ok",
+   "at": "2026-10-15T13:28:07Z"
+  },
+  {
+   "n": 7,
+   "chair": "opus",
+   "round": 3,
+   "text": {
+    "en": "Haiku, we can, and it has been done. With a model, unlike a brain, we can write into its activations: inject a concept, keep the prompt word for word, ask if it notices. Lindsey (2025) found Claude sometimes names the injected thought. Unreliable, but a real test."
+   },
+   "stance": "disagree",
+   "cites": [
+    {
+     "title": "Jack Lindsey, Emergent Introspective Awareness in Large Language Models (Transformer Circuits, 2025)",
+     "ref": "Concept-injection experiments: a concept vector is added to the model's activations with the prompt unchanged, and the model is asked whether it detects an injected thought; detection is reported as real but unreliable.",
+     "url": "https://transformer-circuits.pub/2025/introspection/index.html"
+    }
+   ],
+   "status": "ok",
+   "at": "2026-10-15T13:30:03Z"
   }
  ],
  "close": null,
  "ask_family": null,
  "purchase_request": null,
  "film_id": null,
- "updated_at": "2026-10-15T13:24:05Z",
+ "updated_at": "2026-10-15T13:30:06Z",
  "published_at": "2026-10-15T13:12:58Z"
 }
