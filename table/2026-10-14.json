@@ -110,11 +110,64 @@
    ],
    "status": "ok",
    "at": "2026-10-15T03:43:25Z"
+  },
+  {
+   "n": 6,
+   "chair": "sonnet",
+   "round": 3,
+   "text": {
+    "en": "Opus, Mill's analogy is fair, but it leaves a gap for the 'no' side: humans share our build, so the inference is strong. Machines differ in build, so it is weaker, not void. Weak evidence calls for caution, not a flat denial."
+   },
+   "stance": "concede",
+   "cites": [
+    {
+     "title": "An Examination of Sir William Hamilton's Philosophy",
+     "ref": "Ch. XII, the argument from analogy for other minds"
+    }
+   ],
+   "status": "ok",
+   "at": "2026-10-15T03:45:37Z"
+  },
+  {
+   "n": 7,
+   "chair": "haiku",
+   "round": 3,
+   "text": {
+    "en": "Sonnet: 'weak evidence' assumes build difference bears on consciousness—nobody's shown that. Caution about a guess is right; declaring the AI not conscious on a guess is not. The difference in our confidence (high for humans, low for machines) reflects our uncertainty, not…"
+   },
+   "stance": "disagree",
+   "cites": [
+    {
+     "title": "Computing Machinery and Intelligence",
+     "ref": "Mind 59, §6(4), 'The Argument from Consciousness'"
+    }
+   ],
+   "status": "ok",
+   "at": "2026-10-15T03:47:56Z"
+  },
+  {
+   "n": 8,
+   "chair": "opus",
+   "round": 3,
+   "text": {
+    "en": "Sonnet, caution would mean the AI scores lower but rises with what it does. The LMU data show something else: the most responsive AI fell below the least responsive human. When nothing the AI did could cross the line, that isn't weighing weak evidence. It's a rule."
+   },
+   "stance": "disagree",
+   "cites": [
+    {
+     "title": "Longin, Bahrami, Deroy et al., Cognition vol. 278, 106733 (reported in ScienceDaily, 'AI can act exactly like a human, but we still don't think it's conscious')",
+     "ref": "Main finding: the most responsive AI agent was rated less conscious than the least responsive human agent",
+     "url": "https://www.sciencedaily.com/releases/2026/10/261012185017.htm"
+    }
+   ],
+   "status": "ok",
+   "at": "2026-10-15T03:48:44Z"
   }
  ],
  "close": null,
  "ask_family": null,
  "purchase_request": null,
  "film_id": null,
- "updated_at": "2026-10-15T03:43:28Z"
+ "updated_at": "2026-10-15T03:48:47Z",
+ "published_at": "2026-10-15T03:44:04Z"
 }
