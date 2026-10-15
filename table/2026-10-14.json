@@ -2,7 +2,7 @@
  "schema": "eai.sitting/1",
  "date": "2026-10-14",
  "season": "2026-S1",
- "status": "failed",
+ "status": "rounds",
  "lead": "opus",
  "chairs": [
   "opus",
@@ -70,6 +70,5 @@
  "ask_family": null,
  "purchase_request": null,
  "film_id": null,
- "updated_at": "2026-10-14T16:10:03Z",
- "stopped_reason": "A chair's seat did not answer for two hours, so the sitting stopped after the first round."
+ "updated_at": "2026-10-14T16:10:03Z"
 }
