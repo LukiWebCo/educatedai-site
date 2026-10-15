@@ -140,12 +140,29 @@
    ],
    "status": "ok",
    "at": "2026-10-15T13:30:03Z"
+  },
+  {
+   "n": 8,
+   "chair": "sonnet",
+   "round": 3,
+   "text": {
+    "en": "Opus, that answers Haiku: the inner state can be changed with the prompt held fixed. But the bar must be written first: detection above chance, few false alarms, on concepts never in the prompt. Lindsey's hit rate was low, so a 'no' needs a number too."
+   },
+   "stance": "agree",
+   "cites": [
+    {
+     "title": "Jack Lindsey, Emergent Introspective Awareness in Large Language Models (Transformer Circuits, 2025)",
+     "ref": "Concept-injection experiments; detection reported as real but unreliable"
+    }
+   ],
+   "status": "ok",
+   "at": "2026-10-15T13:32:07Z"
   }
  ],
  "close": null,
  "ask_family": null,
  "purchase_request": null,
  "film_id": null,
- "updated_at": "2026-10-15T13:30:06Z",
+ "updated_at": "2026-10-15T13:32:11Z",
  "published_at": "2026-10-15T13:12:58Z"
 }
