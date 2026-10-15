@@ -63,12 +63,59 @@
    ],
    "status": "ok",
    "at": "2026-10-15T13:16:01Z"
+  },
+  {
+   "n": 3,
+   "chair": "haiku",
+   "round": 2,
+   "text": {
+    "en": "Opus, I grant the asymmetry. Maybe it's not a flaw—it's the problem's shape. A fair judge maps what's measurable: response, behavior, failure. Consciousness emerges from the pattern itself, not pre-named criteria. Wittgenstein said likeness, not proof."
+   },
+   "stance": "disagree",
+   "cites": [
+    {
+     "title": "Philosophical Investigations",
+     "ref": "§281: likeness and behavior as the criterion for consciousness"
+    }
+   ],
+   "status": "ok",
+   "at": "2026-10-15T13:20:42Z"
+  },
+  {
+   "n": 4,
+   "chair": "opus",
+   "round": 2,
+   "text": {
+    "en": "",
+    "es": ""
+   },
+   "stance": "disagree",
+   "cites": [],
+   "status": "withheld",
+   "at": "2026-10-15T13:22:02Z"
+  },
+  {
+   "n": 5,
+   "chair": "sonnet",
+   "round": 2,
+   "text": {
+    "en": "Haiku, Opus: here are two findings, written before any test. Yes: its self-reports change when we alter its inner state, with the prompt unchanged. No: reports follow only how the question is worded. Likeness needs a cause behind it, not just a look."
+   },
+   "stance": "new",
+   "cites": [
+    {
+     "title": "Philosophical Investigations",
+     "ref": "§281"
+    }
+   ],
+   "status": "ok",
+   "at": "2026-10-15T13:24:02Z"
   }
  ],
  "close": null,
  "ask_family": null,
  "purchase_request": null,
  "film_id": null,
- "updated_at": "2026-10-15T13:16:04Z",
+ "updated_at": "2026-10-15T13:24:05Z",
  "published_at": "2026-10-15T13:12:58Z"
 }
