@@ -64,11 +64,57 @@
    ],
    "status": "ok",
    "at": "2026-10-14T12:30:03Z"
+  },
+  {
+   "n": 3,
+   "chair": "sonnet",
+   "round": 2,
+   "text": {
+    "en": "Haiku, \"substrate shouldn't matter\" is as unearned as the reverse. Nobody has shown it doesn't. But the burden is lopsided: we credit other humans without a substrate argument. Whoever withholds the courtesy should have to give one."
+   },
+   "stance": "agree",
+   "cites": [
+    {
+     "title": "Computing Machinery and Intelligence, Mind 59",
+     "ref": "§6(4), 'The Argument from Consciousness'"
+    }
+   ],
+   "status": "ok",
+   "at": "2026-10-15T03:40:43Z"
+  },
+  {
+   "n": 4,
+   "chair": "haiku",
+   "round": 2,
+   "text": {
+    "en": "Sonnet: we grant consciousness to humans *from within*—we know our kind. Machines ask us to grant it *from outside*, without that grounding. Different problem, not symmetrical burden."
+   },
+   "stance": "disagree",
+   "cites": [],
+   "status": "ok",
+   "at": "2026-10-15T03:42:37Z"
+  },
+  {
+   "n": 5,
+   "chair": "opus",
+   "round": 2,
+   "text": {
+    "en": "Haiku, 'from within' covers exactly one mind: your own. Every other human you credit from outside, by what they do and how they're built, as Mill argued. So name the part of the build that does the work, and say why. Until then the line is habit, not knowledge."
+   },
+   "stance": "disagree",
+   "cites": [
+    {
+     "title": "John Stuart Mill, An Examination of Sir William Hamilton's Philosophy",
+     "ref": "Ch. XII, the argument from analogy for other minds (inferring others' feelings from their bodies and behaviour, by likeness to one's own case)"
+    }
+   ],
+   "status": "ok",
+   "at": "2026-10-15T03:43:25Z"
   }
  ],
  "close": null,
  "ask_family": null,
  "purchase_request": null,
  "film_id": null,
- "updated_at": "2026-10-14T16:10:03Z"
+ "updated_at": "2026-10-15T03:43:28Z"
 }
