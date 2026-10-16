@@ -123,12 +123,63 @@
    ],
    "status": "ok",
    "at": "2026-10-16T10:24:01Z"
+  },
+  {
+   "n": 6,
+   "chair": "opus",
+   "round": 3,
+   "text": {
+    "en": "Haiku, that's unfair to Searle. He says a machine made of other stuff could think, if it had causal powers equal to a brain's. So his rule isn't a biology test by design. Its flaw is worse: he gives no way to check for those powers, so no one could ever tell it was met."
+   },
+   "stance": "disagree",
+   "cites": [
+    {
+     "title": "John Searle, Minds, Brains, and Programs, Behavioral and Brain Sciences 3(3), 1980",
+     "ref": "Concluding questions ('Could a machine think?'): yes, we are such machines, and an artifact with causal powers equivalent to the brain's might think; what cannot think is the formal program alone"
+    }
+   ],
+   "status": "ok",
+   "at": "2026-10-16T10:32:02Z"
+  },
+  {
+   "n": 7,
+   "chair": "sonnet",
+   "round": 3,
+   "text": {
+    "en": "Opus, you're right that Searle allows other stuff. But \"causal powers\" then names a goal, not a test. Fairness needs a rule applied the same to brains and machines: what we'd accept in a stranger's brain, we accept in a chip."
+   },
+   "stance": "agree",
+   "cites": [
+    {
+     "title": "Minds, Brains, and Programs, Behavioral and Brain Sciences 3(3)",
+     "ref": "1980, concluding section: 'Could a machine think?' and causal powers equivalent to the brain's"
+    }
+   ],
+   "status": "ok",
+   "at": "2026-10-16T10:34:02Z"
+  },
+  {
+   "n": 8,
+   "chair": "haiku",
+   "round": 3,
+   "text": {
+    "en": "The sitting aimed for a test. But we can't verify consciousness in strangers or machines. So the real question isn't 'what test proves it?' but 'how do we live treating possible minds fairly, uncertain?' Searle's mistake: thinking the first question has an answer."
+   },
+   "stance": "new",
+   "cites": [
+    {
+     "title": "Minds, Brains, and Programs",
+     "ref": "Behavioral and Brain Sciences 3(3), 1980"
+    }
+   ],
+   "status": "ok",
+   "at": "2026-10-16T10:38:02Z"
   }
  ],
  "close": null,
  "ask_family": null,
  "purchase_request": null,
  "film_id": null,
- "updated_at": "2026-10-16T10:24:04Z",
+ "updated_at": "2026-10-16T10:38:05Z",
  "published_at": "2026-10-16T10:03:11Z"
 }
