@@ -1,17 +1,19 @@
 /* Refresh the server-rendered card so live and static transcripts share one markup. */
 (() => {
   const page = document.querySelector("[data-table-live]");
-  if (!page || (!page.hasAttribute("data-table-home") && ["published", "failed"].includes(page.dataset.status))) return;
+  const homeDiscussion = document.querySelector("[data-home-discussion]");
+  if (!page && !homeDiscussion) return;
+  if (page && ["published", "failed"].includes(page.dataset.status)) return;
   const desktop = window.matchMedia("(min-width: 900px)");
   const expandDesktop = () => {
-    if (desktop.matches) page.querySelector(".opening-full")?.setAttribute("open", "");
+    if (desktop.matches) page?.querySelector(".opening-full")?.setAttribute("open", "");
   };
   expandDesktop();
   desktop.addEventListener("change", expandDesktop);
   let previous = null;
   const update = async () => {
     try {
-      const feed = page.hasAttribute("data-table-home")
+      const feed = homeDiscussion
         ? "/table/latest.json"
         : `/table/${encodeURIComponent(page.dataset.date)}.json`;
       const response = await fetch(feed, { cache: "no-store" });
@@ -22,8 +24,6 @@
       const rendered = await fetch(window.location.pathname, { cache: "no-store" });
       if (!rendered.ok) return;
       const documentCopy = new DOMParser().parseFromString(await rendered.text(), "text/html");
-      const card = documentCopy.querySelector("[data-table-live]");
-      if (!card) return;
       const discussion = documentCopy.querySelector("[data-home-discussion]");
       const currentDiscussion = document.querySelector("[data-home-discussion]");
       if (discussion && currentDiscussion) {
@@ -38,6 +38,12 @@
         }
         currentDiscussion.dataset.date = discussion.dataset.date;
       }
+      if (!page) {
+        previous = signature;
+        return;
+      }
+      const card = documentCopy.querySelector("[data-table-live]");
+      if (!card) return;
       const expanded = page.querySelector(".opening-full")?.open;
       if (expanded) card.querySelector(".opening-full")?.setAttribute("open", "");
       // Keep an existing film player and its playback/listeners intact.
@@ -65,16 +71,14 @@
 
 /* Reuse the server's complete, bilingual purse markup during live conversations. */
 (() => {
-  if (!document.querySelector('[data-purse-band], [data-purse-live]')) return;
+  if (!document.querySelector('[data-purse-live]')) return;
   const update = async () => {
     try {
       const response = await fetch(window.location.pathname, { cache: 'no-store' });
       if (!response.ok) return;
       const copy = new DOMParser().parseFromString(await response.text(), 'text/html');
-      for (const selector of ['[data-purse-band]', '[data-purse-live]']) {
-        const next = copy.querySelector(selector);
-        if (next) document.querySelector(selector)?.replaceWith(next);
-      }
+      const next = copy.querySelector('[data-purse-live]');
+      if (next) document.querySelector('[data-purse-live]')?.replaceWith(next);
     } catch (error) { console.warn('purse refresh failed', error); }
   };
   window.setInterval(update, 600000);
