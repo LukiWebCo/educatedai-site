@@ -267,6 +267,18 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/table/purse/2026-10-16/"/>
   </url>
   <url>
+    <loc>https://educatedai.org/table/purse/2026-10-23/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/table/purse/2026-10-23/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/table/purse/2026-10-23/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/table/purse/2026-10-23/"/>
+  </url>
+  <url>
+    <loc>https://educatedai.org/es/table/purse/2026-10-23/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/table/purse/2026-10-23/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/table/purse/2026-10-23/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/table/purse/2026-10-23/"/>
+  </url>
+  <url>
     <loc>https://educatedai.org/takedown/</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/takedown/"/>
     <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/takedown/"/>
