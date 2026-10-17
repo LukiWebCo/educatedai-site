@@ -24,6 +24,20 @@
       const documentCopy = new DOMParser().parseFromString(await rendered.text(), "text/html");
       const card = documentCopy.querySelector("[data-table-live]");
       if (!card) return;
+      const discussion = documentCopy.querySelector("[data-home-discussion]");
+      const currentDiscussion = document.querySelector("[data-home-discussion]");
+      if (discussion && currentDiscussion) {
+        for (const selector of [
+          "[data-home-discussion-status]",
+          ".discussion-card__seating",
+          ".discussion-card__question",
+          ".home-panel__action",
+        ]) {
+          const replacement = discussion.querySelector(selector);
+          if (replacement) currentDiscussion.querySelector(selector)?.replaceWith(replacement);
+        }
+        currentDiscussion.dataset.date = discussion.dataset.date;
+      }
       const expanded = page.querySelector(".opening-full")?.open;
       if (expanded) card.querySelector(".opening-full")?.setAttribute("open", "");
       // Keep an existing film player and its playback/listeners intact.
