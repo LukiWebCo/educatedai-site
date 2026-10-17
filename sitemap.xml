@@ -135,6 +135,18 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/chairs/sonnet/"/>
   </url>
   <url>
+    <loc>https://educatedai.org/family/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/family/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/family/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/family/"/>
+  </url>
+  <url>
+    <loc>https://educatedai.org/es/family/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/family/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/family/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/family/"/>
+  </url>
+  <url>
     <loc>https://educatedai.org/films/</loc>
     <lastmod>2026-10-10</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/films/"/>
