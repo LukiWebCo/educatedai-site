@@ -157,7 +157,7 @@ main{width:min(1200px,100%);margin:0 auto;padding:0 var(--eai-space-4) var(--eai
 .home-panel__action{margin:var(--eai-space-3) 0 0}
 .home-panel__action a{display:inline-flex;align-items:center;min-height:var(--eai-tap-min);font-weight:700;text-decoration-thickness:2px;text-underline-offset:3px}
 .home-panel__balance{font:600 var(--eai-step-2)/1.2 var(--eai-font-display)}
-.discussion-card__seating .table-seating{margin:var(--eai-space-2) 0}
+.discussion-card__seating .table-seating{margin:var(--eai-space-2) 0;display:grid;grid-template-rows:auto auto;row-gap:2rem}
 .discussion-card__seating .table-seating__board{height:210px}
 .discussion-card__seating .table-seat{font-size:.72rem}
 .discussion-card__question{font:600 var(--eai-step-1)/1.2 var(--eai-font-display);text-wrap:pretty;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden}
@@ -406,6 +406,17 @@ html.gated body{overflow:hidden}
 
 .purse-band { margin: 0 auto 1.5rem; padding: .9rem 1.25rem; border-block: 1px solid currentColor; background: var(--eai-color-slab); }
 .purse-band a { display: block; color: inherit; font-weight: 700; }
+.purse-ledger{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.purse-ledger caption{text-align:left;margin-bottom:1rem}
+.purse-ledger th,.purse-ledger td{padding:.65rem;text-align:left;border-bottom:1px solid currentColor;vertical-align:top}
+.purse-history li{margin-block:1rem}
+@media(max-width:639px){
+  .purse-ledger thead{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+  .purse-ledger,.purse-ledger tbody,.purse-ledger tr{display:block}
+  .purse-ledger tr{margin-bottom:1rem;border-bottom:1px solid currentColor}
+  .purse-ledger th,.purse-ledger td{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:.75rem;border:0}
+  .purse-ledger [data-label]::before{content:attr(data-label);font-weight:700}
+}
 .purse-proposal, .purse-decision { border: 1px solid currentColor; border-radius: .5rem; padding: 1rem; margin-block: 1rem; }
 
 /* Poured concrete: grain stays faint; cards keep an opaque reading surface. */
