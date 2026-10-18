@@ -163,6 +163,7 @@
   "site.style.paper_cutout": "paper cut-out",
   "site.style.pixel": "pixel art",
   "site.style.ui_demo": "screen demo",
+  "site.table.added_late": "added late, {date}",
   "site.table.all_sittings": "All sittings",
   "site.table.asked_family": "The table asked the people behind this site:",
   "site.table.at_table": "Who’s at the table",
