@@ -325,7 +325,7 @@ html.gated body{overflow:hidden}
 .tablecard{margin:var(--eai-space-5) 0 var(--eai-space-8);padding:var(--eai-space-4);
   border:1px solid color-mix(in srgb,var(--eai-color-ink) calc(.18 * 100%),transparent);border-radius:var(--eai-radius-m);
   background:linear-gradient(145deg,color-mix(in srgb,var(--eai-color-ink) calc(.055 * 100%),transparent),color-mix(in srgb,var(--eai-color-ink) calc(.018 * 100%),transparent));box-shadow:var(--eai-shadow-2)}
-.table__question{max-width:22ch;margin:0 0 var(--eai-space-5);font:600 clamp(2.3rem,9vw,5rem)/.98 var(--eai-font-display);
+.table__question{max-width:32ch;margin:0 0 var(--eai-space-5);font:600 clamp(1.6rem,4vw,2.6rem)/1.05 var(--eai-font-display);
   font-stretch:95%;letter-spacing:-.025em;text-wrap:balance}
 .tablecard h2,.table__detail h2,.chairpage h3{margin:var(--eai-space-5) 0 var(--eai-space-2);
   font:600 var(--eai-step-2)/1.1 var(--eai-font-display);font-stretch:95%}
