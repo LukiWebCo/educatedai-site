@@ -278,22 +278,10 @@ main{width:min(1200px,100%);margin:0 auto;padding:0 var(--eai-space-4) var(--eai
 .meter span{display:block;width:0;height:100%;background:var(--eai-color-accent)}
 .colophon__links{list-style:none;margin:var(--eai-space-5) 0 0;padding:0;display:flex;flex-wrap:wrap;gap:0 var(--eai-space-5);align-items:center}
 .colophon__links a{display:inline-flex;align-items:center;justify-content:center;min-height:44px;min-width:44px}
-.adult{display:inline-flex;align-items:center;min-height:44px}
 
-/* ---------- 18+ notice */
-.gate{width:min(560px,calc(100% - 2 * var(--eai-space-4)));max-height:calc(100% - 2 * var(--eai-space-4));padding:0;border:0;background:transparent;color:var(--eai-color-ink);overflow:visible}
-.gate::backdrop{background:color-mix(in srgb,var(--eai-color-shadow) 88%,transparent);backdrop-filter:blur(6px)}
-.gate__card{position:relative;padding:var(--eai-space-7) var(--eai-space-5) var(--eai-space-5);border-radius:var(--eai-radius-l);background:var(--eai-color-surface);
+
   border:2px solid color-mix(in srgb,var(--eai-color-ink) calc(.18 * 100%),transparent);box-shadow:var(--eai-shadow-2)}
-@media (min-width:560px){.gate__card{padding:var(--eai-space-7) var(--eai-space-6) var(--eai-space-6)}}
-.gate__badge{position:absolute;top:-44px;left:var(--eai-space-5);margin:0;display:grid;place-items:center;width:88px;height:88px;border-radius:50%;
   background:var(--eai-color-accent);color:var(--eai-color-bg);font:600 2rem/1 var(--eai-font-display);font-stretch:95%;box-shadow:0 0 0 6px var(--eai-color-bg)}
-.gate__title{margin:var(--eai-space-4) 0 var(--eai-space-3);font-family:var(--eai-font-display);font-stretch:95%;font-weight:600;font-size:clamp(2.2rem,10vw,3.2rem);line-height:.95}
-.gate__body{font-size:var(--eai-step-1);line-height:1.4}
-.gate__fine{color:var(--eai-color-ink-muted);font-size:var(--eai-step--1)}
-.gate__actions{display:flex;flex-direction:column;gap:var(--eai-space-3);margin-top:var(--eai-space-5)}
-@media (min-width:560px){.gate__actions{flex-direction:row;flex-wrap:wrap}}
-html.gated body{overflow:hidden}
 
 /* ---------- motion: lines draw, dots pop (only for people who want motion) */
 @media (prefers-reduced-motion:no-preference){
@@ -303,8 +291,6 @@ html.gated body{overflow:hidden}
   .board__pass{stroke-dashoffset:1;animation:eai-draw 2.4s .4s var(--eai-ease) infinite alternate}
   .board__b{animation:eai-pop .6s 2.6s cubic-bezier(.3,1.6,.5,1) both}
   .player__sound-dot{animation:eai-ring 1.8s ease-out infinite}
-  .gate[open] .gate__card{animation:eai-in var(--eai-motion-slow) var(--eai-ease)}
-  .gate[open] .gate__badge{animation:eai-pop .6s .15s cubic-bezier(.3,1.6,.5,1) both}
   .lost__ring{animation:eai-spin 14s linear infinite;transform-origin:60px 60px}
   /* hover and focus lifts: a small move, so it lives here too */
   .btn:hover,.btn:focus-visible{transform:translate(-2px,-2px)}
@@ -319,7 +305,7 @@ html.gated body{overflow:hidden}
 @keyframes eai-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 @keyframes eai-spin{to{transform:rotate(360deg)}}
 
-@media print{body{background:var(--eai-color-bg);color:var(--eai-color-ink)}.masthead nav,.gate,.player__bar{display:none}}
+@media print{body{background:var(--eai-color-bg);color:var(--eai-color-ink)}.masthead nav,.player__bar{display:none}}
 
 /* ---------- the table */
 .tablecard{margin:var(--eai-space-5) 0 var(--eai-space-8);padding:var(--eai-space-4);
@@ -443,7 +429,6 @@ a{color:var(--eai-color-accent-2)}
 @media(min-width:720px){.tablecard{padding:0}.turnlist[data-table-turns],.purse-slab{padding:var(--eai-space-5)}}
 
 .filmrow__num,.prose ol li::marker{color:var(--eai-color-accent-2)}
-.gate__badge{color:var(--eai-color-on-accent)}
 .purse-slab{color:var(--eai-color-ink)}
 .purse-slab .table__spanish{color:var(--eai-color-slab-muted)}
 .purse-slab .turnrow .table__spanish{color:var(--eai-color-ink-muted)}

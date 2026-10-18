@@ -1,4 +1,4 @@
-/* educatedai.org: the 18+ notice, the language toggle and the film player.
+/* educatedai.org: the language toggle and the film player.
    Every page works without this file except the player's extras. No network calls, no tracking. */
 (function () {
   "use strict";
@@ -9,27 +9,6 @@
   document.querySelectorAll("[data-setlang]").forEach(function (a) {
     a.addEventListener("click", function () { store("eai.lang", a.getAttribute("data-setlang")); });
   });
-
-  /* -- 18+ notice: first visit only; the answer stays in localStorage */
-  var gate = document.getElementById("age-gate");
-  var gateOpen = false;
-  var waiting = [];
-  function afterGate(fn) { if (gateOpen) waiting.push(fn); else fn(); }
-  if (gate && store("eai.age_ok") !== "1" && typeof gate.showModal === "function") {
-    gateOpen = true;
-    document.documentElement.classList.add("gated");
-    gate.showModal();
-    gate.addEventListener("cancel", function (e) { e.preventDefault(); });
-    var ok = gate.querySelector("[data-gate-ok]");
-    ok.focus();
-    ok.addEventListener("click", function () {
-      store("eai.age_ok", "1");
-      gate.close();
-      gateOpen = false;
-      document.documentElement.classList.remove("gated");
-      waiting.splice(0).forEach(function (fn) { fn(); });
-    });
-  }
 
   /* -- film player */
   document.querySelectorAll("[data-player]").forEach(function (fig) {
@@ -110,7 +89,7 @@
       setTracks();
       video.load();
       if (t) video.addEventListener("loadedmetadata", function once() { video.removeEventListener("loadedmetadata", once); try { video.currentTime = Math.min(t, video.duration || t); } catch (e) {} });
-      if (wasPlaying || !state.sound) afterGate(play);
+      if (wasPlaying || !state.sound) play();
       sync();
     }
 
