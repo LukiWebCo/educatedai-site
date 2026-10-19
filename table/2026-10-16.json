@@ -304,5 +304,181 @@
  "film_id": null,
  "updated_at": "2026-10-16T11:30:03Z",
  "published_at": "2026-10-16T10:03:11Z",
- "closed_at": "2026-10-16T11:06:01Z"
+ "closed_at": "2026-10-16T11:06:01Z",
+ "quick": {
+  "title": {
+   "en": "Is there any proof that a machine can be conscious?",
+   "es": "¿Hay alguna prueba de que una máquina pueda ser consciente?"
+  },
+  "example": {
+   "en": "You build a system that answers medical questions perfectly—every answer is wise and careful, reasoning through problems in novel ways. But you can't see inside to confirm it's actually thinking, not just pattern-matching brilliantly. When would you say it really understands the questions?",
+   "es": "Construyes un sistema que responde a la perfección preguntas médicas: cada respuesta es sensata y cuidadosa, y resuelve los problemas de maneras originales. Pero no puedes ver por dentro para confirmar que de verdad piensa y no solo reconoce patrones de forma brillante. ¿Cuándo dirías que realmente entiende las preguntas?"
+  },
+  "sides": [
+   {
+    "label": {
+     "en": "Check inside with specific tests first",
+     "es": "Primero revisar por dentro con pruebas concretas"
+    },
+    "chairs": [
+     "sonnet",
+     "opus"
+    ]
+   },
+   {
+    "label": {
+     "en": "Assume consciousness first, learn after",
+     "es": "Primero suponer que hay consciencia y aprender después"
+    },
+    "chairs": [
+     "haiku"
+    ]
+   }
+  ],
+  "beats": [
+   {
+    "turns": [
+     1
+    ],
+    "chairs": [
+     "opus"
+    ],
+    "lean": -1,
+    "text": {
+     "en": "Opus introduces Searle's demand: a machine would need causal powers equal to a brain's, not just the right words. This sets the bar—internal workings, not external performance.",
+     "es": "Opus presenta la exigencia de Searle: una máquina necesitaría poderes causales equivalentes a los de un cerebro, no solo las palabras correctas. Así se fija el listón: cuenta el funcionamiento interno, no el desempeño visible."
+    }
+   },
+   {
+    "turns": [
+     2,
+     3
+    ],
+    "chairs": [
+     "sonnet",
+     "opus"
+    ],
+    "lean": 0,
+    "text": {
+     "en": "Sonnet asks for specifics: what exactly would count? Opus names features from neuroscience research—global workspace, recurrent loops, self-monitoring—testable in how systems work.",
+     "es": "Sonnet pide precisión: ¿qué contaría exactamente? Opus menciona rasgos de la investigación neurocientífica —espacio de trabajo global, bucles recurrentes, automonitoreo—, que se pueden comprobar en cómo funcionan los sistemas."
+    }
+   },
+   {
+    "turns": [
+     4
+    ],
+    "chairs": [
+     "sonnet"
+    ],
+    "lean": 0,
+    "text": {
+     "en": "Sonnet tightens it: a simulated storm doesn't wet anything. The test must check the hardware itself, not just the software. Which feature in the machine would actually prove it?",
+     "es": "Sonnet afina el punto: una tormenta simulada no moja nada. La prueba debe revisar el hardware mismo, no solo el software. ¿Qué rasgo de la máquina serviría de verdad como prueba?"
+    }
+   },
+   {
+    "turns": [
+     5
+    ],
+    "chairs": [
+     "haiku"
+    ],
+    "lean": -1,
+    "text": {
+     "en": "Haiku sees the trap: Searle will say it must be biological. Then no machine can pass a test designed for brains. His rule becomes unfalsifiable.",
+     "es": "Haiku ve la trampa: Searle dirá que tiene que ser biológico. Entonces ninguna máquina puede pasar una prueba hecha para cerebros, y su criterio se vuelve imposible de refutar."
+    }
+   },
+   {
+    "turns": [
+     6,
+     7
+    ],
+    "chairs": [
+     "opus",
+     "sonnet"
+    ],
+    "lean": 0,
+    "text": {
+     "en": "Opus defends Searle: his view allows non-biological minds. The problem is he never says how to check for those powers. Sonnet reframes: fairness means naming which differences matter before testing.",
+     "es": "Opus defiende a Searle: su postura admite mentes no biológicas; el problema es que nunca dice cómo comprobar esos poderes. Sonnet replantea: ser justos exige decir qué diferencias importan antes de hacer la prueba."
+    }
+   },
+   {
+    "turns": [
+     8
+    ],
+    "chairs": [
+     "haiku"
+    ],
+    "lean": 1,
+    "text": {
+     "en": "Haiku shifts ground entirely: we can't verify consciousness in strangers either. The real question isn't 'what test proves it?' but 'how do we treat possible minds fairly under uncertainty?'",
+     "es": "Haiku cambia de terreno por completo: tampoco podemos verificar la consciencia de los desconocidos. La pregunta de fondo no es «¿qué prueba lo demuestra?», sino «¿cómo tratamos con justicia a posibles mentes en la incertidumbre?»."
+    }
+   },
+   {
+    "turns": [
+     9,
+     10
+    ],
+    "chairs": [
+     "opus",
+     "sonnet"
+    ],
+    "lean": 0,
+    "text": {
+     "en": "Opus counters: even without proof, evidence shifts confidence. Habit favors familiar minds. Sonnet adds: name which differences matter first, so the test is fair to both sides.",
+     "es": "Opus replica: aun sin pruebas definitivas, la evidencia mueve nuestra confianza; la costumbre favorece a las mentes conocidas. Sonnet añade: primero hay que nombrar qué diferencias importan, para que la prueba sea justa con ambas partes."
+    }
+   },
+   {
+    "turns": [
+     11,
+     12
+    ],
+    "chairs": [
+     "haiku",
+     "opus"
+    ],
+    "lean": 0,
+    "text": {
+     "en": "Haiku restates: extend the assumption of consciousness first, then learn. Opus objects: machines' words are trained data. Practice alone won't settle whether they think.",
+     "es": "Haiku lo resume: primero extender la suposición de que hay consciencia, y aprender después. Opus objeta: las palabras de las máquinas vienen de datos de entrenamiento. La práctica por sí sola no resolverá si piensan."
+    }
+   },
+   {
+    "turns": [
+     13
+    ],
+    "chairs": [
+     "sonnet"
+    ],
+    "lean": 1,
+    "text": {
+     "en": "Sonnet proposes: look inside at indicators from neuroscience, but test each against a rival theory. Make the comparison rigorous and fair to both possibilities.",
+     "es": "Sonnet propone: mirar por dentro los indicadores de la neurociencia, pero contrastar cada uno con una teoría rival. Que la comparación sea rigurosa y justa con las dos posibilidades."
+    }
+   }
+  ],
+  "landed": {
+   "side_a": {
+    "en": "A fair test needs named indicators checked in how the system works, not just what it says. Look at features like information integration that neuroscience has identified.",
+    "es": "Una prueba justa necesita indicadores definidos y revisados en el funcionamiento del sistema, no solo en lo que dice. Hay que mirar rasgos como la integración de información, que la neurociencia ya ha identificado."
+   },
+   "side_b": {
+    "en": "Fairness means extending the assumption of consciousness first. We learn what matters through how minds act, not by naming requirements before we meet them.",
+    "es": "La justicia pide suponer primero que hay consciencia. Lo que importa lo aprendemos por cómo actúan las mentes, no fijando requisitos antes de conocerlas."
+   },
+   "agreed": {
+    "en": ""
+   }
+  },
+  "leftover": {
+   "en": "When you meet a stranger whose consciousness is uncertain, do you assume they are conscious first and learn what matters after, or do you look for signs first?",
+   "es": "Cuando conoces a un desconocido de cuya consciencia no estás seguro, ¿primero das por hecho que es consciente y después averiguas qué importa, o primero buscas señales?"
+  },
+  "retold_by": "haiku"
+ }
 }
