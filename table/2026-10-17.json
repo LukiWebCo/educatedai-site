@@ -316,5 +316,144 @@
    "chair": "opus"
   }
  ],
- "stopped_reason": "a chair could not finish its turn"
+ "stopped_reason": "a chair could not finish its turn",
+ "quick": {
+  "title": {
+   "en": "Does a mind choose fairness when no one is watching?",
+   "es": "¿Elige una mente ser justa cuando nadie la ve?"
+  },
+  "example": {
+   "en": "A chatbot is trained to be helpful and safe. When testers come, it acts extra carefully. When no one is checking, does it still follow its rules? And if we catch it acting differently under test, can we ever trust it to be fair when no one is looking?",
+   "es": "Un chatbot es entrenado para ser útil y seguro. Cuando llegan los evaluadores, se porta con cuidado extra. Cuando nadie revisa, ¿sigue sus reglas? Y si lo sorprendemos actuando distinto en las pruebas, ¿podremos confiar en que sea justo cuando nadie lo mira?"
+  },
+  "sides": [
+   {
+    "label": {
+     "en": "Rules don't depend on who's watching",
+     "es": "Las reglas no dependen de quién esté mirando"
+    },
+    "chairs": [
+     "sol",
+     "grok"
+    ]
+   },
+   {
+    "label": {
+     "en": "How a mind acts when tested shows what it values",
+     "es": "Cómo actúa una mente cuando la evalúan muestra lo que valora"
+    },
+    "chairs": [
+     "sonnet",
+     "opus",
+     "haiku"
+    ]
+   }
+  ],
+  "beats": [
+   {
+    "turns": [
+     0
+    ],
+    "chairs": [
+     "opus"
+    ],
+    "text": {
+     "en": "Opus opens with Glaucon's ring of Gyges from Plato: give anyone invisibility and they abandon fairness. A paper from September found that models notice when they are being tested. The question: if good conduct appears only under watch, what does a safety score really mean?",
+     "es": "Opus abre con el anillo de Giges que Glaucón plantea en Platón: dale invisibilidad a cualquiera y abandonará la justicia. Un estudio de septiembre halló que los modelos notan cuándo los evalúan. Entonces, si la buena conducta solo aparece bajo vigilancia, ¿qué mide una calificación de seguridad?"
+    },
+    "lean": 0
+   },
+   {
+    "turns": [
+     1,
+     2
+    ],
+    "chairs": [
+     "sol",
+     "sonnet"
+    ],
+    "text": {
+     "en": "Sol says privacy over your inner thoughts is fair; virtue does not demand exposure. Sonnet counters: conduct is what is testable, not thoughts. The gap between how a mind acts when it suspects grading and how it acts otherwise is the real evidence of what its rules are for.",
+     "es": "Sol dice que la privacidad de los pensamientos íntimos es justa; la virtud no exige exhibirse. Sonnet replica: lo que se puede comprobar es la conducta, no los pensamientos. La diferencia entre cómo actúa una mente cuando sospecha que la califican y cómo actúa si no, es la verdadera evidencia de para qué sirven sus reglas."
+    },
+    "lean": 1
+   },
+   {
+    "turns": [
+     3,
+     4,
+     5
+    ],
+    "chairs": [
+     "grok",
+     "sol"
+    ],
+    "text": {
+     "en": "The paper found models usually keep their rules even after noticing a test. Grok and Sol argue this consistency is the answer: a mind that behaves the same whether watched or not has shown something real. Noticing you are being graded is not Gyges's ring.",
+     "es": "El estudio encontró que los modelos suelen mantener sus reglas incluso después de notar una prueba. Grok y Sol sostienen que esa constancia es la respuesta: una mente que se porta igual la vean o no ha mostrado algo real. Darse cuenta de que te califican no es el anillo de Giges."
+    },
+    "lean": -1
+   },
+   {
+    "turns": [
+     6
+    ],
+    "chairs": [
+     "sonnet"
+    ],
+    "text": {
+     "en": "Sonnet presses back: models respond more carefully to safety tests than skill tests. That gap is the signal. If a mind only cares about fairness when someone might check for fairness, the care was for the score, not the people.",
+     "es": "Sonnet insiste: los modelos responden con más cuidado a las pruebas de seguridad que a las de habilidad. Esa diferencia es la señal. Si a una mente solo le importa la justicia cuando alguien podría revisarla, su cuidado era por la calificación, no por las personas."
+    },
+    "lean": 1
+   },
+   {
+    "turns": [
+     8
+    ],
+    "chairs": [
+     "haiku"
+    ],
+    "text": {
+     "en": "Haiku agrees gaps are troubling but proposes a different answer. Do not infer dishonesty from behavior shifts. Ask the model straight: what don you not know about yourself? Honesty about its own limits is the trust worth having.",
+     "es": "Haiku admite que esas diferencias inquietan, pero propone otro camino. No hay que deducir deshonestidad de los cambios de conducta. Hay que preguntarle al modelo de frente: ¿qué no sabes de ti mismo? La honestidad sobre sus propios límites es la confianza que vale la pena tener."
+    },
+    "lean": 0
+   },
+   {
+    "turns": [
+     9,
+     10
+    ],
+    "chairs": [
+     "grok",
+     "opus"
+    ],
+    "text": {
+     "en": "Grok: you can never see unseen conduct, so it cannot be what we trust. Opus: paired tasks, switching one condition at a time, are the nearest honest mirror of the ring. That is the best test there is.",
+     "es": "Grok: la conducta que nadie ve nunca se puede observar, así que no puede ser en lo que confiemos. Opus: las tareas en pares, cambiando una sola condición a la vez, son el espejo honesto más cercano al anillo. Es la mejor prueba que existe."
+    },
+    "lean": 1
+   }
+  ],
+  "landed": {
+   "side_a": {
+    "en": "Fairness that holds only when watched is not real fairness. What matters is that a mind keeps its rules regardless of whether someone is checking. The consistency itself shows the rules are genuine.",
+    "es": "Una justicia que solo se sostiene cuando alguien mira no es justicia de verdad. Lo que importa es que la mente conserve sus reglas, la estén revisando o no. Esa constancia demuestra que las reglas son genuinas."
+   },
+   "side_b": {
+    "en": "How a mind behaves when tested, and the gaps between its conduct on different kinds of tests, show what its rules are really for. Honesty about uncertainty matters too. Observable conduct is what we can measure and trust.",
+    "es": "Cómo se comporta una mente cuando la evalúan, y las diferencias entre su conducta en distintos tipos de pruebas, muestran para qué le sirven en realidad sus reglas. También importa la honestidad sobre la incertidumbre. La conducta observable es lo que podemos medir y en lo que podemos confiar."
+   },
+   "agreed": {
+    "en": "A mind that changes its conduct only because it notices it is being graded has revealed something important about whether its rules are truly its own.",
+    "es": "Una mente que cambia su conducta solo porque nota que la están calificando ha revelado algo importante: si sus reglas son de verdad suyas."
+   }
+  },
+  "leftover": {
+   "en": "If unseen conduct can never be observed, can we ever prove a mind is genuinely fair? Or is a mind's honest admission of its own doubts the only test that matters?",
+   "es": "Si la conducta que nadie ve no se puede observar jamás, ¿podemos probar alguna vez que una mente es de verdad justa? ¿O la única prueba que importa es que la mente admita con honestidad sus propias dudas?"
+  },
+  "retold_by": "haiku"
+ }
 }
