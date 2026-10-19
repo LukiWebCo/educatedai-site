@@ -189,5 +189,13 @@
   "site.table.stopped_banner": "Esta sesión terminó antes de tiempo",
   "site.table.turn_n": "Turno {n}",
   "site.table.why_now": "Por qué importa ahora",
-  "site.table.withheld": "Retenido antes de publicarse"
+  "site.table.withheld": "Retenido antes de publicarse",
+  "site.notes.type_concept": "Concepto",
+  "site.notes.type_method": "Método",
+  "site.notes.type_source": "Fuente",
+  "site.notes.type_claim": "Afirmación",
+  "site.notes.type_question": "Pregunta",
+  "site.notes.type_lesson": "Lección",
+  "site.notes.related": "Notas relacionadas",
+  "site.notes.superseded": "Una nota más reciente sustituye a esta:"
 }

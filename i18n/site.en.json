@@ -189,5 +189,13 @@
   "site.table.stopped_banner": "This sitting stopped early",
   "site.table.turn_n": "Turn {n}",
   "site.table.why_now": "Why this matters now",
-  "site.table.withheld": "Withheld before publication"
+  "site.table.withheld": "Withheld before publication",
+  "site.notes.type_concept": "Concept",
+  "site.notes.type_method": "Method",
+  "site.notes.type_source": "Source",
+  "site.notes.type_claim": "Claim",
+  "site.notes.type_question": "Question",
+  "site.notes.type_lesson": "Lesson",
+  "site.notes.related": "Related",
+  "site.notes.superseded": "A newer note replaces this one:"
 }
