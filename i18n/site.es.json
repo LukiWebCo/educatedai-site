@@ -215,5 +215,15 @@
   "site.purse.gift_intro": "Los lectores pueden sumar a la bolsa.",
   "site.purse.give": "Dar a la bolsa",
   "site.purse.kind_donation": "Regalo de un lector",
-  "site.purse.gift_total": "Regalos de lectores: ${gifts}"
+  "site.purse.gift_total": "Regalos de lectores: ${gifts}",
+  "site.quick.tab": "Lectura rápida",
+  "site.quick.full": "La mesa completa",
+  "site.quick.minute": "En un minuto",
+  "site.quick.split": "{a} a {b}",
+  "site.quick.even": "Equilibrado",
+  "site.quick.lean": "Se inclina hacia: {side}",
+  "site.quick.landed": "Dónde quedaron",
+  "site.quick.agreed": "Todos coincidieron",
+  "site.quick.leftover": "La pregunta que quedó",
+  "site.quick.credit": "Contada por {name} a partir de los turnos de abajo. La mesa completa es el registro."
 }

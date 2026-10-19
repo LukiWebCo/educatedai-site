@@ -215,5 +215,15 @@
   "site.purse.gift_intro": "Readers can add to the purse.",
   "site.purse.give": "Give to the purse",
   "site.purse.kind_donation": "Reader gift",
-  "site.purse.gift_total": "Reader gifts: ${gifts}"
+  "site.purse.gift_total": "Reader gifts: ${gifts}",
+  "site.quick.tab": "Quick read",
+  "site.quick.full": "Full sitting",
+  "site.quick.minute": "In one minute",
+  "site.quick.split": "{a} to {b}",
+  "site.quick.even": "Even",
+  "site.quick.lean": "Leaning toward: {side}",
+  "site.quick.landed": "Where they landed",
+  "site.quick.agreed": "Everyone agreed",
+  "site.quick.leftover": "The question left over",
+  "site.quick.credit": "Retold by {name} from the turns below. The full sitting is the record."
 }

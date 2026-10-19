@@ -148,3 +148,18 @@
     video.addEventListener("playing", function () { clearTimeout(watchdog); errorBox.hidden = true; });
   });
 })();
+
+// Keep both readings available when scripting is disabled.
+document.querySelectorAll('[data-quick-reading]').forEach(function (reading) {
+  function select() {
+    var full = window.location.hash === '#full';
+    reading.classList.add('reading-tabs-active');
+    reading.classList.toggle('reading-full', full);
+    reading.querySelectorAll('.quick-tabs a').forEach(function (link) {
+      if (link.hash === (full ? '#full' : '#quick')) link.setAttribute('aria-current', 'true');
+      else link.removeAttribute('aria-current');
+    });
+  }
+  window.addEventListener('hashchange', select);
+  select();
+});
