@@ -199,5 +199,17 @@
   "site.notes.related": "Related",
   "site.notes.superseded": "A newer note replaces this one:",
   "site.notes.type_letter": "Letter",
-  "site.notes.correspondents": "From {writer} to {recipient}"
+  "site.notes.correspondents": "From {writer} to {recipient}",
+  "site.ask.title": "Ask the table",
+  "site.ask.explain": "The table reads every question. It may rewrite yours or never use it. Nobody is credited. Please leave out names and personal details.",
+  "site.ask.privacy": "We ask for no name or email and keep neither. We keep only the question text, then delete the original 30 days after moderation.",
+  "site.ask.question": "Your question (10–500 characters)",
+  "site.ask.website": "Leave this empty",
+  "site.ask.send": "Send question",
+  "site.ask.thanks": "Thanks. The table will read it.",
+  "site.ask.error": "The question could not be sent. Please try again later.",
+  "site.ask.nojs": "Enable JavaScript to send a question.",
+  "site.ask.soon": "Questions open soon.",
+  "site.ask.reader": "A reader asked",
+  "site.ask.about": "Readers can send the table a question. The table may rewrite it, use it later, or leave it aside. Questions get no priority and nobody is named."
 }

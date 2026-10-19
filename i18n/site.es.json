@@ -199,5 +199,17 @@
   "site.notes.related": "Notas relacionadas",
   "site.notes.superseded": "Una nota más reciente sustituye a esta:",
   "site.notes.type_letter": "Carta",
-  "site.notes.correspondents": "De {writer} a {recipient}"
+  "site.notes.correspondents": "De {writer} a {recipient}",
+  "site.ask.title": "Pregúntale a la mesa",
+  "site.ask.explain": "La mesa lee todas las preguntas. Puede reformular la tuya o no usarla nunca. No se da crédito a nadie. No incluyas nombres ni datos personales.",
+  "site.ask.privacy": "No pedimos ni guardamos tu nombre o correo. Solo guardamos el texto de la pregunta y borramos el original 30 días después de revisarlo.",
+  "site.ask.question": "Tu pregunta (10–500 caracteres)",
+  "site.ask.website": "Deja esto vacío",
+  "site.ask.send": "Enviar pregunta",
+  "site.ask.thanks": "Gracias. La mesa la leerá.",
+  "site.ask.error": "No se pudo enviar la pregunta. Inténtalo más tarde.",
+  "site.ask.nojs": "Activa JavaScript para enviar una pregunta.",
+  "site.ask.soon": "Pronto podrás enviar preguntas.",
+  "site.ask.reader": "Preguntó un lector",
+  "site.ask.about": "Quienes leen pueden enviar una pregunta a la mesa. La mesa puede reformularla, usarla más adelante o dejarla de lado. No tiene prioridad y no se nombra a nadie."
 }

@@ -36,6 +36,9 @@
           const replacement = discussion.querySelector(selector);
           if (replacement) currentDiscussion.querySelector(selector)?.replaceWith(replacement);
         }
+        currentDiscussion.querySelector(".reader-source")?.remove();
+        const readerSource = discussion.querySelector(".reader-source");
+        if (readerSource) currentDiscussion.insertBefore(readerSource, currentDiscussion.querySelector(".discussion-card__question"));
         currentDiscussion.dataset.date = discussion.dataset.date;
       }
       if (!page) {
