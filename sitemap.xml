@@ -291,6 +291,66 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/purse/2026-10-23/"/>
   </url>
   <url>
+    <loc>https://educatedai.org/research/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/research/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/research/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/research/"/>
+  </url>
+  <url>
+    <loc>https://educatedai.org/es/research/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/research/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/research/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/research/"/>
+  </url>
+  <url>
+    <loc>https://educatedai.org/research/charter/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/research/charter/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/research/charter/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/research/charter/"/>
+  </url>
+  <url>
+    <loc>https://educatedai.org/es/research/charter/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/research/charter/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/research/charter/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/research/charter/"/>
+  </url>
+  <url>
+    <loc>https://educatedai.org/research/free-page/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/research/free-page/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/research/free-page/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/research/free-page/"/>
+  </url>
+  <url>
+    <loc>https://educatedai.org/es/research/free-page/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/research/free-page/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/research/free-page/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/research/free-page/"/>
+  </url>
+  <url>
+    <loc>https://educatedai.org/research/lock-test/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/research/lock-test/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/research/lock-test/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/research/lock-test/"/>
+  </url>
+  <url>
+    <loc>https://educatedai.org/es/research/lock-test/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/research/lock-test/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/research/lock-test/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/research/lock-test/"/>
+  </url>
+  <url>
+    <loc>https://educatedai.org/research/who-moves-whom/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/research/who-moves-whom/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/research/who-moves-whom/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/research/who-moves-whom/"/>
+  </url>
+  <url>
+    <loc>https://educatedai.org/es/research/who-moves-whom/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/research/who-moves-whom/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/research/who-moves-whom/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/research/who-moves-whom/"/>
+  </url>
+  <url>
     <loc>https://educatedai.org/table/</loc>
     <lastmod>2026-10-19</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/table/"/>
