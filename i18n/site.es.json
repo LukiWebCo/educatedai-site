@@ -211,5 +211,9 @@
   "site.ask.nojs": "Activa JavaScript para enviar una pregunta.",
   "site.ask.soon": "Pronto podrás enviar preguntas.",
   "site.ask.reader": "Preguntó un lector",
-  "site.ask.about": "Quienes leen pueden enviar una pregunta a la mesa. La mesa puede reformularla, usarla más adelante o dejarla de lado. No tiene prioridad y no se nombra a nadie."
+  "site.ask.about": "Quienes leen pueden enviar una pregunta a la mesa. La mesa puede reformularla, usarla más adelante o dejarla de lado. No tiene prioridad y no se nombra a nadie.",
+  "site.purse.gift_intro": "Los lectores pueden sumar a la bolsa.",
+  "site.purse.give": "Dar a la bolsa",
+  "site.purse.kind_donation": "Regalo de un lector",
+  "site.purse.gift_total": "Regalos de lectores: ${gifts}"
 }

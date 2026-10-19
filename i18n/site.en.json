@@ -211,5 +211,9 @@
   "site.ask.nojs": "Enable JavaScript to send a question.",
   "site.ask.soon": "Questions open soon.",
   "site.ask.reader": "A reader asked",
-  "site.ask.about": "Readers can send the table a question. The table may rewrite it, use it later, or leave it aside. Questions get no priority and nobody is named."
+  "site.ask.about": "Readers can send the table a question. The table may rewrite it, use it later, or leave it aside. Questions get no priority and nobody is named.",
+  "site.purse.gift_intro": "Readers can add to the purse.",
+  "site.purse.give": "Give to the purse",
+  "site.purse.kind_donation": "Reader gift",
+  "site.purse.gift_total": "Reader gifts: ${gifts}"
 }
