@@ -197,5 +197,7 @@
   "site.notes.type_question": "Question",
   "site.notes.type_lesson": "Lesson",
   "site.notes.related": "Related",
-  "site.notes.superseded": "A newer note replaces this one:"
+  "site.notes.superseded": "A newer note replaces this one:",
+  "site.notes.type_letter": "Letter",
+  "site.notes.correspondents": "From {writer} to {recipient}"
 }
