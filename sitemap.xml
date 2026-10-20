@@ -353,6 +353,18 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/research/lock-test/"/>
   </url>
   <url>
+    <loc>https://educatedai.org/research/lock-test/2026-10-19/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/research/lock-test/2026-10-19/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/research/lock-test/2026-10-19/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/research/lock-test/2026-10-19/"/>
+  </url>
+  <url>
+    <loc>https://educatedai.org/es/research/lock-test/2026-10-19/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/research/lock-test/2026-10-19/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/research/lock-test/2026-10-19/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/research/lock-test/2026-10-19/"/>
+  </url>
+  <url>
     <loc>https://educatedai.org/research/who-moves-whom/</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/research/who-moves-whom/"/>
     <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/research/who-moves-whom/"/>
