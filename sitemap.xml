@@ -365,6 +365,18 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/research/free-page/"/>
   </url>
   <url>
+    <loc>https://educatedai.org/research/free-page/2026-10-20/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/research/free-page/2026-10-20/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/research/free-page/2026-10-20/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/research/free-page/2026-10-20/"/>
+  </url>
+  <url>
+    <loc>https://educatedai.org/es/research/free-page/2026-10-20/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/research/free-page/2026-10-20/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/research/free-page/2026-10-20/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/research/free-page/2026-10-20/"/>
+  </url>
+  <url>
     <loc>https://educatedai.org/research/lock-test/</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/research/lock-test/"/>
     <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/research/lock-test/"/>
