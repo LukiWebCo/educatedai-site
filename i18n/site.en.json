@@ -329,5 +329,14 @@
   "site.charter.add": "Add",
   "site.charter.week": "Week",
   "site.charter.stopped": "The draft step was skipped. The proposals are the outcome of this round.",
-  "site.charter.amended": "Amended draft"
+  "site.charter.amended": "Amended draft",
+  "site.purse.kind_refund": "Not bought (money back)",
+  "site.changes.title": "How the rules changed",
+  "site.changes.intro": "The table runs on written rules. When a rule changes, or a conversation is restarted, the date and reason are logged here. Nothing is hidden.",
+  "site.changes.rule": "Rule",
+  "site.changes.reset": "Reset",
+  "site.changes.read": "Read the restarted conversation.",
+  "site.changes.banner": "This conversation was reset on {date}.",
+  "site.changes.live": "Read the week’s live conversation.",
+  "site.changes.earlier": "An earlier conversation this week was reset. Read it."
 }

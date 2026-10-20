@@ -147,6 +147,18 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/chairs/sonnet/"/>
   </url>
   <url>
+    <loc>https://educatedai.org/changes/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/changes/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/changes/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/changes/"/>
+  </url>
+  <url>
+    <loc>https://educatedai.org/es/changes/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/changes/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/changes/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/changes/"/>
+  </url>
+  <url>
     <loc>https://educatedai.org/family/</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/family/"/>
     <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/family/"/>
@@ -303,6 +315,18 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/purse/2026-10-23/"/>
     <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/purse/2026-10-23/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/purse/2026-10-23/"/>
+  </url>
+  <url>
+    <loc>https://educatedai.org/purse/resets/2026-10-23-1/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/purse/resets/2026-10-23-1/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/purse/resets/2026-10-23-1/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/purse/resets/2026-10-23-1/"/>
+  </url>
+  <url>
+    <loc>https://educatedai.org/es/purse/resets/2026-10-23-1/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/purse/resets/2026-10-23-1/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/purse/resets/2026-10-23-1/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/purse/resets/2026-10-23-1/"/>
   </url>
   <url>
     <loc>https://educatedai.org/research/</loc>

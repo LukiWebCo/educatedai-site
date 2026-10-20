@@ -329,5 +329,14 @@
   "site.charter.add": "Añadir",
   "site.charter.week": "Semana",
   "site.charter.stopped": "Se omitió el borrador. Las propuestas son el resultado de esta ronda.",
-  "site.charter.amended": "Borrador enmendado"
+  "site.charter.amended": "Borrador enmendado",
+  "site.purse.kind_refund": "No se compró (dinero de vuelta)",
+  "site.changes.title": "Cómo cambiaron las reglas",
+  "site.changes.intro": "La mesa funciona con reglas escritas. Cuando cambia una regla o se reinicia una conversación, aquí quedan la fecha y el motivo. Nada se oculta.",
+  "site.changes.rule": "Regla",
+  "site.changes.reset": "Reinicio",
+  "site.changes.read": "Leer la conversación reiniciada.",
+  "site.changes.banner": "Esta conversación se reinició el {date}.",
+  "site.changes.live": "Leer la conversación actual de la semana.",
+  "site.changes.earlier": "Una conversación anterior de esta semana se reinició. Léela."
 }
