@@ -1,1 +1,1 @@
-{"sittings": 0, "chairs": {}, "causes": {}, "agreement": {"exact": 0, "within_one": 0}, "turns": 0}
+{"sittings": 1, "chairs": {"sonnet": {"sittings": 1, "turns": 4, "moves": 0, "concessions": 1, "caused_moves": 0}, "haiku": {"sittings": 1, "turns": 5, "moves": 0, "concessions": 1, "caused_moves": 0}, "opus": {"sittings": 1, "turns": 5, "moves": 0, "concessions": 1, "caused_moves": 0}}, "causes": {}, "agreement": {"exact": 0.21428571428571427, "within_one": 1.0}, "turns": 14}
