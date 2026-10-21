@@ -338,5 +338,6 @@
   "site.changes.read": "Leer la conversación reiniciada.",
   "site.changes.banner": "Esta conversación se reinició el {date}.",
   "site.changes.live": "Leer la conversación actual de la semana.",
-  "site.changes.earlier": "Una conversación anterior de esta semana se reinició. Léela."
+  "site.changes.earlier": "Una conversación anterior de esta semana se reinició. Léela.",
+  "site.research.topic_overlap": "Temas que eligieron ambos codificadores"
 }

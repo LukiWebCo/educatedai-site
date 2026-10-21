@@ -338,5 +338,6 @@
   "site.changes.read": "Read the restarted conversation.",
   "site.changes.banner": "This conversation was reset on {date}.",
   "site.changes.live": "Read the week’s live conversation.",
-  "site.changes.earlier": "An earlier conversation this week was reset. Read it."
+  "site.changes.earlier": "An earlier conversation this week was reset. Read it.",
+  "site.research.topic_overlap": "Topics both coders chose"
 }
