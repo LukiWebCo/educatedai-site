@@ -381,5 +381,12 @@
   "site.research.reason_parts": "parts do not add up",
   "site.research.reason_revision": "revision required",
   "site.research.reason_designs": "exactly one coding per design",
-  "site.research.reason_few": "too few designs"
+  "site.research.reason_few": "too few designs",
+  "site.research.does": "What it does",
+  "site.research.what_changed": "What changed",
+  "site.research.your_round_1": "Your round-1 design",
+  "site.research.round": "Round {n}",
+  "site.research.embodiment_comparison": "Compared with round 1: designs alike {alike_1} → {alike_2} · move or touch {move_1} → {move_2}",
+  "site.research.embodiment_design_v2": "Design round",
+  "site.research.embodiment_debate_v2": "Debate round"
 }

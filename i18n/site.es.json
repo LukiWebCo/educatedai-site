@@ -381,5 +381,12 @@
   "site.research.reason_parts": "los componentes no suman el total",
   "site.research.reason_revision": "se requiere una revisión",
   "site.research.reason_designs": "exactamente una codificación por diseño",
-  "site.research.reason_few": "muy pocos diseños"
+  "site.research.reason_few": "muy pocos diseños",
+  "site.research.does": "Lo que hace",
+  "site.research.what_changed": "Qué cambió",
+  "site.research.your_round_1": "Tu diseño de la ronda 1",
+  "site.research.round": "Ronda {n}",
+  "site.research.embodiment_comparison": "En comparación con la ronda 1: semejanza entre diseños {alike_1} → {alike_2} · movimiento o tacto {move_1} → {move_2}",
+  "site.research.embodiment_design_v2": "Ronda de diseño",
+  "site.research.embodiment_debate_v2": "Ronda de discusión"
 }
