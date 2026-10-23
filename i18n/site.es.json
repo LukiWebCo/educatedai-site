@@ -412,5 +412,12 @@
   "site.research.v3_core_row": "Ronda 3 con la carta",
   "site.research.v3_coder": "Codificador",
   "site.research.v3_rationale": "Justificación",
-  "site.research.v3_memory": "Memoria"
+  "site.research.v3_memory": "Memoria",
+  "site.data.title": "Datos abiertos",
+  "site.data.name": "Archivo",
+  "site.data.size": "Tamaño",
+  "site.data.download": "Descargar",
+  "site.data.bytes": "{count} bytes",
+  "site.data.generated": "Generado:",
+  "site.data.research": "Los datos detrás de estos estudios"
 }

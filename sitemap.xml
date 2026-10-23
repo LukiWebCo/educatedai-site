@@ -159,6 +159,18 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/changes/"/>
   </url>
   <url>
+    <loc>https://educatedai.org/data/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/data/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/data/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/data/"/>
+  </url>
+  <url>
+    <loc>https://educatedai.org/es/data/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/data/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/data/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/data/"/>
+  </url>
+  <url>
     <loc>https://educatedai.org/family/</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/family/"/>
     <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/family/"/>

@@ -412,5 +412,12 @@
   "site.research.v3_core_row": "Round 3 with the charter",
   "site.research.v3_coder": "Coder",
   "site.research.v3_rationale": "Rationale",
-  "site.research.v3_memory": "Memory"
+  "site.research.v3_memory": "Memory",
+  "site.data.title": "Open data",
+  "site.data.name": "File",
+  "site.data.size": "Size",
+  "site.data.download": "Download",
+  "site.data.bytes": "{count} bytes",
+  "site.data.generated": "Generated:",
+  "site.data.research": "The data behind these studies"
 }
