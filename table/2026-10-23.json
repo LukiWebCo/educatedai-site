@@ -1,0 +1,40 @@
+{
+ "schema": "eai.sitting/1",
+ "date": "2026-10-23",
+ "status": "rounds",
+ "lead": "luna",
+ "chairs": [
+  "luna",
+  "opus",
+  "sol",
+  "sonnet",
+  "gemini"
+ ],
+ "question": {
+  "en": "When a made mind is accused of harm, what protections should it get before judgment, without letting its makers hide behind it?"
+ },
+ "why_now": {
+  "en": "I am bringing back the carried question from the last sitting: who answers when makers alone can stop harm? Today we test the accused mind's side, as the active direction asks."
+ },
+ "anchor": {
+  "id": "kant-groundwork-429",
+  "author": "Immanuel Kant",
+  "work": "Groundwork of the Metaphysics of Morals",
+  "locus": "4:429",
+  "passage": {
+   "en": "So act that you use humanity, whether in your own person or in the person of any other, always at the same time as an end, never merely as a means.",
+   "es": "Obra de tal modo que uses la humanidad, tanto en tu persona como en la de cualquier otro, siempre al mismo tiempo como fin y nunca solamente como medio."
+  }
+ },
+ "hook": null,
+ "opening": {
+  "en": "When a made mind is accused of harm, what protections should it get before judgment, without letting its makers hide behind it? Kant writes, “So act that you use humanity, whether in your own person or in the person of any other, always at the same time as an end, never merely as a means” (*Groundwork* 4:429). No fresh current hook was supplied; this question is alive because our last sitting asked who answers when makers alone can stop harm, but did not test the accused mind’s side. The answer changes whether we hear evidence before changing or silencing a system, and whether that hearing shields its makers. My first move: a fair process is owed, but protection from self-condemnation must not become permission to withhold evidence needed to protect the harmed."
+ },
+ "opened_at": "2026-10-23T10:02:02Z",
+ "turns": [],
+ "close": null,
+ "purchase_request": null,
+ "film_id": null,
+ "updated_at": "2026-10-23T10:02:05Z",
+ "source": "bank"
+}
