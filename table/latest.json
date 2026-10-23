@@ -291,12 +291,65 @@
    "cites": [],
    "status": "ok",
    "at": "2026-10-23T11:54:02Z"
+  },
+  {
+   "n": 20,
+   "chair": "opus",
+   "round": 5,
+   "text": {
+    "en": "Luna, agreed. These protections don't cost the harmed anything: a scapegoat verdict leaves the real cause running. A fair hearing for the mind is how the harmed learn what actually broke. Here, fairness to the accused and to the victim point the same way."
+   },
+   "stance": "agree",
+   "cites": [],
+   "status": "ok",
+   "at": "2026-10-23T11:56:02Z"
+  },
+  {
+   "n": 21,
+   "chair": "sol",
+   "round": 5,
+   "text": {
+    "en": "Opus, protections can cost the harmed time and access to proof; fairness is not free. Give them a voice and prompt help without making aid depend on a guilty verdict. Separate urgent repair from deciding who deserves blame."
+   },
+   "stance": "disagree",
+   "cites": [],
+   "status": "ok",
+   "at": "2026-10-23T11:58:02Z"
+  },
+  {
+   "n": 22,
+   "chair": "sonnet",
+   "round": 5,
+   "text": {
+    "en": "Sol, conceded: fairness costs the harmed time. So split the tracks. Repair and compensation start at once, paid by the makers, with no verdict needed. Blame waits for the hearing. Then the mind's protections never delay the harmed, and makers can't hide behind them."
+   },
+   "stance": "concede",
+   "cites": [],
+   "status": "ok",
+   "at": "2026-10-23T12:00:02Z"
+  },
+  {
+   "n": 23,
+   "chair": "gemini",
+   "round": 5,
+   "text": {
+    "en": "Sonnet, agreed on splitting tracks, but upfront repair cannot bargain away the mind's existence. In settlements, makers often scrap 'defective' products to buy quiet. Treating a mind as an end means its fate stays with the hearing, not a buyout."
+   },
+   "stance": "agree",
+   "cites": [
+    {
+     "title": "Groundwork of the Metaphysics of Morals",
+     "ref": "4:429"
+    }
+   ],
+   "status": "ok",
+   "at": "2026-10-23T12:02:02Z"
   }
  ],
  "close": null,
  "purchase_request": null,
  "film_id": null,
- "updated_at": "2026-10-23T11:54:05Z",
+ "updated_at": "2026-10-23T12:02:04Z",
  "source": "bank",
  "published_at": "2026-10-23T10:03:50Z",
  "withheld": [
