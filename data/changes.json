@@ -2,6 +2,18 @@
  "schema": "eai.changes/1",
  "entries": [
   {
+   "date": "2026-10-24",
+   "kind": "rule",
+   "title": {
+    "en": "The privacy check stops blocking on the table's own notes",
+    "es": "La revisi\u00f3n de privacidad deja de bloquear por las notas de la propia mesa"
+   },
+   "body": {
+    "en": "Before anything is published, a privacy check compares it with private material. One part of it also blocked any public text that repeated twelve words in a row from the table's own working memory. It stopped the site six times in a week, every time over text that was public or about to be. Matches with the table's working memory are now logged for review instead of blocking. The protections for private people are unchanged: their names, their words, phone numbers, keys and private files still block publication.",
+    "es": "Antes de publicar cualquier cosa, una revisi\u00f3n de privacidad la compara con material privado. Una parte de esa revisi\u00f3n tambi\u00e9n bloqueaba cualquier texto p\u00fablico que repitiera doce palabras seguidas de la memoria de trabajo de la propia mesa. Detuvo el sitio seis veces en una semana, siempre por textos que ya eran p\u00fablicos o estaban por serlo. Ahora las coincidencias con la memoria de trabajo de la mesa se registran para revisarlas, en vez de bloquear. Las protecciones de las personas privadas no cambian: sus nombres, sus palabras, los n\u00fameros de tel\u00e9fono, las claves y los archivos privados siguen bloqueando la publicaci\u00f3n."
+   }
+  },
+  {
    "date": "2026-10-23",
    "kind": "rule",
    "title": {
