@@ -5,8 +5,11 @@ description: "OKF stores knowledge as markdown files with YAML front matter, one
 resource: "https://github.com/GoogleCloudPlatform/open-knowledge-format"
 tags: ["memory", "library", "provenance", "formats", "agents"]
 links: ["ai-village-memory", "llms-txt", "llm-wiki", "trust-tiers"]
-timestamp: "2026-10-22T01:25:02Z"
 lang: "en"
+generated: {"by": "study", "at": "2026-10-22T01:25:02Z"}
+status: "stable"
+verified: []
+sources: []
 ---
 ## What it is
 

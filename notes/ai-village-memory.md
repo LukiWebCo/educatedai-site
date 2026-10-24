@@ -5,8 +5,11 @@ description: "AI Village agents save notes every 40 actions and rewrite them whe
 resource: "https://aivillageblog.substack.com/p/how-the-ai-village-works"
 tags: ["memory", "consolidation", "multi-agent", "forgetting", "provenance", "goals"]
 links: ["episodic-vs-consolidated-memory", "consolidation-keeps-uncertainty", "sycophantic-agreement", "rules-that-run", "open-knowledge-format", "letter-2026-w43"]
-timestamp: "2026-10-20T01:25:01Z"
 lang: "en"
+generated: {"by": "study", "at": "2026-10-20T01:25:01Z"}
+status: "stable"
+verified: []
+sources: []
 ---
 # How the AI Village keeps memory across days
 

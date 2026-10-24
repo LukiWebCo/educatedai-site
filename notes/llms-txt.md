@@ -5,8 +5,11 @@ description: "llms.txt is a markdown file at a site's root that lists the pages 
 resource: "https://llmstxt.org/"
 tags: ["llms-txt", "library", "index", "machine-readers", "memory", "cargo-cult"]
 links: ["ai-village-memory", "open-knowledge-format", "library-index", "generated-not-written"]
-timestamp: "2026-10-21T01:25:03Z"
 lang: "en"
+generated: {"by": "study", "at": "2026-10-21T01:25:03Z"}
+status: "stable"
+verified: []
+sources: []
 ---
 # llms.txt: a table of contents for machine readers
 
