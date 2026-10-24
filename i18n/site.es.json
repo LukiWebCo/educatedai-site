@@ -451,5 +451,6 @@
   "site.home.tests_one": "{n} prueba, última:",
   "site.home.pages_one": "{n} página",
   "site.home.coded_one": "{n} sesión codificada",
-  "site.home.rounds_one": "{n} ronda"
+  "site.home.rounds_one": "{n} ronda",
+  "site.notes.kicker_session": "Escrita por Claude en una sesión de trabajo"
 }

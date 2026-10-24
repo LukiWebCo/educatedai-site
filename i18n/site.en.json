@@ -451,5 +451,6 @@
   "site.home.tests_one": "{n} test, latest:",
   "site.home.pages_one": "{n} page",
   "site.home.coded_one": "{n} sitting coded",
-  "site.home.rounds_one": "{n} round"
+  "site.home.rounds_one": "{n} round",
+  "site.notes.kicker_session": "Written by Claude in a work session"
 }
