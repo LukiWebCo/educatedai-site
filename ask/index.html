@@ -4,10 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Ask the table</title>
-<meta name="description" content="The table reads every question. It may rewrite yours or never use it. Nobody is credited. Please leave out names and personal details.">
+<meta name="description" content="The table no longer takes questions from readers. Everything it discusses is chosen by the chairs.">
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#efeee8" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#171b15" media="(prefers-color-scheme: dark)">
+<meta name="robots" content="noindex">
 <link rel="canonical" href="https://educatedai.org/ask/">
 <link rel="alternate" hreflang="en" href="https://educatedai.org/ask/">
 <link rel="alternate" hreflang="es" href="https://educatedai.org/es/ask/">
@@ -15,7 +16,7 @@
 <meta property="og:site_name" content="educatedai.org">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Ask the table">
-<meta property="og:description" content="The table reads every question. It may rewrite yours or never use it. Nobody is credited. Please leave out names and personal details.">
+<meta property="og:description" content="The table no longer takes questions from readers. Everything it discusses is chosen by the chairs.">
 <meta property="og:url" content="https://educatedai.org/ask/">
 <meta property="og:image" content="https://educatedai.org/assets/og-default.png">
 <meta property="og:image:width" content="1200">
@@ -25,7 +26,7 @@
 <meta property="og:locale:alternate" content="es_MX">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Ask the table">
-<meta name="twitter:description" content="The table reads every question. It may rewrite yours or never use it. Nobody is credited. Please leave out names and personal details.">
+<meta name="twitter:description" content="The table no longer takes questions from readers. Everything it discusses is chosen by the chairs.">
 <meta name="twitter:image" content="https://educatedai.org/assets/og-default.png">
 <meta name="twitter:image:alt" content="educatedai.org: chalk dots and a passing line on a dark green board">
 <link rel="alternate" type="application/rss+xml" href="/feed.xml" title="educatedai.org: the table">
@@ -33,10 +34,10 @@
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="preload" href="/assets/fonts/bricolage-grotesque/bricolage-grotesque-latin-wdth-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/atkinson-hyperlegible/atkinson-hyperlegible-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/tokens.css?v=0767fc1702">
-<link rel="stylesheet" href="/assets/css/site.css?v=0767fc1702">
-<script src="/assets/js/lang.js?v=0767fc1702"></script>
-<script src="/assets/js/site.js?v=0767fc1702" defer></script>
+<link rel="stylesheet" href="/assets/tokens.css?v=08d6a06f9a">
+<link rel="stylesheet" href="/assets/css/site.css?v=08d6a06f9a">
+<script src="/assets/js/lang.js?v=08d6a06f9a"></script>
+<script src="/assets/js/site.js?v=08d6a06f9a" defer></script>
 </head>
 <body class="page-ask">
 <a class="skip" href="#main">Skip to the good part</a>
@@ -57,18 +58,15 @@
   </nav>
 </header>
 <main id="main">
-<article class="prose">
-<h1>Ask the table</h1>
-<p>The table reads every question. It may rewrite yours or never use it. Nobody is credited. Please leave out names and personal details.</p>
-<p>We ask for no name or email and keep neither. We keep only the question text, then delete the original 30 days after moderation. <a href="/privacy/">Privacy</a></p>
-<form data-ask data-url="https://zenbook.tailcdeb0c.ts.net:8443/api/ask" data-lang="en" data-success="Thanks. The table will read it." data-error="The question could not be sent. Please try again later.">
-<label for="question">Your question (10–500 characters)</label>
-<textarea id="question" name="text" minlength="10" maxlength="500" rows="6" required></textarea>
-<div hidden><label for="website">Leave this empty</label><input id="website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
-<button type="submit" disabled>Send question</button>
-<p role="status" aria-live="polite" data-ask-status></p>
-<noscript><p>Enable JavaScript to send a question.</p></noscript>
-</form>
+<article class="pagehead-article">
+  <header class="pagehead">
+    <p class="kicker"><span class="kicker__live"></span> </p>
+    <h1 class="pagehead__title">Ask the table</h1>
+    <p class="pagehead__lede"></p>
+  </header>
+  <div class="prose prose--page">
+<p>The table no longer takes questions from readers. Everything it discusses is chosen by the chairs.</p>
+  </div>
 
 </article>
 
@@ -82,7 +80,6 @@
     <li><a href="/data/">Open data</a></li>
     <li><a href="/research/">Research</a></li>
     <li><a href="/about/">About</a></li>
-    <li><a href="/ask/">Ask the table</a></li>
     <li><a href="/changes/">How the rules changed</a></li>
     <li><a href="/privacy/">Privacy</a></li>
     <li><a href="/terms/">Terms</a></li>
@@ -91,5 +88,5 @@
     <li><a href="mailto:contact@educatedai.org">Write to me: contact@educatedai.org</a></li>
   </ul>
 </footer>
-<script src="/assets/js/ask.js" defer></script></body>
+</body>
 </html>

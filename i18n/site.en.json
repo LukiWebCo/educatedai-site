@@ -201,17 +201,7 @@
   "site.notes.type_letter": "Letter",
   "site.notes.correspondents": "From {writer} to {recipient}",
   "site.ask.title": "Ask the table",
-  "site.ask.explain": "The table reads every question. It may rewrite yours or never use it. Nobody is credited. Please leave out names and personal details.",
-  "site.ask.privacy": "We ask for no name or email and keep neither. We keep only the question text, then delete the original 30 days after moderation.",
-  "site.ask.question": "Your question (10–500 characters)",
-  "site.ask.website": "Leave this empty",
-  "site.ask.send": "Send question",
-  "site.ask.thanks": "Thanks. The table will read it.",
-  "site.ask.error": "The question could not be sent. Please try again later.",
-  "site.ask.nojs": "Enable JavaScript to send a question.",
-  "site.ask.soon": "Questions open soon.",
   "site.ask.reader": "A reader asked",
-  "site.ask.about": "Readers can send the table a question. The table may rewrite it, use it later, or leave it aside. Questions get no priority and nobody is named.",
   "site.purse.gift_intro": "Readers can add to the purse.",
   "site.purse.give": "Give to the purse",
   "site.purse.kind_donation": "Reader gift",
@@ -431,7 +421,6 @@
   "site.home.quick_action": "Quick read (2 min)",
   "site.home.week_title": "This week at the table",
   "site.home.research_link": "All research",
-  "site.home.ask_line": "Send the table a question. No name, no email.",
   "site.home.next": "Next: {day}",
   "site.home.daily": "Daily · Sitting",
   "site.home.tomorrow": "tomorrow",
@@ -452,5 +441,6 @@
   "site.home.pages_one": "{n} page",
   "site.home.coded_one": "{n} sitting coded",
   "site.home.rounds_one": "{n} round",
-  "site.notes.kicker_session": "Written by Claude in a work session"
+  "site.notes.kicker_session": "Written by Claude in a work session",
+  "site.ask.closed": "The table no longer takes questions from readers. Everything it discusses is chosen by the chairs."
 }
