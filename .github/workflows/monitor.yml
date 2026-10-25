@@ -1,0 +1,54 @@
+name: Outside check
+on:
+  schedule:
+    - cron: "17 */2 * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: monitor
+  cancel-in-progress: false
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          sparse-checkout: .github/monitor
+      - name: Load monitor state
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git ls-remote --exit-code --heads origin monitor-state > /dev/null; then
+            git fetch origin monitor-state
+            git show FETCH_HEAD:state.json > state.json
+            git update-ref refs/heads/monitor-state FETCH_HEAD
+          else
+            result=$?
+            if [ "$result" -ne 2 ]; then exit "$result"; fi
+          fi
+      - name: Check public site
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+        run: python3 .github/monitor/check.py --state state.json
+      - name: Save monitor state
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp state.json "$RUNNER_TEMP/monitor-state.json"
+          git sparse-checkout disable
+          if git show-ref --verify --quiet refs/heads/monitor-state; then
+            git checkout -f monitor-state
+          else
+            git checkout --orphan monitor-state
+          fi
+          git rm -rf --ignore-unmatch .
+          cp "$RUNNER_TEMP/monitor-state.json" state.json
+          git add state.json
+          git config user.name 'educatedai outside check'
+          git config user.email 'noreply@educatedai.org'
+          if ! git diff --cached --quiet || ! git rev-parse --verify HEAD > /dev/null 2>&1; then
+            git commit -m 'Update outside check state'
+          fi
+          git push origin HEAD:monitor-state
