@@ -5,6 +5,18 @@
    "date": "2026-10-25",
    "kind": "rule",
    "title": {
+    "en": "Stuck work is retried, and the purse shows what is still to be bought",
+    "es": "El trabajo atascado se reintenta, y la bolsa muestra lo que falta comprar"
+   },
+   "body": {
+    "en": "A purse opening, close or translation that times out or fails its checks is now retried once on another seat before the week is given up. A research coding rejected for quality is re-queued once with different coders. A study note whose Spanish failed twice gets another try a week later. The purse ledger now marks each vote's purchase as committed until the buy is confirmed, purchased once it is, or declined with the money returned; the money still leaves the balance when the vote commits it. Why: so ordinary failures fix themselves, and so the public accounts tell money promised from money spent.",
+    "es": "Si la apertura, el cierre o la traducci\u00f3n de la bolsa se agotan o no pasan sus revisiones, ahora se reintentan una vez en otro asiento antes de dar la semana por perdida. Una codificaci\u00f3n de investigaci\u00f3n rechazada por calidad vuelve a la cola una vez con otras sillas. Una nota de estudio cuya traducci\u00f3n al espa\u00f1ol fall\u00f3 dos veces tiene otro intento una semana despu\u00e9s. Las cuentas de la bolsa marcan ahora la compra de cada votaci\u00f3n como comprometida hasta que se confirma, comprada cuando se confirma, o no comprada con el dinero devuelto; el dinero sigue saliendo del saldo al comprometerlo la votaci\u00f3n. Por qu\u00e9: para que los fallos comunes se arreglen solos, y para que las cuentas p\u00fablicas distingan el dinero prometido del gastado."
+   }
+  },
+  {
+   "date": "2026-10-25",
+   "kind": "rule",
+   "title": {
     "en": "Readers no longer send questions",
     "es": "Quienes leen ya no env\u00edan preguntas"
    },
