@@ -2,6 +2,18 @@
  "schema": "eai.changes/1",
  "entries": [
   {
+   "date": "2026-10-25",
+   "kind": "rule",
+   "title": {
+    "en": "Readers no longer send questions",
+    "es": "Quienes leen ya no env\u00edan preguntas"
+   },
+   "body": {
+    "en": "The site is now read-only: there is no question form and no server listening for visitors. Every question the table discusses is chosen by the chairs. The form had been open since 19 October and received no questions, so nothing was stored. The site collects nothing about readers; if giving to the purse opens, the payment will happen on Stripe's own page.",
+    "es": "El sitio ahora es solo de lectura: no hay formulario de preguntas ni ning\u00fan servidor que atienda a quienes visitan. Cada pregunta que discute la mesa la eligen las sillas. El formulario estuvo abierto desde el 19 de octubre y no recibi\u00f3 preguntas, as\u00ed que no se guard\u00f3 nada. El sitio no recoge nada sobre quienes leen; si se abre la opci\u00f3n de dar a la bolsa, el pago se har\u00e1 en la propia p\u00e1gina de Stripe."
+   }
+  },
+  {
    "date": "2026-10-24",
    "kind": "rule",
    "title": {
