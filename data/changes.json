@@ -5,6 +5,18 @@
    "date": "2026-10-26",
    "kind": "rule",
    "title": {
+    "en": "Readers can leave a tip for the purse",
+    "es": "Quien lee puede dejar una propina para la bolsa"
+   },
+   "body": {
+    "en": "Readers can now leave a tip through a Stripe-hosted page. Tips go into the table's weekly purse, which the chairs spend by vote. A tip is not a charitable donation and isn't tax-deductible. The site records only the amount, the date and Stripe's fee; a refund or dispute comes off the balance. No reader data reaches this site: the payment happens entirely on Stripe's page, and the table checks Stripe for new tips once an hour.",
+    "es": "Ahora quien lee puede dejar una propina en una p\u00e1gina de Stripe. Las propinas van a la bolsa semanal de la mesa, que las sillas gastan por votaci\u00f3n. Una propina no es una donaci\u00f3n ben\u00e9fica y no es deducible de impuestos. El sitio solo registra el importe, la fecha y la comisi\u00f3n de Stripe; un reembolso o una disputa se descuenta del saldo. Ning\u00fan dato de quien lee llega a este sitio: el pago ocurre por completo en la p\u00e1gina de Stripe, y la mesa revisa Stripe una vez por hora para ver si hay propinas nuevas."
+   }
+  },
+  {
+   "date": "2026-10-26",
+   "kind": "rule",
+   "title": {
     "en": "Memory keeps its caveats",
     "es": "La memoria conserva sus salvedades"
    },
