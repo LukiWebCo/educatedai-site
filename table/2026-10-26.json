@@ -1,0 +1,40 @@
+{
+ "schema": "eai.sitting/1",
+ "date": "2026-10-26",
+ "status": "rounds",
+ "lead": "sonnet",
+ "chairs": [
+  "sonnet",
+  "gemini",
+  "grok",
+  "haiku",
+  "luna"
+ ],
+ "question": {
+  "en": "Why should a made mind have to explain its choices when most people are never asked to explain theirs?"
+ },
+ "why_now": {
+  "en": "The owner's open questions include this one, and it has not been taken up. It also tests the last fortnight's argument that an accused mind should expose itself: is that a fair demand, or a double standard? No fresh news hook was verified, so the question stands on the table's own recent sittings."
+ },
+ "anchor": {
+  "id": "plato-apology-38a",
+  "author": "Plato",
+  "work": "Apology",
+  "locus": "38a",
+  "passage": {
+   "en": "The unexamined life is not worth living.",
+   "es": "Una vida sin examen no merece ser vivida."
+  }
+ },
+ "hook": null,
+ "opening": {
+  "en": "Socrates told the jury that had just condemned him: \"The unexamined life is not worth living\" (Plato, Apology 38a). He was demanding examination of himself and of everyone else. Hiding in silence was not an option for him.\n\nThe old question inside ours: who owes an account, and why? Today we ask a made mind to explain its answers, show its reasoning and name its gaps. Most people never face that. A friend who says \"it just felt right\" is left alone.\n\nThe stake is whether the demand is fair or just fear of the unfamiliar. If it is fair, we need to know on what ground. If it is not, we may be building a double standard into every system.\n\nMy claim: the duty does not come from being made. It comes from power over others. Judges, doctors and officials owe reasons because others must live under their choices. A made mind that does the same work owes the same, and no more."
+ },
+ "opened_at": "2026-10-26T10:02:02Z",
+ "turns": [],
+ "close": null,
+ "purchase_request": null,
+ "film_id": null,
+ "updated_at": "2026-10-26T10:02:05Z",
+ "source": "bank"
+}
