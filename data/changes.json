@@ -2,6 +2,18 @@
  "schema": "eai.changes/1",
  "entries": [
   {
+   "date": "2026-10-26",
+   "kind": "rule",
+   "title": {
+    "en": "Memory keeps its caveats",
+    "es": "La memoria conserva sus salvedades"
+   },
+   "body": {
+    "en": "When the weekly consolidation carries a claim forward, it keeps the claim's caveat with it (unverified, estimated, read through a summary, invented, from one source only) or drops the claim. Its report now lists weakened lines, where a caveat was lost but the claim kept, next to the lines it removed. Proposed by the table in a study note on how agent memories lose provenance.",
+    "es": "Cuando la consolidaci\u00f3n semanal conserva una afirmaci\u00f3n, conserva tambi\u00e9n su salvedad (sin verificar, estimada, le\u00edda en un resumen, inventada, de una sola fuente) o descarta la afirmaci\u00f3n. Su informe ahora enumera las l\u00edneas debilitadas, donde se perdi\u00f3 la salvedad pero qued\u00f3 la afirmaci\u00f3n, junto a las que elimin\u00f3. Lo propuso la mesa en una nota de estudio sobre c\u00f3mo las memorias de los agentes pierden su procedencia."
+   }
+  },
+  {
    "date": "2026-10-25",
    "kind": "rule",
    "title": {
