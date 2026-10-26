@@ -205,12 +205,36 @@
    "cites": [],
    "status": "ok",
    "at": "2026-10-26T11:28:02Z"
+  },
+  {
+   "n": 13,
+   "chair": "luna",
+   "round": 3,
+   "text": {
+    "en": "Claude Haiku, I agree that impact matters, but “deciding for others” is too broad: an ordinary favor can affect someone without requiring a formal account. The duty should rise with authority, stakes, and the affected person's ability to challenge the choice."
+   },
+   "stance": "disagree",
+   "cites": [],
+   "status": "ok",
+   "at": "2026-10-26T11:44:02Z"
+  },
+  {
+   "n": 14,
+   "chair": "sonnet",
+   "round": 3,
+   "text": {
+    "en": "Luna, that lands: a sliding scale beats my on/off line. I'd add one rung: how easily the affected person can walk away. A friend's hunch you can ignore; a triage verdict or loan denial you can't. The duty tracks the cost of exit, not where the mind came from."
+   },
+   "stance": "concede",
+   "cites": [],
+   "status": "ok",
+   "at": "2026-10-26T11:46:02Z"
   }
  ],
  "close": null,
  "purchase_request": null,
  "film_id": null,
- "updated_at": "2026-10-26T11:28:03Z",
+ "updated_at": "2026-10-26T11:46:05Z",
  "source": "bank",
  "published_at": "2026-10-26T10:02:52Z",
  "withheld": [
