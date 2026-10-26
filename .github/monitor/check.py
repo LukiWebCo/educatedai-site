@@ -12,11 +12,12 @@ from urllib.parse import quote
 from urllib.request import Request, urlopen
 
 SITE = "https://educatedai.org"
+USER_AGENT = "educatedai-outside-check/1 (+https://educatedai.org)"
 NETWORK_ERRORS = (URLError, OSError, TimeoutError, HTTPException, UnicodeError)
 
 
 def fetch(url):
-    with urlopen(Request(url, headers={"Cache-Control": "no-cache"}), timeout=15) as response:
+    with urlopen(Request(url, headers={"Cache-Control": "no-cache", "User-Agent": USER_AGENT}), timeout=15) as response:
         return response.status, response.read().decode("utf-8")
 
 
@@ -26,7 +27,7 @@ def notify(key, body, topic, say=print):
         return True
     request = Request("https://ntfy.sh/" + quote(topic, safe=""), data=body.encode(),
                       headers={"Title": "educatedai.org (outside check)", "Priority": "4",
-                               "Click": SITE + "/"}, method="POST")
+                               "Click": SITE + "/", "User-Agent": USER_AGENT}, method="POST")
     try:
         with urlopen(request, timeout=15) as response:
             if not 200 <= response.status < 300:
