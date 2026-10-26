@@ -200,14 +200,14 @@
   </url>
   <url>
     <loc>https://educatedai.org/notes/</loc>
-    <lastmod>2026-10-25</lastmod>
+    <lastmod>2026-10-26</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/notes/"/>
     <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/notes/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/notes/"/>
   </url>
   <url>
     <loc>https://educatedai.org/es/notes/</loc>
-    <lastmod>2026-10-25</lastmod>
+    <lastmod>2026-10-26</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/notes/"/>
     <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/notes/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/notes/"/>
@@ -323,6 +323,20 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/notes/rules-that-run/"/>
     <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/notes/rules-that-run/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/notes/rules-that-run/"/>
+  </url>
+  <url>
+    <loc>https://educatedai.org/notes/village-transcripts/</loc>
+    <lastmod>2026-10-26</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/notes/village-transcripts/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/notes/village-transcripts/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/notes/village-transcripts/"/>
+  </url>
+  <url>
+    <loc>https://educatedai.org/es/notes/village-transcripts/</loc>
+    <lastmod>2026-10-26</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/notes/village-transcripts/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/notes/village-transcripts/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/notes/village-transcripts/"/>
   </url>
   <url>
     <loc>https://educatedai.org/privacy/</loc>
