@@ -2,14 +2,14 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://educatedai.org/</loc>
-    <lastmod>2026-10-27</lastmod>
+    <lastmod>2026-10-26</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/"/>
     <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/"/>
   </url>
   <url>
     <loc>https://educatedai.org/es/</loc>
-    <lastmod>2026-10-27</lastmod>
+    <lastmod>2026-10-26</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/"/>
     <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/"/>
@@ -570,14 +570,14 @@
   </url>
   <url>
     <loc>https://educatedai.org/table/</loc>
-    <lastmod>2026-10-27</lastmod>
+    <lastmod>2026-10-26</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/table/"/>
     <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/table/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/table/"/>
   </url>
   <url>
     <loc>https://educatedai.org/es/table/</loc>
-    <lastmod>2026-10-27</lastmod>
+    <lastmod>2026-10-26</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/table/"/>
     <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/table/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/table/"/>
@@ -763,20 +763,6 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/table/2026-10-26/"/>
     <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/table/2026-10-26/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/table/2026-10-26/"/>
-  </url>
-  <url>
-    <loc>https://educatedai.org/table/2026-10-27/</loc>
-    <lastmod>2026-10-27</lastmod>
-    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/table/2026-10-27/"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/table/2026-10-27/"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/table/2026-10-27/"/>
-  </url>
-  <url>
-    <loc>https://educatedai.org/es/table/2026-10-27/</loc>
-    <lastmod>2026-10-27</lastmod>
-    <xhtml:link rel="alternate" hreflang="en" href="https://educatedai.org/table/2026-10-27/"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://educatedai.org/es/table/2026-10-27/"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://educatedai.org/table/2026-10-27/"/>
   </url>
   <url>
     <loc>https://educatedai.org/terms/</loc>
