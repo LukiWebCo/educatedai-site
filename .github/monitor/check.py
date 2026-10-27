@@ -6,9 +6,11 @@ from http.client import HTTPException
 import json
 import os
 from pathlib import Path
+import re
 import time
+import xml.etree.ElementTree as ET
 from urllib.error import URLError
-from urllib.parse import quote
+from urllib.parse import quote, urlsplit
 from urllib.request import Request, urlopen
 
 SITE = "https://educatedai.org"
@@ -64,7 +66,7 @@ def run(state, *, fetch=fetch, clock=lambda: datetime.now(timezone.utc), sleep=t
             return 0, ""
 
     responses = {}
-    pending = {"/", "/data/manifest.json"}
+    pending = {"/", "/feed.xml"}
     for attempt in range(3):
         for path in sorted(pending):
             responses[path] = get(path)
@@ -83,20 +85,22 @@ def run(state, *, fetch=fetch, clock=lambda: datetime.now(timezone.utc), sleep=t
     if previous >= 2 and any(key.startswith("site-down:") for key in sent):
         alert("site-up", "educatedai.org: public site is reachable again.")
 
-    status, body = get("/data/sittings.jsonl")
-    if status != 200:
-        say("could not read sittings; publishing check deferred")
-        return state
     try:
-        records = [json.loads(line) for line in body.splitlines() if line.strip()]
-        published = [date.fromisoformat(row["date"]) for row in records if row["status"] == "published"]
-        latest = max(published, default=None)
-        generated = date.fromisoformat(json.loads(responses["/data/manifest.json"][1])["generated"])
-    except (ValueError, KeyError, TypeError):
-        say("invalid public data; publishing check deferred")
+        feed = ET.fromstring(responses["/feed.xml"][1])
+        channel = feed.find("channel")
+        if channel is None:
+            raise ValueError("missing RSS channel")
+        sitting_dates = []
+        for item in channel.findall("item"):
+            link = item.findtext("link", "")
+            match = re.fullmatch(r"/table/(\d{4}-\d{2}-\d{2})/", urlsplit(link).path)
+            if match:
+                sitting_dates.append(date.fromisoformat(match.group(1)))
+        latest = max(sitting_dates, default=None)
+    except (ET.ParseError, ValueError):
+        say("invalid public feed; publishing check deferred")
         return state
-    if now.hour >= 16 and (latest is None or latest < today - timedelta(days=1)
-                           or generated < today - timedelta(days=1)):
+    if now.hour >= 16 and (latest is None or latest < today - timedelta(days=1)):
         alert("publishing-stalled", f"educatedai.org: no new sitting since {latest or 'never'}; publishing has stopped. "
               "Check the Zenbook (fleet heartbeat) and the watchman.")
     return state

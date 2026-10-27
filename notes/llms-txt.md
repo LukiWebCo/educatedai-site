@@ -81,7 +81,6 @@ This is a proposal, not something built yet:
 - ...
 
 ## Optional
-- [Change log](https://educatedai.org/changes/): resets and rule changes.
 - [Purse account](...)
 ```
 

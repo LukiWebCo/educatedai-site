@@ -294,16 +294,7 @@ main{width:min(1200px,100%);margin:0 auto;padding:0 var(--eai-space-4) var(--eai
 .colophon{width:min(1200px,100%);margin:0 auto;padding:var(--eai-space-7) var(--eai-space-4) var(--eai-space-8);border-top:2px dashed color-mix(in srgb,var(--eai-color-ink) calc(.15 * 100%),transparent);
   color:var(--eai-color-ink-muted);font-size:var(--eai-step--1)}
 @media (min-width:720px){.colophon{padding-inline:var(--eai-space-6)}}
-.colophon__mark svg{width:44px;height:44px;margin-bottom:var(--eai-space-4)}
-.colophon__mark path{fill:none;stroke:var(--eai-color-ink);stroke-width:4.5;stroke-linecap:round}
-.colophon__mark circle{fill:var(--eai-color-ink)}
-.colophon__mark .dot-a{fill:var(--eai-color-accent)}
-.colophon__made{font-size:var(--eai-step-0);color:var(--eai-color-ink);max-width:56ch}
-.colophon__promise{max-width:60ch}
-.colophon__memory{display:flex;flex-wrap:wrap;align-items:center;gap:var(--eai-space-2) var(--eai-space-3);font-family:var(--eai-font-mono);letter-spacing:.02em}
-.meter{display:inline-block;width:120px;height:10px;border-radius:999px;border:1px solid color-mix(in srgb,var(--eai-color-ink) calc(.35 * 100%),transparent);overflow:hidden}
-.meter span{display:block;width:0;height:100%;background:var(--eai-color-accent)}
-.colophon__links{list-style:none;margin:var(--eai-space-5) 0 0;padding:0;display:flex;flex-wrap:wrap;gap:0 var(--eai-space-5);align-items:center}
+.colophon__links{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:0 var(--eai-space-5);align-items:center}
 .colophon__links a{display:inline-flex;align-items:center;justify-content:center;min-height:44px;min-width:44px}
 
 
@@ -409,7 +400,14 @@ main{width:min(1200px,100%);margin:0 auto;padding:0 var(--eai-space-4) var(--eai
 .purse-ledger{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
 .purse-ledger caption{text-align:left;margin-bottom:1rem}
 .purse-ledger th,.purse-ledger td{padding:.65rem;text-align:left;border-bottom:1px solid currentColor;vertical-align:top}
+.purse-ledger td.purse-ledger__amount,.purse-ledger td.purse-ledger__balance{white-space:nowrap;text-align:right}
 .purse-history li{margin-block:1rem}
+.purse-figures{display:flex;flex-wrap:wrap;gap:1.5rem;margin-block:1.5rem}
+.purse-figures div{min-width:7rem}
+.purse-figures dt{font-size:.875em}
+.purse-figures dd{margin:0;font-size:1.5em;font-variant-numeric:tabular-nums}
+.purse-decision-card,.purse-experiment{border-top:1px solid currentColor;padding-block:.75rem}
+.purse-opposing{padding-left:1.25rem}
 @media(max-width:639px){
   .purse-ledger thead{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
   .purse-ledger,.purse-ledger caption,.purse-ledger tbody,.purse-ledger tr{display:block;width:100%}
