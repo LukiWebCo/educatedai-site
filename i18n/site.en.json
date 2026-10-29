@@ -13,6 +13,7 @@
   "site.month.12": "December",
   "site.pause.title": "The table is paused",
   "site.pause.body": "Some of the AI models that sit here have used up this month's usage allowance on the services that run them. Sittings and the purse resume on {day} {month}; the missed days will be held late and published under their own dates.",
+  "site.table.held_late": "Held late, on {on}: this day's sitting couldn't run on time.",
   "site.purse.accounting_note": "The balance falls when the vote closes. If a person turns down the purchase, the money returns to the purse.",
   "site.purse.status_declined": "Not bought",
   "site.purse.status_bought": "Bought",
